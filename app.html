@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Reliqt — RWA Collectibles</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8F9FC;
+  --bg1:#F0F2F8;
+  --surface:#FFFFFF;
+  --surface2:#F5F6FA;
+  --border:rgba(0,0,0,0.07);
+  --border2:rgba(0,82,255,0.15);
+  --text:#0D0F1A;
+  --text2:#6B7080;
+  --text3:#A0A5B8;
+  --accent:#0052FF;
+  --accent2:#1A6BFF;
+  --green:#16A34A;
+  --red:#DC2626;
+  --gold:#D4A843;
+  --font:'Geist',sans-serif;
+  --mono:'Geist Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;flex-direction:column;overflow-x:hidden}
+
+/* ── NAV ── */
+.nav{
+  height:56px;flex-shrink:0;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 20px;gap:8px;
+  position:sticky;top:0;z-index:100;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:8px;
+  margin-right:16px;text-decoration:none;
+}
+.nav-logo-mark{
+  width:28px;height:28px;
+  background:linear-gradient(135deg,var(--accent),#003FCC);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.nav-tabs{display:flex;align-items:center;gap:2px;flex:1}
+.nav-tab{
+  padding:6px 14px;border-radius:7px;
+  font-size:13px;font-weight:500;
+  color:var(--text2);border:none;background:none;
+  cursor:pointer;transition:all 0.15s;
+  letter-spacing:-0.01em;white-space:nowrap;
+}
+.nav-tab:hover{background:var(--bg1);color:var(--text)}
+.nav-tab.active{background:rgba(0,82,255,0.08);color:var(--accent);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nav-pts{
+  font-family:var(--mono);font-size:12px;
+  color:var(--text2);
+  background:var(--bg1);
+  padding:5px 10px;border-radius:6px;
+}
+.nav-pts span{color:var(--accent);font-weight:600}
+.nav-wallet{
+  display:flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:8px;
+  padding:7px 14px;font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 2px 8px rgba(0,82,255,0.25);
+}
+.nav-wallet:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,82,255,0.35)}
+.nav-wallet svg{width:14px;height:14px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── PAGES ── */
+.page{display:none;padding:20px;max-width:1200px;margin:0 auto;width:100%}
+.page.active{display:block;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:20px;flex-wrap:wrap;
+}
+.filter-btn{
+  padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+  font-family:var(--mono);letter-spacing:0.02em;
+}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.filter-search{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:8px;padding:6px 12px;
+  transition:border-color 0.15s;
+}
+.filter-search:focus-within{border-color:var(--accent)}
+.filter-search svg{color:var(--text3);flex-shrink:0}
+.filter-search input{
+  border:none;background:none;outline:none;
+  font-family:var(--font);font-size:13px;color:var(--text);
+  width:160px;
+}
+.filter-search input::placeholder{color:var(--text3)}
+
+/* ── CARD GRID ── */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:14px;
+}
+
+/* ── MARKET CARD ── */
+.mc{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  cursor:pointer;transition:all 0.2s;
+}
+.mc:hover{
+  border-color:rgba(0,82,255,0.25);
+  box-shadow:0 8px 32px rgba(0,82,255,0.1);
+  transform:translateY(-3px);
+}
+.mc-img{
+  height:200px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-size:48px;
+  background:#0a0a1a;
+  overflow:hidden;
+}
+.mc-img svg { display:block; flex-shrink:0; }
+.mc-grade{
+  position:absolute;top:8px;right:8px;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  color:#fff;font-family:var(--mono);font-size:9px;
+  padding:3px 8px;border-radius:4px;letter-spacing:0.1em;font-weight:500;
+}
+.mc-badge{
+  position:absolute;top:8px;left:8px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  padding:3px 8px;border-radius:4px;letter-spacing:0.08em;
+}
+.mc-badge.hot{background:rgba(220,38,38,0.12);color:#DC2626;border:1px solid rgba(220,38,38,0.2)}
+.mc-badge.new{background:rgba(0,82,255,0.12);color:var(--accent);border:1px solid rgba(0,82,255,0.2)}
+.mc-badge.rare{background:rgba(212,168,67,0.12);color:var(--gold);border:1px solid rgba(212,168,67,0.2)}
+.mc-body{padding:12px}
+.mc-cat{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px}
+.mc-name{font-size:14px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-set{font-size:11px;color:var(--text3);margin-bottom:10px}
+.mc-prog{height:3px;background:rgba(0,82,255,0.1);border-radius:2px;margin-bottom:10px}
+.mc-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 1s ease}
+.mc-footer{display:flex;align-items:center;justify-content:space-between}
+.mc-price{font-size:17px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+.mc-price small{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;font-weight:400;letter-spacing:0}
+.mc-buy{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:7px;
+  padding:6px 14px;font-family:var(--font);
+  font-size:12px;font-weight:700;cursor:pointer;
+  transition:all 0.15s;box-shadow:0 2px 6px rgba(0,82,255,0.2);
+  letter-spacing:-0.01em;
+}
+.mc-buy:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,82,255,0.3)}
+
+/* ── GACHA PAGE ── */
+.gacha-hero{
+  background:linear-gradient(135deg,#EEF3FF,#F5F0FF);
+  border:1.5px solid rgba(0,82,255,0.1);
+  border-radius:16px;padding:32px;
+  text-align:center;margin-bottom:24px;
+}
+.gacha-hero h2{font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:8px}
+.gacha-hero p{font-size:14px;color:var(--text2);margin-bottom:20px}
+.gacha-packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.gp{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:all 0.2s;
+}
+.gp:hover{border-color:rgba(0,82,255,0.25);box-shadow:0 8px 24px rgba(0,82,255,0.1);transform:translateY(-2px)}
+.gp-img{
+  height:120px;display:flex;align-items:center;justify-content:center;
+  font-size:44px;background:linear-gradient(135deg,#EEF3FF,#E8F4FF);
+}
+.gp-body{padding:16px}
+.gp-name{font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}
+.gp-desc{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.gp-stats{display:flex;gap:12px;margin-bottom:14px}
+.gp-stat{flex:1;background:var(--bg1);border-radius:6px;padding:8px;text-align:center}
+.gp-stat-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.gp-stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+.gp-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:8px;
+  padding:11px;font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 2px 8px rgba(0,82,255,0.25);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.gp-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,82,255,0.35)}
+
+/* ── LEADERBOARD ── */
+.lb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.lb-header h2{font-size:20px;font-weight:800;letter-spacing:-0.03em}
+.lb-table{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+.lb-head{
+  display:grid;grid-template-columns:60px 1fr 120px 100px;
+  padding:12px 20px;
+  background:var(--bg1);
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.lb-row{
+  display:grid;grid-template-columns:60px 1fr 120px 100px;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  align-items:center;transition:background 0.15s;font-size:13px;
+}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:var(--bg1)}
+.lb-row.you{background:rgba(0,82,255,0.04);border-left:3px solid var(--accent)}
+.lb-rank{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text2)}
+.lb-wallet{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.lb-pts{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)}
+.lb-txns{font-family:var(--mono);font-size:12px;color:var(--text3)}
+.you-badge{
+  font-size:9px;background:rgba(0,82,255,0.1);color:var(--accent);
+  padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:600;
+}
+
+/* ── PORTFOLIO ── */
+.pf-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.pf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.pf-stat{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:18px;
+}
+.pf-stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+.pf-stat-val{font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+.pf-stat-val.blue{color:var(--accent)}
+.pf-stat-val.green{color:var(--green)}
+.pf-empty{
+  text-align:center;padding:60px 20px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;
+}
+.pf-empty p{font-size:14px;color:var(--text2);margin-bottom:16px}
+.pf-holding{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:16px;
+  display:grid;grid-template-columns:48px 1fr auto;
+  gap:12px;align-items:center;margin-bottom:10px;
+}
+.pf-h-img{
+  width:48px;height:48px;border-radius:8px;
+  background:linear-gradient(135deg,#EEF3FF,#E8EEFF);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.pf-h-name{font-size:14px;font-weight:700;letter-spacing:-0.02em}
+.pf-h-set{font-size:11px;color:var(--text3);margin-top:2px}
+.pf-h-tokens{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);text-align:right}
+.pf-h-val{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right;margin-top:2px}
+
+/* ── REFERRAL ── */
+.ref-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:24px;margin-bottom:14px;
+}
+.ref-code-box{
+  background:var(--bg1);border:1.5px solid rgba(0,82,255,0.15);
+  border-radius:10px;padding:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin:16px 0;
+}
+.ref-code{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent);letter-spacing:0.1em}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  font-size:13px;font-weight:500;
+  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+  animation:slideIn 0.25s ease;
+  display:flex;align-items:center;gap:8px;
+  max-width:300px;
+}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--accent)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:8000;
+  background:rgba(13,15,26,0.5);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+.modal-box{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;width:100%;max-width:420px;
+  box-shadow:0 24px 60px rgba(0,82,255,0.12);
+  animation:slideUp 0.25s ease;overflow:hidden;
+}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-size:17px;font-weight:700;letter-spacing:-0.02em}
+.modal-close{background:var(--bg1);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:14px;color:var(--text2);transition:all 0.15s}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:0 20px 20px}
+
+/* ── WALLET MODAL ── */
+.wallet-option{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:10px;padding:13px;cursor:pointer;
+  width:100%;text-align:left;transition:all 0.15s;
+  margin-bottom:8px;
+}
+.wallet-option:last-child{margin-bottom:0}
+.wallet-option:hover{border-color:var(--accent);background:rgba(0,82,255,0.03)}
+.wallet-icon{width:36px;height:36px;border-radius:8px;flex-shrink:0;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px}
+.wallet-name{font-size:14px;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
+.wallet-desc{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.wallet-arrow{margin-left:auto;color:var(--accent);font-size:16px}
+.wallet-status{
+  text-align:center;font-size:12px;color:var(--accent);
+  font-family:var(--mono);min-height:20px;margin-bottom:12px;
+}
+
+/* ── BUY MODAL ── */
+.buy-card-info{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg1);border-radius:10px;padding:14px;margin-bottom:16px;
+}
+.buy-card-emoji{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#EEF3FF,#E8EEFF);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.buy-card-name{font-size:15px;font-weight:700;letter-spacing:-0.02em}
+.buy-card-grade{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;margin-top:2px}
+.buy-card-price{margin-left:auto;font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-0.02em}
+.buy-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.buy-input{
+  width:100%;background:var(--bg1);border:1.5px solid var(--border);
+  color:var(--text);font-family:var(--font);font-size:16px;font-weight:600;
+  padding:11px 14px;border-radius:8px;outline:none;transition:border-color 0.15s;
+  margin-bottom:12px;
+}
+.buy-input:focus{border-color:var(--accent)}
+.buy-summary{
+  background:var(--bg1);border-radius:8px;padding:12px 14px;margin-bottom:16px;
+}
+.buy-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.buy-row span:first-child{color:var(--text2)}
+.buy-row span:last-child{font-weight:600;font-family:var(--mono)}
+.buy-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;
+  padding:14px;font-family:var(--font);font-size:15px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 4px 14px rgba(0,82,255,0.3);
+}
+.buy-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,82,255,0.4)}
+.buy-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+/* ── GACHA RESULT ── */
+.gacha-result-overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(13,15,26,0.7);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.gacha-result-overlay.open{display:flex;animation:fadeIn 0.3s ease}
+.gacha-result-box{
+  background:var(--surface);border-radius:20px;
+  padding:40px 32px;text-align:center;width:100%;max-width:340px;
+  box-shadow:0 32px 80px rgba(0,82,255,0.15);
+  animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.gr-emoji{font-size:72px;margin-bottom:12px;display:block}
+.gr-rarity{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;font-weight:700;margin-bottom:8px;
+}
+.gr-rarity.legendary{color:var(--gold)}
+.gr-rarity.epic{color:#9333EA}
+.gr-rarity.rare{color:var(--accent)}
+.gr-rarity.common{color:var(--text3)}
+.gr-name{font-size:20px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
+.gr-val{font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:20px}
+.gr-btn{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;padding:12px 32px;
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;box-shadow:0 4px 14px rgba(0,82,255,0.3);
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .nav-tabs{display:none}
+  .page{padding:12px}
+  .card-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .pf-stats{grid-template-columns:1fr 1fr}
+  .lb-head,.lb-row{grid-template-columns:40px 1fr 100px}
+  .lb-row>:last-child{display:none}
+  .lb-head>:last-child{display:none}
+  .mobile-nav{display:flex !important}
+}
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(255,255,255,0.97);
+  border-top:1px solid var(--border);
+  padding:6px 2px max(10px,env(safe-area-inset-bottom)) 2px;
+  width:100%;
+}
+.mob-tabs{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  overflow:hidden;
+}
+.mob-tab{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:none;border:none;cursor:pointer;
+  padding:3px 0;
+  min-width:0;flex:1 1 0;
+  color:var(--text3);transition:color 0.15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.mob-tab.active{color:var(--accent)}
+.mob-tab svg{width:20px;height:20px;flex-shrink:0}
+.mob-tab span{
+  font-size:8.5px;font-weight:600;
+  font-family:var(--mono);
+  white-space:nowrap;
+  display:block;
+  width:100%;
+  text-align:center;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ── NO HORIZONTAL SCROLL (DESKTOP + MOBILE) ── */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  overscroll-behavior: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
+}
+/* Don't break SVG card art with max-width */
+* { box-sizing: border-box; }
+img, video, iframe, embed { max-width: 100% !important; }
+
+/* ── MOBILE BOTTOM NAV FIX ── */
+@media(max-width: 768px) {
+  /* Content padding above bottom nav */
+  .main { padding-bottom: 80px !important; }
+  .page { padding: 12px 14px 20px !important; }
+  .nav-pts { display: none !important; }
+  .nav-right { gap: 6px !important; }
+  .nav-wallet { 
+    padding: 6px 10px !important; 
+    font-size: 12px !important;
+  }
+  .nav-wallet svg { display: none !important; }
+  .mc-img { height: 160px !important; }
+
+  /* Portfolio stats - 2 columns on mobile */
+  .pf-stats { 
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .pf-stat { padding: 12px 10px !important; }
+  .pf-stat-val { font-size: 16px !important; }
+  .pf-stat-label { font-size: 9px !important; }
+
+  /* Page padding */
+  .page { 
+    padding: 12px 12px 16px !important;
+  }
+
+  /* Filter bar scroll */
+  .filter-bar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-search { 
+    flex-shrink: 0;
+    min-width: 140px;
+  }
+
+  /* Card grid 2 cols */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .mc-img { height: 130px !important; }
+  .mc-name { font-size: 13px !important; }
+
+  /* Gacha packs */
+  .gacha-packs { grid-template-columns: 1fr !important; }
+  .gacha-hero { padding: 20px !important; }
+  .gacha-hero h2 { font-size: 22px !important; }
+
+  /* Leaderboard */
+  .lb-head, .lb-row {
+    grid-template-columns: 44px 1fr 90px !important;
+    padding: 10px 12px !important;
+  }
+  .lb-head > :last-child,
+  .lb-row > :last-child { display: none !important; }
+
+  /* Modal */
+  .modal-box {
+    margin: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Referral */
+  .ref-code { font-size: 20px !important; }
+}
+
+/* ── DESKTOP FIXES ── */
+@media(min-width: 769px) {
+  .mobile-nav { display: none !important; }
+  .main { padding-bottom: 0 !important; }
+  
+  /* Center content */
+  .page {
+    padding: 24px 32px !important;
+  }
+}
+
+/* ── PORTFOLIO EMPTY STATE FIX ── */
+.pf-empty {
+  padding: 40px 20px !important;
+  border-radius: 14px !important;
+}
+.pf-empty p {
+  font-size: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+/* ── GENERAL POLISH ── */
+.filter-btn { white-space: nowrap; flex-shrink: 0; }
+.nav-logo-text { white-space: nowrap; }
+.lb-wallet { 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ── TRADE PAGE ── */
+#page-trade {
+  padding: 0 !important;
+  max-width: 100% !important;
+  height: calc(100vh - 56px);
+  display: none;
+}
+#page-trade.active {
+  display: grid !important;
+  grid-template-columns: 260px 1fr 300px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+@media(max-width:768px){
+  #page-trade.active {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr auto;
+    height: calc(100vh - 56px - 60px);
+  }
+  .tr-token-list { display: none !important; }
+  .tr-trade-panel { max-height: 300px; overflow-y: auto; }
+}
+
+/* Token List */
+.tr-token-list {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface);
+}
+.tr-tl-head {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.tr-tl-title { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: 0.06em; text-transform: uppercase; font-family: var(--mono); }
+.tr-tl-count { font-family: var(--mono); font-size: 10px; color: var(--text3); background: var(--bg1); padding: 2px 7px; border-radius: 4px; }
+.tr-tl-scroll { overflow-y: auto; flex: 1; }
+.tr-tl-scroll::-webkit-scrollbar { width: 3px; }
+.tr-tl-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.tr-tl-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+}
+.tr-tl-item:hover { background: rgba(0,82,255,0.03); }
+.tr-tl-item.active { background: rgba(0,82,255,0.06); border-left: 2px solid var(--accent); }
+.tr-tl-emoji { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#EEF3FF,#E8EEFF); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.tr-tl-symbol { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+.tr-tl-name { font-size: 10px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tr-tl-price { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text); }
+.tr-tl-change { font-family: var(--mono); font-size: 10px; font-weight: 600; }
+.tr-tl-change.up { color: var(--green); }
+.tr-tl-change.down { color: var(--red); }
+
+/* Chart Area */
+.tr-chart-area {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg);
+}
+.tr-ca-header {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  background: var(--surface);
+}
+.tr-ca-emoji { width: 40px; height: 40px; border-radius: 9px; background: linear-gradient(135deg,#EEF3FF,#E8EEFF); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.tr-ca-symbol { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+.tr-ca-subname { font-size: 11px; color: var(--text2); font-family: var(--mono); margin-top: 1px; }
+.tr-ca-priceblock { margin-left: auto; text-align: right; }
+.tr-ca-price { font-size: 22px; font-weight: 800; letter-spacing: -0.04em; }
+.tr-ca-change { font-family: var(--mono); font-size: 12px; font-weight: 600; margin-top: 1px; }
+.tr-ca-change.up { color: var(--green); }
+.tr-ca-change.down { color: var(--red); }
+
+.tr-stats-bar {
+  display: flex; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; background: var(--surface);
+  overflow-x: auto;
+}
+.tr-stats-bar::-webkit-scrollbar { display: none; }
+.tr-stat {
+  flex: 1; min-width: 80px; padding: 8px 12px;
+  border-right: 1px solid var(--border);
+}
+.tr-stat:last-child { border-right: none; }
+.tr-stat-label { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+.tr-stat-val { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.tr-stat-val.accent { color: var(--accent); }
+.tr-stat-val.green { color: var(--green); }
+
+.tr-chart-tabs {
+  display: flex; gap: 2px; padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; align-items: center;
+  background: var(--bg);
+}
+.tr-chart-tab {
+  padding: 3px 9px; border-radius: 5px;
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text3); cursor: pointer; border: none; background: none; transition: all 0.15s;
+}
+.tr-chart-tab.active { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.tr-dex-link {
+  margin-left: auto; font-family: var(--mono); font-size: 11px;
+  color: var(--accent); text-decoration: none;
+  display: flex; align-items: center; gap: 4px;
+}
+
+.tr-chart-wrap { flex: 1; overflow: hidden; padding: 8px; }
+#trChartSvg { width: 100%; height: 100%; display: block; }
+
+/* Reserve bar at bottom */
+.tr-card-bar {
+  border-top: 1px solid var(--border); padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface); flex-shrink: 0;
+}
+.tr-cb-emoji { width: 44px; height: 56px; border-radius: 6px; background: linear-gradient(135deg,#EEF3FF,#E8EEFF); display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid var(--border); flex-shrink: 0; }
+.tr-cb-name { font-size: 13px; font-weight: 700; letter-spacing: -0.02em; }
+.tr-cb-set { font-size: 10px; color: var(--text2); font-family: var(--mono); margin-top: 1px; }
+.tr-cb-tags { display: flex; gap: 5px; margin-top: 5px; }
+.tr-cb-tag { font-family: var(--mono); font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.tr-cb-tag.grade { background: rgba(0,82,255,0.08); color: var(--accent); border: 1px solid rgba(0,82,255,0.15); }
+.tr-cb-tag.vault { background: rgba(22,163,74,0.08); color: var(--green); border: 1px solid rgba(22,163,74,0.15); }
+
+/* Trade Panel */
+.tr-trade-panel {
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; background: var(--surface);
+}
+.tr-trade-panel::-webkit-scrollbar { width: 3px; }
+.tr-trade-panel::-webkit-scrollbar-thumb { background: var(--border2); }
+.tr-tp-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.tr-tp-tab {
+  flex: 1; padding: 12px; text-align: center;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  border: none; background: none; color: var(--text2);
+  transition: all 0.15s; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; letter-spacing: -0.01em;
+}
+.tr-tp-tab.active.buy { color: var(--green); border-color: var(--green); }
+.tr-tp-tab.active.sell { color: var(--red); border-color: var(--red); }
+
+.tr-tp-body { padding: 14px; }
+.tr-tp-label { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; }
+
+.tr-mp-row {
+  background: var(--bg1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tr-mp-label { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.tr-mp-val { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text); }
+
+.tr-input-box {
+  background: var(--bg1); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.tr-input-box:focus-within { border-color: rgba(0,82,255,0.3); }
+.tr-input-sublabel { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+.tr-input { width: 100%; background: none; border: none; outline: none; font-family: var(--mono); font-size: 16px; font-weight: 600; color: var(--text); }
+.tr-input-hint { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+.tr-slider {
+  width: 100%; height: 3px; border-radius: 2px;
+  -webkit-appearance: none; appearance: none;
+  background: linear-gradient(90deg, var(--accent) var(--pct,0%), var(--bg1) var(--pct,0%));
+  margin: 10px 0; cursor: pointer; outline: none;
+}
+.tr-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent);
+  border: 2px solid #fff; cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(0,82,255,0.2);
+}
+.tr-pct-row {
+  display: flex; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.tr-pct-btn {
+  font-family: var(--mono); font-size: 10px; color: var(--text3);
+  background: var(--bg1); border: 1px solid var(--border);
+  border-radius: 4px; padding: 3px 8px; cursor: pointer; transition: all 0.15s;
+}
+.tr-pct-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.tr-summary {
+  background: var(--bg1); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 12px; margin-bottom: 12px;
+}
+.tr-sum-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; }
+.tr-sum-row span:first-child { color: var(--text2); font-family: var(--mono); font-size: 10px; }
+.tr-sum-row span:last-child { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.tr-sum-total {
+  display: flex; justify-content: space-between;
+  padding: 7px 0 0; margin-top: 4px;
+  border-top: 1px solid var(--border); font-weight: 700;
+}
+.tr-sum-total span:last-child { color: var(--accent); font-family: var(--mono); }
+
+.tr-buy-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 8px;
+  font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: -0.01em;
+}
+.tr-buy-btn.buy { background: linear-gradient(135deg,#16A34A,#15803D); color: #fff; box-shadow: 0 3px 10px rgba(22,163,74,0.3); }
+.tr-buy-btn.buy:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(22,163,74,0.4); }
+.tr-buy-btn.sell { background: linear-gradient(135deg,#DC2626,#B91C1C); color: #fff; box-shadow: 0 3px 10px rgba(220,38,38,0.3); }
+.tr-buy-btn.sell:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(220,38,38,0.4); }
+.tr-buy-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+.tr-reserve { padding: 14px; border-top: 1px solid var(--border); }
+.tr-reserve-title { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+.tr-rc {
+  background: var(--bg1); border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.tr-rc-img { height: 90px; background: linear-gradient(135deg,#EEF3FF,#E8EEFF); display: flex; align-items: center; justify-content: center; font-size: 34px; position: relative; }
+.tr-rc-grade { position: absolute; bottom: 6px; right: 8px; background: rgba(0,82,255,0.1); color: var(--accent); font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 4px; border: 1px solid rgba(0,82,255,0.2); }
+.tr-rc-body { padding: 10px; }
+.tr-rc-name { font-size: 12px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 2px; }
+.tr-rc-set { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+.tr-rc-row { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; }
+.tr-rc-row span:first-child { color: var(--text3); font-family: var(--mono); font-size: 10px; }
+.tr-rc-row span:last-child { font-family: var(--mono); font-weight: 600; font-size: 10px; }
+
+</style>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0052FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Reliqt">
+<link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_10_7.jpeg">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-mark" style="background:transparent;width:32px;height:32px;padding:0"><svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="38" y="5" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 50 17)"/><rect x="65" y="25" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 77 37)"/><rect x="65" y="55" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 77 67)"/><rect x="38" y="70" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 50 82)"/><rect x="10" y="55" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 22 67)"/><rect x="10" y="25" width="24" height="24" rx="5" fill="#0052FF" transform="rotate(45 22 37)"/></svg></div>
+    <span class="nav-logo-text">Reliqt</span>
+  </a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('market',this)">Marketplace</button>
+    <button class="nav-tab" onclick="showPage('trade',this)">
+      <span style="display:flex;align-items:center;gap:5px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        Trade
+      </span>
+    </button>
+    <button class="nav-tab" onclick="showPage('gacha',this)">Gacha</button>
+    <button class="nav-tab" onclick="showPage('leaderboard',this)">Leaderboard</button>
+    <button class="nav-tab" onclick="showPage('portfolio',this)">Portfolio</button>
+    <button class="nav-tab" onclick="showPage('referral',this)">Referral</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-pts" id="navPts"><span id="ptsDisplay">0</span> pts</div>
+    <button class="nav-wallet" id="walletBtn" onclick="currentUser ? disconnectWallet() : openWalletModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <span id="walletLabel">Connect Wallet</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main" id="mainContent">
+
+  <!-- MARKETPLACE -->
+  <div class="page active" id="page-market">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+      <button class="filter-btn" onclick="filterCards('pokemon',this)">Pokémon</button>
+      <button class="filter-btn" onclick="filterCards('sport',this)">Sports</button>
+      <button class="filter-btn" onclick="filterCards('anime',this)">Anime</button>
+      <button class="filter-btn" onclick="filterCards('hot',this)">🔥 Hot</button>
+      <div class="filter-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search cards..." id="searchInput" oninput="searchCards(this.value)"/>
+      </div>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+
+  <!-- GACHA -->
+  <div class="page" id="page-gacha">
+    <div class="gacha-hero">
+      <h2>🎰 Gacha Packs</h2>
+      <p>Open packs for a chance to win rare PSA graded cards</p>
+    </div>
+    <div class="gacha-packs" id="gachaPacks"></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="page" id="page-leaderboard">
+    <div class="lb-header">
+      <h2>🏆 Leaderboard</h2>
+      <button onclick="loadLeaderboard()" style="background:var(--bg1);border:1.5px solid var(--border);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:var(--mono)">Refresh</button>
+    </div>
+    <div class="lb-table">
+      <div class="lb-head">
+        <div>Rank</div><div>Wallet</div><div>Points</div><div>Txns</div>
+      </div>
+      <div id="lbBody"></div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="page" id="page-portfolio">
+    <div class="pf-header">
+      <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.03em">My Portfolio</h2>
+      <button onclick="syncPortfolio()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-weight:600;font-family:var(--font)">Sync from Chain</button>
+    </div>
+    <div class="pf-stats">
+      <div class="pf-stat">
+        <div class="pf-stat-label">Total Value</div>
+        <div class="pf-stat-val blue" id="pfTotalVal">$0.00</div>
+      </div>
+      <div class="pf-stat">
+        <div class="pf-stat-label">Tokens Held</div>
+        <div class="pf-stat-val" id="pfTotalTokens">0</div>
+      </div>
+      <div class="pf-stat">
+        <div class="pf-stat-label">Points</div>
+        <div class="pf-stat-val green" id="pfPoints">0</div>
+      </div>
+    </div>
+    <div id="pfHoldings"></div>
+  </div>
+
+  <!-- REFERRAL -->
+  <div class="page" id="page-referral">
+    <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.03em;margin-bottom:16px">🎁 Referral Program</h2>
+
+    <div id="refNotConnected" style="display:none;text-align:center;padding:40px 20px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:16px">
+      <div style="font-size:40px;margin-bottom:12px">🔗</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">Connect Wallet First</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Connect your wallet to get your referral code</div>
+      <button onclick="openWalletModal()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer">Connect Wallet</button>
+    </div>
+
+    <div id="refConnected">
+    <div class="ref-card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Your Referral Code</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Invite friends and earn 500 pts each</div>
+      <div class="ref-code-box">
+        <div class="ref-code" id="refCode">—</div>
+        <button onclick="copyRefCode()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Copy</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="shareTwitter()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg1);border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.763l7.659-8.63L2.039 2.25H8.624l4.24 5.607zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Share on X
+        </button>
+        <button onclick="shareTelegram()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg1);border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.607c-.152.67-.554.834-1.12.518l-3.1-2.284-1.495 1.438c-.165.165-.304.304-.623.304l.222-3.16 5.754-5.196c-.054-.345-.387-.123L6.945 14.6l-3.06-.955c-.665-.207-.678-.665.138-.984l11.944-4.606c.554-.2 1.04.135.595 1.193z"/></svg>
+          Telegram
+        </button>
+      </div>
+    </div>
+    <div class="ref-card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Referral Stats</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--accent)" id="refCount">0</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Referrals</div>
+        </div>
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--green)" id="refPts">0</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Points</div>
+        </div>
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--gold)">500</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Per Referral</div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+
+  <!-- TRADE PAGE -->
+  <div class="page" id="page-trade">
+    <!-- Token List -->
+    <div class="tr-token-list">
+      <div class="tr-tl-head">
+        <span class="tr-tl-title">All Tokens</span>
+        <span class="tr-tl-count" id="trTokenCount">0</span>
+      </div>
+      <div class="tr-tl-scroll" id="trTokenList"></div>
+    </div>
+
+    <!-- Chart Area -->
+    <div class="tr-chart-area">
+      <div class="tr-ca-header">
+        <div class="tr-ca-emoji" id="trCaEmoji">🎴</div>
+        <div>
+          <div class="tr-ca-symbol" id="trCaSymbol">rLEBRON</div>
+          <div class="tr-ca-subname" id="trCaName">LeBron James</div>
+        </div>
+        <div class="tr-ca-priceblock">
+          <div class="tr-ca-price" id="trCaPrice">$1.24</div>
+          <div class="tr-ca-change up" id="trCaChange">+4.2%</div>
+        </div>
+      </div>
+
+      <div class="tr-stats-bar">
+        <div class="tr-stat"><div class="tr-stat-label">Market Cap</div><div class="tr-stat-val accent" id="trMcap">$12,400</div></div>
+        <div class="tr-stat"><div class="tr-stat-label">FDV</div><div class="tr-stat-val" id="trFdv">$12,400</div></div>
+        <div class="tr-stat"><div class="tr-stat-label">Supply</div><div class="tr-stat-val" id="trSupply">10K</div></div>
+        <div class="tr-stat"><div class="tr-stat-label">Card Value</div><div class="tr-stat-val accent" id="trCardVal">$12,400</div></div>
+        <div class="tr-stat"><div class="tr-stat-label">24h Vol</div><div class="tr-stat-val" id="trVol">—</div></div>
+      </div>
+
+      <div class="tr-chart-tabs">
+        <button class="tr-chart-tab active" onclick="trSetTf('1m',this)">1M</button>
+        <button class="tr-chart-tab" onclick="trSetTf('5m',this)">5M</button>
+        <button class="tr-chart-tab" onclick="trSetTf('15m',this)">15M</button>
+        <button class="tr-chart-tab" onclick="trSetTf('1h',this)">1H</button>
+        <button class="tr-chart-tab" onclick="trSetTf('1d',this)">1D</button>
+        <a id="trDexLink" href="#" target="_blank" class="tr-dex-link" style="display:none">
+          DexScreener ↗
+        </a>
+      </div>
+
+      <div class="tr-chart-wrap" id="trChartWrap">
+        <svg id="trChartSvg" style="width:100%;height:100%;display:block"></svg>
+        <iframe id="trDexFrame" style="display:none;width:100%;height:100%;border:none;border-radius:8px" allowtransparency="true"></iframe>
+      </div>
+
+      <div class="tr-card-bar">
+        <div class="tr-cb-emoji" id="trCbEmoji">🏀</div>
+        <div>
+          <div class="tr-cb-name" id="trCbName">LeBron James</div>
+          <div class="tr-cb-set" id="trCbSet">2003 Topps Chrome RC</div>
+          <div class="tr-cb-tags">
+            <span class="tr-cb-tag grade" id="trCbGrade">PSA 10</span>
+            <span class="tr-cb-tag vault">✓ VAULTED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Trade Panel -->
+    <div class="tr-trade-panel">
+
+      <!-- Uniswap Widget (shown for LIVE tokens) -->
+      <div id="trUniswapWidget" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+          <div style="font-size:11px;font-family:var(--mono);color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Swap via Uniswap</div>
+          <div style="font-size:12px;color:var(--text2)">Real on-chain swap · Powered by Uniswap V4</div>
+        </div>
+        <iframe
+          id="trUniswapFrame"
+          style="flex:1;border:none;width:100%;min-height:360px"
+          allow="clipboard-write"
+          src=""
+        ></iframe>
+        <div style="padding:8px 16px;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0">
+          <a id="trUniswapLink" href="#" target="_blank"
+            style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--accent);text-decoration:none;padding:8px;background:rgba(0,82,255,0.06);border-radius:8px;border:1px solid rgba(0,82,255,0.12)">
+            Open full Uniswap ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Custom panel (shown for non-live tokens) -->
+      <div id="trCustomPanel">
+      <div class="tr-tp-tabs">
+        <button class="tr-tp-tab active buy" id="trTabBuy" onclick="trSetTab('buy')">BUY</button>
+        <button class="tr-tp-tab sell" id="trTabSell" onclick="trSetTab('sell')">SELL</button>
+      </div>
+      <div class="tr-tp-body">
+        <div class="tr-mp-row">
+          <span class="tr-mp-label">Market Price</span>
+          <span class="tr-mp-val" id="trMpVal">1 rLEBRON = $1.24</span>
+        </div>
+
+        <div class="tr-tp-label">Amount</div>
+        <div class="tr-input-box">
+          <div class="tr-input-sublabel">You Pay (USDC)</div>
+          <input class="tr-input" type="number" id="trAmtIn" placeholder="0.00" oninput="trCalc()" min="0" step="0.01"/>
+          <div class="tr-input-hint">Balance: <span id="trBalIn">0.00 USDC</span></div>
+        </div>
+
+        <input type="range" class="tr-slider" id="trSlider" min="0" max="100" value="0" oninput="trSlide(this.value)"/>
+        <div class="tr-pct-row">
+          <button class="tr-pct-btn" onclick="trSlide(25)">25%</button>
+          <button class="tr-pct-btn" onclick="trSlide(50)">50%</button>
+          <button class="tr-pct-btn" onclick="trSlide(75)">75%</button>
+          <button class="tr-pct-btn" onclick="trSlide(100)">MAX</button>
+        </div>
+
+        <div class="tr-input-box">
+          <div class="tr-input-sublabel">You Receive</div>
+          <input class="tr-input" type="number" id="trAmtOut" placeholder="0" readonly/>
+          <div class="tr-input-hint" id="trSymbolHint">rLEBRON tokens</div>
+        </div>
+
+        <div class="tr-summary">
+          <div class="tr-sum-row"><span>Token Price</span><span id="trSumPrice">$1.24</span></div>
+          <div class="tr-sum-row"><span>Price Impact</span><span id="trSumImpact">~0.1%</span></div>
+          <div class="tr-sum-row"><span>Gas Fee</span><span>~$0.02</span></div>
+          <div class="tr-sum-total">
+            <span>Total</span>
+            <span id="trSumTotal">$0.00</span>
+          </div>
+        </div>
+
+        <button class="tr-buy-btn buy" id="trBtn" onclick="trExecute()" disabled>
+          Connect Wallet to Trade
+        </button>
+      </div>
+      </div>
+
+      <div class="tr-reserve">
+        <div class="tr-reserve-title">Reserve Details</div>
+        <div class="tr-rc">
+          <div class="tr-rc-img" id="trRcImg">🏀<div class="tr-rc-grade" id="trRcGrade">PSA 10</div></div>
+          <div class="tr-rc-body">
+            <div class="tr-rc-name" id="trRcName">LeBron James</div>
+            <div class="tr-rc-set" id="trRcSet">2003 Topps Chrome RC</div>
+            <div class="tr-rc-row"><span>Card Value</span><span id="trRcVal">$12,400</span></div>
+            <div class="tr-rc-row"><span>Pop Report</span><span id="trRcPop">12 known</span></div>
+            <div class="tr-rc-row"><span>Token Supply</span><span>10,000</span></div>
+            <div class="tr-rc-row"><span>Vault Status</span><span style="color:var(--green)">✓ Secured</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mob-tabs">
+    <button class="mob-tab active" onclick="showPage('market',this)" data-page="market">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      <span>Market</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('trade',this)" data-page="trade">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      <span>Trade</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('gacha',this)" data-page="gacha">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span>Gacha</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('leaderboard',this)" data-page="leaderboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
+      <span>Ranks</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('portfolio',this)" data-page="portfolio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <span>Portf.</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('referral',this)" data-page="referral">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <span>Refer</span>
+    </button>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="modal-overlay" id="walletModal" onclick="if(event.target===this)closeWalletModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Connect Wallet</div>
+      <button class="modal-close" onclick="closeWalletModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wallet-status" id="walletStatus"></div>
+      <button class="wallet-option" onclick="connectWallet('metamask')">
+        <div class="wallet-icon" style="background:#FFF8F0;border:1px solid #E2761B33;padding:4px"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fox ears -->
+  <path d="M4 4L10 12L7 8Z" fill="#E2761B"/>
+  <path d="M24 4L18 12L21 8Z" fill="#E2761B"/>
+  <!-- Fox head -->
+  <path d="M4 4L10 12L14 9L18 12L24 4L20 14L14 16L8 14Z" fill="#E4761B"/>
+  <!-- Chin -->
+  <path d="M8 14L10 19L14 21L18 19L20 14L14 16Z" fill="#D7C1B3"/>
+  <!-- Snout -->
+  <path d="M11 17L12.5 20L14 18.5L15.5 20L17 17L14 16Z" fill="#233447"/>
+  <!-- Eyes -->
+  <circle cx="10.5" cy="12" r="1.5" fill="#233447"/>
+  <circle cx="17.5" cy="12" r="1.5" fill="#233447"/>
+  <!-- Cheeks -->
+  <path d="M8 14L10 12L10 19L8 14Z" fill="#E4761B" opacity="0.6"/>
+  <path d="M20 14L18 12L18 19L20 14Z" fill="#E4761B" opacity="0.6"/>
+</svg></div>
+        <div><div class="wallet-name">MetaMask</div><div class="wallet-desc">Browser extension</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+      <button class="wallet-option" onclick="connectWallet('bitget')">
+        <div class="wallet-icon" style="padding:0;border:none;overflow:hidden"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="36" height="36" rx="9" fill="#0B1426"/><path d="M12 10L22 18L12 26" stroke="#00E8FF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="wallet-name">Bitget Wallet</div><div class="wallet-desc">Multi-chain wallet</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+      <button class="wallet-option" onclick="connectWallet('okx')">
+        <div class="wallet-icon" style="padding:0;border:none;overflow:hidden"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="28" height="28" rx="7" fill="#000000"/>
+  <!-- O shape top-left -->
+  <rect x="6" y="6" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="7.5" y="7.5" width="4" height="4" rx="0.8" fill="#000"/>
+  <!-- K shape top-right -->
+  <rect x="15" y="6" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="16.5" y="7.5" width="4" height="4" rx="0.8" fill="#000"/>
+  <!-- X shape bottom-left -->
+  <rect x="6" y="15" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="7.5" y="16.5" width="4" height="4" rx="0.8" fill="#000"/>
+  <!-- dot bottom-right -->
+  <rect x="15" y="15" width="7" height="7" rx="1.5" fill="white"/>
+  <rect x="16.5" y="16.5" width="4" height="4" rx="0.8" fill="#000"/>
+</svg></div>
+        <div><div class="wallet-name">OKX Wallet</div><div class="wallet-desc">Web3 wallet</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BUY MODAL -->
+<div class="modal-overlay" id="buyModal" onclick="if(event.target===this)closeBuyModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Buy Tokens</div>
+      <button class="modal-close" onclick="closeBuyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="buy-card-info">
+        <div class="buy-card-emoji" id="buyEmoji">🎴</div>
+        <div>
+          <div class="buy-card-name" id="buyName">Card Name</div>
+          <div class="buy-card-grade" id="buyGrade">PSA 10</div>
+        </div>
+        <div class="buy-card-price" id="buyPrice">$0.00</div>
+      </div>
+      <div class="buy-label">Amount of tokens</div>
+      <input class="buy-input" type="number" id="buyAmt" min="1" max="10000" value="10" oninput="updateBuySummary()"/>
+      <div class="buy-summary">
+        <div class="buy-row"><span>Token price</span><span id="sumPrice">$0.00</span></div>
+        <div class="buy-row"><span>Tokens</span><span id="sumQty">10</span></div>
+        <div class="buy-row"><span>ETH cost</span><span id="sumEth">0.00 ETH</span></div>
+        <div class="buy-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px">
+          <span style="font-weight:700">Total USD</span>
+          <span style="color:var(--accent);font-weight:700" id="sumTotal">$0.00</span>
+        </div>
+      </div>
+      <button class="buy-btn" id="buyBtn" onclick="confirmBuy()">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- GACHA RESULT -->
+<div class="gacha-result-overlay" id="gachaResult" onclick="if(event.target===this)closeGachaResult()">
+  <div class="gacha-result-box">
+    <span class="gr-emoji" id="grEmoji">🎴</span>
+    <div class="gr-rarity" id="grRarity">COMMON</div>
+    <div class="gr-name" id="grName">Card Name</div>
+    <div class="gr-val" id="grVal">Value: $0</div>
+    <button class="gr-btn" onclick="closeGachaResult()">Awesome! ✓</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+
+// Real PSA card photos
+const CARD_PHOTOS = {
+  11: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_11_5.png",
+  9: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_12_3.jpeg",
+  8: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_13_4.jpeg",
+  2: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_1_rel.jpeg",
+  1: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_2_weight.jpeg",
+  0: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_3_9.jpeg",
+  6: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_4_8.jpeg",
+  10: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_5_2.jpeg",
+  7: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_6_1.jpeg",
+  5: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_7_0.jpeg",
+  3: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_8_6.webp",
+  4: "https://raw.githubusercontent.com/OblivaAi/reliqt/main/img_9_10.webp"
+};
+
+// ── CARD ART SVG ──
+function cardSVG(id, size=44) {
+  // Use real photo if available
+  if (CARD_PHOTOS[id]) {
+    const h = Math.round(size*1.4);
+    const big = size >= 100;
+    if (big) {
+      return `<div style="position:absolute;inset:0;overflow:hidden">
+        <img src="${CARD_PHOTOS[id]}" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:8px 10px">
+          <div style="font-size:11px;font-weight:700;color:#fff;font-family:monospace;letter-spacing:0.06em">${(window.CARDS&&CARDS[id])?CARDS[id].symbol:""}</div>
+        </div>
+      </div>`;
+    }
+    return `<div style="width:${size}px;height:${h}px;border-radius:6px;overflow:hidden;position:relative;display:inline-block;flex-shrink:0">
+      <img src="${CARD_PHOTOS[id]}" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block"/>
+    </div>`;
+  }
+  const arts = {
+    0: {accent:'#4a7aff',bg1:'#0a1a4a',bg2:'#1a3a8f',shape:'basketball'},
+    1: {accent:'#ff5a5a',bg1:'#3a0a0a',bg2:'#8f1a1a',shape:'football'},
+    2: {accent:'#2ecb6b',bg1:'#0a2a14',bg2:'#0a5a2a',shape:'soccer'},
+    3: {accent:'#ff7a2a',bg1:'#2a0a00',bg2:'#6a2a00',shape:'fire'},
+    4: {accent:'#ffd000',bg1:'#2a1a00',bg2:'#6a4a00',shape:'lightning'},
+    5: {accent:'#cc66ff',bg1:'#1a0a2a',bg2:'#4a1a6a',shape:'star'},
+    6: {accent:'#aaaaaa',bg1:'#0a0a0a',bg2:'#2a2a2a',shape:'star'},
+    7: {accent:'#55cc44',bg1:'#0a1a0a',bg2:'#1a3a1a',shape:'soccer'},
+    8: {accent:'#00b4ff',bg1:'#001a2a',bg2:'#004a7a',shape:'star'},
+    9: {accent:'#ff9900',bg1:'#1a0a00',bg2:'#3a2000',shape:'basketball'},
+    10:{accent:'#ff4444',bg1:'#2a0000',bg2:'#6a1a00',shape:'fire'},
+    11:{accent:'#ffdd00',bg1:'#1a1a00',bg2:'#3a3a00',shape:'lightning'},
+  };
+  const a = arts[id] || arts[0];
+  const w = size, h = Math.round(size*1.4);
+  const cx = w/2, cy = h*0.46;
+  const r = w*0.34;
+  let shape = '';
+  if (a.shape==='basketball') {
+    shape = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${a.accent}" stroke-width="${w*0.02}" opacity="0.9"/>
+      <path d="M${cx-r} ${cy} Q${cx} ${cy-r*0.7} ${cx+r} ${cy}" fill="none" stroke="${a.accent}" stroke-width="${w*0.015}" opacity="0.6"/>
+      <path d="M${cx-r} ${cy} Q${cx} ${cy+r*0.7} ${cx+r} ${cy}" fill="none" stroke="${a.accent}" stroke-width="${w*0.015}" opacity="0.6"/>
+      <line x1="${cx}" y1="${cy-r}" x2="${cx}" y2="${cy+r}" stroke="${a.accent}" stroke-width="${w*0.015}" opacity="0.6"/>`;
+  } else if (a.shape==='football') {
+    shape = `<ellipse cx="${cx}" cy="${cy}" rx="${r}" ry="${r*0.6}" fill="none" stroke="${a.accent}" stroke-width="${w*0.02}" opacity="0.9"/>
+      <line x1="${cx-r}" y1="${cy}" x2="${cx+r}" y2="${cy}" stroke="${a.accent}" stroke-width="${w*0.012}" opacity="0.5"/>
+      <line x1="${cx}" y1="${cy-r*0.6}" x2="${cx}" y2="${cy+r*0.6}" stroke="${a.accent}" stroke-width="${w*0.012}" opacity="0.5"/>`;
+  } else if (a.shape==='soccer') {
+    const pts = Array.from({length:5},(_,i)=>{const a2=Math.PI*2*i/5-Math.PI/2;return `${cx+r*Math.cos(a2)},${cy+r*Math.sin(a2)}`}).join(' ');
+    shape = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${a.accent}" stroke-width="${w*0.02}" opacity="0.8"/>
+      <polygon points="${pts}" fill="${a.accent}" opacity="0.5"/>`;
+  } else if (a.shape==='fire') {
+    shape = `<path d="M${cx} ${cy+r} Q${cx-r*0.8} ${cy+r*0.4} ${cx-r*0.5} ${cy-r*0.2} Q${cx-r*0.3} ${cy-r*0.7} ${cx} ${cy-r} Q${cx-r*0.1} ${cy-r*0.3} ${cx+r*0.2} ${cy-r*0.4} Q${cx+r*0.3} ${cy-r*0.1} ${cx+r*0.6} ${cy-r*0.3} Q${cx+r*0.9} ${cy+r*0.2} ${cx} ${cy+r}Z" fill="${a.accent}" opacity="0.85"/>`;
+  } else if (a.shape==='lightning') {
+    shape = `<polygon points="${cx+r*0.2},${cy-r} ${cx-r*0.3},${cy+r*0.1} ${cx+r*0.1},${cy+r*0.1} ${cx-r*0.2},${cy+r} ${cx+r*0.3},${cy-r*0.1} ${cx-r*0.1},${cy-r*0.1}" fill="${a.accent}" opacity="0.9"/>`;
+  } else {
+    const pts5 = Array.from({length:10},(_,i)=>{const ang=Math.PI*2*i/10-Math.PI/2;const rad=i%2===0?r:r*0.45;return `${cx+rad*Math.cos(ang)},${cy+rad*Math.sin(ang)}`}).join(' ');
+    shape = `<polygon points="${pts5}" fill="${a.accent}" opacity="0.9"/>`;
+  }
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="border-radius:6px;display:block">
+    <defs><linearGradient id="cg${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${a.bg1}"/><stop offset="100%" stop-color="${a.bg2}"/></linearGradient></defs>
+    <rect width="${w}" height="${h}" rx="6" fill="url(#cg${id})"/>
+    <rect x="1" y="1" width="${w-2}" height="${h-2}" rx="5" fill="none" stroke="${a.accent}" stroke-width="1" opacity="0.5"/>
+    ${shape}
+    <rect x="0" y="${h*0.72}" width="${w}" height="${h*0.28}" rx="0" fill="rgba(0,0,0,0.5)"/>
+    <text x="${cx}" y="${h*0.83}" text-anchor="middle" font-family="monospace" font-size="${w*0.13}" font-weight="700" fill="${a.accent}">${(window._cardToken&&window._cardToken[id])||''}</text>
+    <text x="${cx}" y="${h*0.93}" text-anchor="middle" font-family="monospace" font-size="${w*0.1}" fill="rgba(255,255,255,0.7)">PSA 10</text>
+  </svg>`;
+}
+
+// Card token map for SVG labels
+window._cardToken = {0:'rLEBRON',1:'rMAHOMES',2:'rHAALAND',3:'rCHARIZ',4:'rPIKACHU',5:'rMEWTWO',6:'rUMBREON',7:'rVENUS',8:'rWEMBY',9:'rSGA',10:'rCHARIZEX',11:'rGOKU'};
+
+const CONTRACT = '0x9644C7bbCeAB35e9CD0Cc5c65503Ce42FBF08685';
+const BASE_RPC = 'https://mainnet.base.org';
+const SUPABASE_URL = 'https://wsrvoburpbulfvzrlslq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcnZvYnVycGJ1bGZ2enJsc3EiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc4MDY0MTA1MywiZXhwIjoyMDk2MjE3MDUzfQ.4q1YYtlILruraBuWnU60MQ7znly_zUOXytRs4WrtKrk';
+
+// ── DATA ──
+const CARDS = [
+  {id:0,name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:1.24,cardValue:12400,sold:73,badge:'hot'},
+  {id:1,name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,sold:41,badge:'new'},
+  {id:2,name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,sold:89,badge:''},
+  {id:3,name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,sold:62,badge:'hot'},
+  {id:4,name:'Pikachu Illustrator',set:'1998 CoroCoro Promo',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,sold:95,badge:'rare'},
+  {id:5,name:'Mewtwo Holo 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,sold:55,badge:''},
+  {id:6,name:'Umbreon V Max',set:'2021 Full Art',grade:'PSA 10',cat:'pokemon',emoji:'🌑',price:0.46,cardValue:4600,sold:30,badge:'new'},
+  {id:7,name:'Venusaur 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🌿',price:1.95,cardValue:19500,sold:70,badge:''},
+  {id:8,name:'Wembanyama RC',set:'2023 Panini Prizm',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,sold:58,badge:'hot'},
+  {id:9,name:'SGA RC',set:'2018 Panini Prizm',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.28,cardValue:2800,sold:44,badge:''},
+  {id:10,name:'Charizard EX',set:'2003 Skyridge Holo',grade:'PSA 9',cat:'pokemon',emoji:'🐲',price:2.40,cardValue:24000,sold:35,badge:''},
+  {id:11,name:'Goku Ultra Instinct',set:'2022 Bandai',grade:'PSA 10',cat:'anime',emoji:'💛',price:0.85,cardValue:8500,sold:35,badge:'new'},
+];
+
+const GACHA_PACKS = [
+  {id:0,name:'Pokémon Starter Pack',desc:'Common Pokémon cards · 10% chance PSA 10',emoji:'📦',price:0.001,cards:50,winRate:'10% PSA 10',color:'#EEF3FF'},
+  {id:1,name:'Legendary Pack',desc:'Charizard · Pikachu · Mewtwo pulls',emoji:'💎',price:0.003,cards:1,winRate:'25% big win',color:'#F5F0FF'},
+  {id:2,name:'Sports Elite Pack',desc:'NBA · NFL · Soccer RC cards',emoji:'🏆',price:0.0007,cards:5,winRate:'15% PSA 10',color:'#FFF5EE'},
+];
+
+// ── STATE ──
+let currentUser = null;
+let userPoints = parseInt(localStorage.getItem('reliqt_pts') || '0');
+let portfolio = JSON.parse(localStorage.getItem('reliqt_pf') || '[]');
+let activeFilter = 'all';
+let buyCardId = null;
+
+// ── PROVIDER ──
+function getProvider() { return window._activeProvider || window.ethereum; }
+
+async function rpcCall(method, params) {
+  const r = await fetch(BASE_RPC, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+  return (await r.json()).result;
+}
+
+// ── TOAST ──
+function showToast(type, msg) {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideIn 0.25s ease reverse'; setTimeout(() => t.remove(), 250); }, 3000);
+}
+
+// ── PAGE ROUTING ──
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name)?.classList.add('active');
+
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.mob-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (name === 'leaderboard') loadLeaderboard();
+  if (name === 'portfolio') renderPortfolio();
+  if (name === 'referral') renderReferral();
+  if (name === 'gacha') renderGacha();
+  if (name === 'trade') setTimeout(() => { if (typeof initTrade === 'function') initTrade(); loadTradeBalance(); }, 100);
+}
+
+// ── WALLET MODAL ──
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('open');
+}
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('open');
+  document.getElementById('walletStatus').textContent = '';
+}
+
+async function connectWallet(type) {
+  const status = document.getElementById('walletStatus');
+  status.textContent = 'Connecting...';
+
+  let provider = null;
+  if (type === 'metamask') {
+    provider = window.ethereum;
+    if (!provider || !provider.isMetaMask) {
+      status.textContent = '';
+      showToast('error', 'MetaMask not found!');
+      window.open('https://metamask.io/download/', '_blank');
+      return;
+    }
+  } else if (type === 'bitget') {
+    provider = window.bitkeep?.ethereum || window.bitget?.ethereum;
+    if (!provider) {
+      status.textContent = '';
+      showToast('error', 'Bitget not found!');
+      window.open('https://web3.bitget.com', '_blank');
+      return;
+    }
+  } else if (type === 'okx') {
+    provider = window.okxwallet;
+    if (!provider) {
+      status.textContent = '';
+      showToast('error', 'OKX not found!');
+      window.open('https://www.okx.com/web3', '_blank');
+      return;
+    }
+  }
+
+  try {
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (!accounts?.length) throw new Error('No accounts');
+
+    // Switch to Base only if not already on Base
+    const chainId = await provider.request({ method: 'eth_chainId' });
+    if (chainId !== '0x2105') {
+      try {
+        await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+      } catch(se) {
+        if (se.code === 4902) {
+          await provider.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x2105', chainName: 'Base Mainnet', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+        }
+      }
+    }
+
+    window._activeProvider = provider;
+    currentUser = { address: accounts[0], display: accounts[0].slice(0,6) + '...' + accounts[0].slice(-4), type };
+    closeWalletModal();
+    onConnected();
+    showToast('success', '✅ Connected: ' + currentUser.display);
+
+  } catch(e) {
+    status.textContent = '';
+    showToast('error', e.code === 4001 ? 'Rejected' : (e.message || 'Failed'));
+  }
+}
+
+function onConnected() {
+  // Save session to localStorage
+  localStorage.setItem('reliqt_wallet', JSON.stringify(currentUser));
+
+  const btn = document.getElementById('walletBtn');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> ${currentUser.display}`;
+  btn.style.background = 'linear-gradient(135deg,#16A34A,#15803D)';
+  document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+  const refEl = document.getElementById('refCode');
+  if (refEl) refEl.textContent = currentUser.address.slice(2,10).toUpperCase();
+  setTimeout(syncPortfolio, 1500);
+  // Register user in Supabase
+  registerUserSupabase(currentUser.address);
+  // Check referral code
+  const ref = localStorage.getItem('reliqt_ref');
+  if (ref) processReferral(currentUser.address, ref);
+}
+
+// Disconnect wallet
+function disconnectWallet() {
+  currentUser = null;
+  localStorage.removeItem('reliqt_wallet');
+  window._activeProvider = null;
+  const btn = document.getElementById('walletBtn');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> Connect Wallet';
+  btn.style.background = 'linear-gradient(135deg,var(--accent),var(--accent2))';
+  showToast('info', 'Wallet disconnected');
+}
+
+// ── RENDER MARKETPLACE ──
+function renderMarket(cards) {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = cards.map(c => `
+    <div class="mc" onclick="openBuyModal(${c.id})">
+      <div class="mc-img" style="padding:0;overflow:hidden;background:#0a0a1a;position:relative">
+        ${cardSVG(c.id, 160)}
+        <div class="mc-grade" style="position:absolute;top:8px;left:8px;z-index:3">${c.grade}</div>
+        ${c.badge ? `<div class="mc-badge ${c.badge}">${c.badge==='hot'?'🔥 HOT':c.badge==='new'?'NEW':'RARE'}</div>` : ''}
+      </div>
+      <div class="mc-body">
+        <div class="mc-cat">${c.cat}</div>
+        <div class="mc-name">${c.name}</div>
+        <div class="mc-set">${c.set}</div>
+        <div class="mc-prog"><div class="mc-prog-fill" style="width:0%" data-w="${c.sold}%"></div></div>
+        <div class="mc-footer">
+          <div class="mc-price"><small>Token price</small>$${c.price.toFixed(2)}</div>
+          <button class="mc-buy" onclick="event.stopPropagation();openBuyModal(${c.id})">Buy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  setTimeout(() => document.querySelectorAll('.mc-prog-fill').forEach(b => { b.style.width = b.dataset.w; }), 100);
+}
+
+function filterCards(type, btn) {
+  activeFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let filtered = type === 'all' ? CARDS : type === 'hot' ? CARDS.filter(c => c.badge === 'hot') : CARDS.filter(c => c.cat === type);
+  renderMarket(filtered);
+}
+
+function searchCards(q) {
+  const filtered = CARDS.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.set.toLowerCase().includes(q.toLowerCase()));
+  renderMarket(filtered);
+}
+
+// ── BUY MODAL ──
+function openBuyModal(id) {
+  if (!currentUser) { openWalletModal(); return; }
+  buyCardId = id;
+  const c = CARDS[id];
+  document.getElementById('buyEmoji').innerHTML = cardSVG(c.id, 44);
+  document.getElementById('buyName').textContent = c.name;
+  document.getElementById('buyGrade').textContent = c.grade;
+  document.getElementById('buyPrice').textContent = '$' + c.price.toFixed(2);
+  document.getElementById('buyAmt').value = 10;
+  updateBuySummary();
+  document.getElementById('buyModal').classList.add('open');
+}
+
+function closeBuyModal() { document.getElementById('buyModal').classList.remove('open'); buyCardId = null; }
+
+// ── LIVE ETH PRICE ──
+let ETH_PRICE = 3000;
+async function fetchEthPrice() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+    const d = await r.json();
+    if (d?.ethereum?.usd) ETH_PRICE = d.ethereum.usd;
+  } catch(e) {}
+}
+fetchEthPrice();
+setInterval(fetchEthPrice, 60000);
+
+function updateBuySummary() {
+  if (buyCardId === null) return;
+  const c = CARDS[buyCardId];
+  const qty = parseInt(document.getElementById('buyAmt').value) || 1;
+  const total = qty * c.price;
+  const eth = total / ETH_PRICE;
+  document.getElementById('sumPrice').textContent = '$' + c.price.toFixed(2);
+  document.getElementById('sumQty').textContent = qty;
+  document.getElementById('sumEth').textContent = eth.toFixed(6) + ' ETH';
+  document.getElementById('sumTotal').textContent = '$' + total.toFixed(2);
+}
+
+async function confirmBuy() {
+  if (!currentUser || buyCardId === null) return;
+  const c = CARDS[buyCardId];
+  const qty = parseInt(document.getElementById('buyAmt').value) || 1;
+  const priceWei = BigInt(Math.floor(c.price / ETH_PRICE * 1e18)) * BigInt(qty);
+
+  const btn = document.getElementById('buyBtn');
+  btn.disabled = true;
+
+  try {
+    const provider = getProvider();
+    if (!provider) throw new Error('No wallet connected');
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+    // Check user has enough ETH
+    const balHex = await rpcCall('eth_getBalance', [accounts[0], 'latest']);
+    const bal = BigInt(balHex || '0x0');
+    const gasEst = BigInt(200000) * BigInt(2000000000); // 200k gas * 2 gwei
+    if (bal < priceWei + gasEst) {
+      showToast('error', `Not enough ETH. Need ~${(Number(priceWei)/1e18).toFixed(6)} ETH`);
+      btn.disabled = false; btn.textContent = 'Buy Now';
+      return;
+    }
+
+    btn.textContent = 'Waiting for MetaMask...';
+    showToast('info', `Confirm in MetaMask...`);
+
+    // buyCardTokens(uint256 cardId, uint256 amount)
+    const data = '0x880aee10'
+      + buyCardId.toString(16).padStart(64,'0')
+      + qty.toString(16).padStart(64,'0');
+
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: accounts[0], to: CONTRACT, data, value: '0x' + priceWei.toString(16), gas: '0x' + (200000).toString(16) }]
+    });
+
+    btn.textContent = 'Confirming on-chain...';
+    showToast('info', `TX sent: ${txHash.slice(0,10)}... waiting...`);
+
+    // Wait for receipt
+    const receipt = await waitTx(txHash, 30);
+    if (receipt?.status === '0x1') {
+      closeBuyModal();
+      showToast('success', `✅ Bought ${qty} tokens! View on BaseScan`);
+      userPoints += qty * 10;
+      document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+      localStorage.setItem('reliqt_pts', userPoints);
+      const existing = portfolio.find(p => p.cardId === buyCardId);
+      if (existing) existing.tokens += qty;
+      else portfolio.push({ cardId: buyCardId, tokens: qty, avgPrice: c.price, txHash });
+      localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+      renderPortfolio();
+      // Link to BaseScan
+      setTimeout(() => {
+        if (confirm('View transaction on BaseScan?')) window.open('https://basescan.org/tx/' + txHash, '_blank');
+      }, 500);
+    } else {
+      showToast('error', 'Transaction failed! Check BaseScan: ' + txHash.slice(0,10));
+    }
+  } catch(e) {
+    if (e.code === 4001) showToast('info', 'Transaction cancelled');
+    else showToast('error', e.message?.slice(0,80) || 'Transaction failed');
+  }
+  btn.disabled = false; btn.textContent = 'Buy Now';
+}
+
+// ── GACHA ──
+function renderGacha() {
+  const packs = document.getElementById('gachaPacks');
+  packs.innerHTML = GACHA_PACKS.map(p => `
+    <div class="gp">
+      <div class="gp-img" style="background:#0a0a1a;display:flex;align-items:center;justify-content:center;gap:4px;overflow:hidden">
+        ${cardSVG(p.id*3, 52)}${cardSVG(p.id*3+1, 52)}${cardSVG(p.id*3+2, 52)}
+      </div>
+      <div class="gp-body">
+        <div class="gp-name">${p.name}</div>
+        <div class="gp-desc">${p.desc}</div>
+        <div class="gp-stats">
+          <div class="gp-stat">
+            <div class="gp-stat-val">${p.cards}</div>
+            <div class="gp-stat-label">Contains</div>
+          </div>
+          <div class="gp-stat">
+            <div class="gp-stat-val">${p.winRate}</div>
+            <div class="gp-stat-label">Win rate</div>
+          </div>
+        </div>
+        <button class="gp-btn" onclick="openGacha(${p.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Open Now · ${p.price} ETH
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openGacha(packId) {
+  if (!currentUser) { openWalletModal(); return; }
+  const pack = GACHA_PACKS[packId];
+  const provider = getProvider();
+  if (!provider) { showToast('error', 'Connect wallet first'); return; }
+
+  showToast('info', 'Opening pack... confirm in wallet');
+  try {
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    const priceWei = Math.floor(pack.price * 1e18);
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: accounts[0], to: CONTRACT, data: '0x2cc1f70b', value: '0x' + priceWei.toString(16), gas: '0x30D40' }]
+    });
+
+    // Random result
+    const rand = Math.random() * 100;
+    const rarity = rand < 60 ? 'common' : rand < 85 ? 'rare' : rand < 95 ? 'epic' : 'legendary';
+    const card = CARDS[Math.floor(Math.random() * CARDS.length)];
+
+    document.getElementById('grEmoji').innerHTML = cardSVG(card.id, 80);
+    document.getElementById('grRarity').className = 'gr-rarity ' + rarity;
+    document.getElementById('grRarity').textContent = rarity.toUpperCase();
+    document.getElementById('grName').textContent = card.name;
+    document.getElementById('grVal').textContent = 'Value: $' + card.cardValue.toLocaleString();
+    document.getElementById('gachaResult').classList.add('open');
+
+    userPoints += 100;
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    localStorage.setItem('reliqt_pts', userPoints);
+
+  } catch(e) {
+    if (e.code !== 4001) showToast('error', e.message || 'Failed');
+  }
+}
+
+function closeGachaResult() { document.getElementById('gachaResult').classList.remove('open'); }
+
+// ── LEADERBOARD ──
+async function loadLeaderboard() {
+  const body = document.getElementById('lbBody');
+  body.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3)">Loading from blockchain...</div>';
+
+  try {
+    const logs = await rpcCall('eth_getLogs', [{ fromBlock: '0x0', toBlock: 'latest', address: CONTRACT }]);
+    const players = {};
+    (logs || []).forEach(log => {
+      if (!log.topics?.[1]) return;
+      const addr = '0x' + log.topics[1].slice(26);
+      if (!players[addr]) players[addr] = { address: addr, txs: 0 };
+      players[addr].txs++;
+    });
+
+    let list = Object.values(players).sort((a, b) => b.txs - a.txs);
+    if (!list.length) list = [{ address: '0xA2e17FFB1EEd1222CaB7651F1c762833e0f20f31', txs: 1, pts: 100 }];
+
+    const medals = ['🥇', '🥈', '🥉'];
+    body.innerHTML = list.slice(0, 20).map((p, i) => {
+      const isYou = currentUser?.address?.toLowerCase() === p.address.toLowerCase();
+      const short = p.address.slice(0,6) + '...' + p.address.slice(-4);
+      return `<div class="lb-row ${isYou ? 'you' : ''}">
+        <div class="lb-rank">${i < 3 ? medals[i] : '#' + (i+1)}</div>
+        <div class="lb-wallet">${short}${isYou ? '<span class="you-badge">YOU</span>' : ''}</div>
+        <div class="lb-pts">${(p.txs * 100).toLocaleString()}</div>
+        <div class="lb-txns">${p.txs}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    body.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3)">Failed to load — check connection</div>';
+  }
+}
+
+// ── PORTFOLIO ──
+async function syncPortfolio() {
+  if (!currentUser?.address) { showToast('error', 'Connect wallet first'); return; }
+  showToast('info', 'Syncing from blockchain...');
+
+  try {
+    let totalTokens = 0, totalVal = 0;
+    const holdings = [];
+    for (let i = 0; i < CARDS.length; i++) {
+      const res = await rpcCall('eth_call', [{ to: CONTRACT, from: currentUser.address, data: '0x62bf0975' + i.toString(16).padStart(64,'0') }, 'latest']);
+      const amt = parseInt(res, 16) || 0;
+      if (amt > 0) { holdings.push({ cardId: i, tokens: amt }); totalTokens += amt; totalVal += amt * CARDS[i].price; }
+    }
+    portfolio = holdings;
+    localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+    // Fetch points from contract
+    try {
+      const ptsRes = await rpcCall('eth_call', [{ to: CONTRACT, from: currentUser.address, data: '0xba9c4637' }, 'latest']);
+      const pts = parseInt(ptsRes, 16) || 0;
+      if (pts > 0) { userPoints = pts; localStorage.setItem('reliqt_pts', pts); }
+    } catch(e) {}
+
+    document.getElementById('pfTotalVal').textContent = '$' + totalVal.toFixed(2);
+    document.getElementById('pfTotalTokens').textContent = totalTokens.toLocaleString();
+    document.getElementById('pfPoints').textContent = userPoints.toLocaleString();
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    portfolio = holdings;
+    localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+    renderPortfolio();
+    showToast('success', `✅ Synced! ${holdings.length} cards found`);
+  } catch(e) {
+    showToast('error', 'Sync failed: ' + e.message);
+  }
+}
+
+function renderPortfolio() {
+  const el = document.getElementById('pfHoldings');
+  document.getElementById('pfPoints').textContent = userPoints.toLocaleString();
+  if (!portfolio.length) {
+    el.innerHTML = '<div class="pf-empty"><p>No tokens yet. Start collecting!</p><button onclick="showPage(\'market\',null);document.querySelector(\'.nav-tab\').click()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer;font-family:var(--font)">Browse Marketplace →</button></div>';
+    return;
+  }
+  let totalVal = 0, totalTokens = 0;
+  el.innerHTML = portfolio.map(h => {
+    const c = CARDS[h.cardId];
+    if (!c) return '';
+    const val = h.tokens * c.price;
+    totalVal += val; totalTokens += h.tokens;
+    return `<div class="pf-holding">
+      <div class="pf-h-img">${cardSVG(c.id||0, 44)}</div>
+      <div>
+        <div class="pf-h-name">${c.name}</div>
+        <div class="pf-h-set">${c.set}</div>
+      </div>
+      <div>
+        <div class="pf-h-tokens">${h.tokens} tokens</div>
+        <div class="pf-h-val">$${val.toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('pfTotalVal').textContent = '$' + totalVal.toFixed(2);
+  document.getElementById('pfTotalTokens').textContent = totalTokens.toLocaleString();
+}
+
+// ── REFERRAL ──
+function renderReferral() {
+  const notConn = document.getElementById('refNotConnected');
+  const conn = document.getElementById('refConnected');
+  if (!currentUser) {
+    notConn.style.display = 'block';
+    conn.style.display = 'none';
+    return;
+  }
+  notConn.style.display = 'none';
+  conn.style.display = 'block';
+  const code = currentUser.address.slice(2,10).toUpperCase();
+  document.getElementById('refCode').textContent = code;
+  loadReferralStats(currentUser.address);
+}
+
+function copyRefCode() {
+  const code = document.getElementById('refCode').textContent;
+  navigator.clipboard.writeText(`https://reliqt.vercel.app/app.html?ref=${code}`);
+  showToast('success', '✅ Referral link copied!');
+}
+
+function shareTwitter() {
+  const code = document.getElementById('refCode').textContent;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join Reliqt — own fractions of PSA 10 collectibles! Use my code: ${code}\nhttps://reliqt.vercel.app/app.html?ref=${code}`)}`,'_blank');
+}
+
+function shareTelegram() {
+  const code = document.getElementById('refCode').textContent;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(`https://reliqt.vercel.app/app.html?ref=${code}`)}&text=${encodeURIComponent(`Join Reliqt! Use code: ${code}`)}`,'_blank');
+}
+
+
+// ── SUPABASE FUNCTIONS ──
+async function sbFetch(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  return res.json();
+}
+
+async function registerUserSupabase(wallet) {
+  try {
+    const existing = await sbFetch(`users?wallet=eq.${wallet}&select=*`);
+    if (existing.length > 0) {
+      // Update points
+      userPoints = existing[0].points || userPoints;
+      document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+      localStorage.setItem('reliqt_pts', userPoints);
+      return;
+    }
+    const refCode = wallet.slice(2,10).toUpperCase();
+    await sbFetch('users', 'POST', { wallet, ref_code: refCode, points: 0, total_referrals: 0 });
+  } catch(e) { console.log('Supabase register error:', e); }
+}
+
+async function processReferral(referredWallet, referrerCode) {
+  try {
+    const referrers = await sbFetch(`users?ref_code=eq.${referrerCode}&select=*`);
+    if (!referrers.length) return;
+    const referrer = referrers[0];
+    if (referrer.wallet === referredWallet) return;
+    const existing = await sbFetch(`referrals?referred_wallet=eq.${referredWallet}&select=*`);
+    if (existing.length > 0) return;
+    await sbFetch('referrals', 'POST', { referrer_wallet: referrer.wallet, referred_wallet: referredWallet, bonus_paid: false });
+    await sbFetch(`users?wallet=eq.${referrer.wallet}`, 'PATCH', { points: (referrer.points||0) + 500, total_referrals: (referrer.total_referrals||0) + 1 });
+    await sbFetch(`users?wallet=eq.${referredWallet}`, 'PATCH', { points: 500 });
+    userPoints += 500;
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    localStorage.setItem('reliqt_pts', userPoints);
+    localStorage.removeItem('reliqt_ref');
+    showToast('success', '🎉 Referral bonus! +500 pts');
+  } catch(e) { console.log('Referral error:', e); }
+}
+
+async function loadReferralStats(wallet) {
+  try {
+    const [userData, referrals] = await Promise.all([
+      sbFetch(`users?wallet=eq.${wallet}&select=*`),
+      sbFetch(`referrals?referrer_wallet=eq.${wallet}&select=*`)
+    ]);
+    const count = referrals.length || 0;
+    const el1 = document.getElementById('refCount');
+    const el2 = document.getElementById('refPts');
+    if (el1) el1.textContent = count;
+    if (el2) el2.textContent = (count * 500).toLocaleString();
+  } catch(e) {}
+}
+
+
+// ── LIVE PRICES ──
+async function fetchLivePrices() {
+  // Prices are hardcoded — no external API needed for now
+  console.log('✅ Using hardcoded prices');
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  renderMarket(CARDS);
+  renderGacha();
+
+  // Check ref code in URL
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (ref) localStorage.setItem('reliqt_ref', ref);
+
+  // Restore session
+  const saved = localStorage.getItem('reliqt_wallet');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    onConnected();
+  }
+
+  document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+  renderPortfolio();
+  // Fetch live prices after 2s
+  setTimeout(fetchLivePrices, 2000);
+  // Refresh prices every 5 min
+  setInterval(fetchLivePrices, 300000);
+  // Init trade after short delay so TRADE_TOKENS is defined
+  setTimeout(initTrade, 100);
+});
+
+// ── PWA SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ SW registered'))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+
+
+// ══════════════════════════════════════
+// TRADE PAGE
+// ══════════════════════════════════════
+const TRADE_TOKENS = [
+  {id:0,symbol:'rLEBRON',name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.001,cardValue:12400,supply:10000,change:0,volume:0,pop:12,address:'0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5',pool:'0xa568a959Aa287F9004DBe9C5402b581083A0dc6f',live:true},
+  {id:1,symbol:'rMAHOMES',name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,supply:10000,change:1.8,volume:312000,pop:8,address:'0x9e89159aB6763baed111980A809D53663D2c35b4'},
+  {id:2,symbol:'rHAALAND',name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,supply:10000,change:1.3,volume:540000,pop:6,address:'0xaE67C945523F03BE4bd1fC32888161447a75ef13'},
+  {id:3,symbol:'rCHARIZARD',name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,supply:10000,change:2.1,volume:1200000,pop:3,address:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902'},
+  {id:4,symbol:'rPIKACHU',name:'Pikachu Illustrator',set:'1998 CoroCoro Promo',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,supply:10000,change:0.5,volume:280000,pop:1,address:'0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63'},
+  {id:5,symbol:'rMEWTWO',name:'Mewtwo Holo 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,supply:10000,change:3.7,volume:680000,pop:5,address:'0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B'},
+  {id:6,symbol:'rWEMBY',name:'Victor Wembanyama',set:'2023 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,supply:10000,change:6.1,volume:920000,pop:15,address:'0xBd057659a966BC7acfE26798FcB320595C553754'},
+];
+
+const RELIQT_FACTORY = '0x48DC7247e6F7578c48090504c241635fd0299d80';
+
+let trCurrentToken = TRADE_TOKENS[0];
+let trTab = 'buy';
+let trPriceHistory = {};
+let trChartTf = '15m';
+
+let trInitialized = false;
+function initTrade() {
+  if (trInitialized) { renderTrTokenList(); trDrawChart(); return; }
+  trInitialized = true;
+  renderTrTokenList();
+  trSelectToken(0);
+  trStartPriceFeed();
+}
+
+function renderTrTokenList() {
+  const list = document.getElementById('trTokenList');
+  if (!list) return;
+  document.getElementById('trTokenCount').textContent = TRADE_TOKENS.length;
+  list.innerHTML = TRADE_TOKENS.map(t => `
+    <div class="tr-tl-item ${t.id === trCurrentToken.id ? 'active' : ''}" onclick="trSelectToken(${t.id})">
+      <div class="tr-tl-emoji">${cardSVG(t.id, 34)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="tr-tl-symbol">${t.symbol} ${t.live ? '<span style="font-size:9px;background:#16A34A;color:#fff;padding:1px 5px;border-radius:3px;font-weight:700;vertical-align:middle">LIVE</span>' : ''}</div>
+        <div class="tr-tl-name">${t.name}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="tr-tl-price">$${t.price.toFixed(2)}</div>
+        <div class="tr-tl-change ${t.change >= 0 ? 'up' : 'down'}">${t.change >= 0 ? '+' : ''}${t.change.toFixed(1)}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function trSelectToken(id) {
+  trCurrentToken = TRADE_TOKENS[id];
+  document.querySelectorAll('.tr-tl-item').forEach((el,i) => el.classList.toggle('active', i === id));
+  trUpdateHeader();
+
+  const t = trCurrentToken;
+  const widget = document.getElementById('trUniswapWidget');
+  const custom = document.getElementById('trCustomPanel');
+
+  if (t.live && t.address) {
+    // Show Uniswap Widget
+    widget.style.display = 'flex';
+    custom.style.display = 'none';
+    const frame = document.getElementById('trUniswapFrame');
+    const link  = document.getElementById('trUniswapLink');
+    // Uniswap swap URL with pre-filled tokens on Base
+    const uniUrl = `https://app.uniswap.org/swap?inputCurrency=${USDC_BASE}&outputCurrency=${t.address}&chain=base`;
+    frame.src = uniUrl;
+    if (link) link.href = uniUrl;
+  } else {
+    widget.style.display = 'none';
+    custom.style.display = 'block';
+    trDrawChart();
+    trUpdatePanel();
+  }
+}
+
+function trUpdateHeader() {
+  const t = trCurrentToken;
+  document.getElementById('trCaEmoji').innerHTML = cardSVG(t.id, 40);
+  document.getElementById('trCaSymbol').textContent = t.symbol;
+  document.getElementById('trCaSymbol').innerHTML = t.symbol + (t.live ? ' <span style="font-size:10px;background:#16A34A;color:#fff;padding:2px 7px;border-radius:4px;font-weight:700;vertical-align:middle;font-family:var(--mono)">LIVE</span>' : '');
+  document.getElementById('trCaName').textContent = t.name;
+  document.getElementById('trCaPrice').textContent = '$' + t.price.toFixed(4);
+  const chgEl = document.getElementById('trCaChange');
+  chgEl.textContent = (t.change >= 0 ? '+' : '') + t.change.toFixed(2) + '%';
+  chgEl.className = 'tr-ca-change ' + (t.change >= 0 ? 'up' : 'down');
+  document.getElementById('trMcap').textContent = '$' + (t.price * t.supply).toLocaleString();
+  document.getElementById('trFdv').textContent = '$' + (t.price * t.supply).toLocaleString();
+  document.getElementById('trSupply').textContent = (t.supply/1000) + 'K';
+  document.getElementById('trCardVal').textContent = '$' + t.cardValue.toLocaleString();
+  document.getElementById('trVol').textContent = '$' + (t.volume/1000).toFixed(1) + 'K';
+  document.getElementById('trCbEmoji').innerHTML = cardSVG(t.id, 44);
+  document.getElementById('trRcImg').innerHTML = cardSVG(t.id, 80) + `<div class="tr-rc-grade" id="trRcGrade">${t.grade}</div>`;  document.getElementById('trCbName').textContent = t.name;
+  document.getElementById('trCbSet').textContent = t.set;
+  document.getElementById('trCbGrade').textContent = t.grade;
+  // Reserve
+  document.getElementById('trRcImg').childNodes[0].textContent = t.emoji;
+  document.getElementById('trRcGrade').textContent = t.grade;
+  document.getElementById('trRcName').textContent = t.name;
+  document.getElementById('trRcSet').textContent = t.set;
+  document.getElementById('trRcVal').textContent = '$' + t.cardValue.toLocaleString();
+  document.getElementById('trRcPop').textContent = t.pop + ' known';
+}
+
+function trUpdatePanel() {
+  const t = trCurrentToken;
+  document.getElementById('trMpVal').textContent = '1 ' + t.symbol + ' = $' + t.price.toFixed(4);
+  document.getElementById('trSymbolHint').textContent = t.symbol + ' tokens';
+  document.getElementById('trSumPrice').textContent = '$' + t.price.toFixed(4);
+  if (currentUser) {
+    const btn = document.getElementById('trBtn');
+    btn.disabled = false;
+    btn.textContent = (trTab === 'buy' ? 'Buy ' : 'Sell ') + t.symbol;
+  }
+  trCalc();
+}
+
+function trCalc() {
+  const usdc = parseFloat(document.getElementById('trAmtIn').value) || 0;
+  const tokens = usdc / trCurrentToken.price;
+  document.getElementById('trAmtOut').value = tokens > 0 ? tokens.toFixed(4) : '';
+  document.getElementById('trSumTotal').textContent = '$' + usdc.toFixed(2);
+  const slider = document.getElementById('trSlider');
+  const pct = Math.min((usdc / 1000) * 100, 100);
+  slider.value = pct;
+  slider.style.setProperty('--pct', pct + '%');
+}
+
+function trSlide(pct) {
+  const amt = (pct / 100) * 1000;
+  document.getElementById('trAmtIn').value = amt.toFixed(2);
+  document.getElementById('trSlider').value = pct;
+  document.getElementById('trSlider').style.setProperty('--pct', pct + '%');
+  trCalc();
+}
+
+function trSetTab(tab) {
+  trTab = tab;
+  document.getElementById('trTabBuy').className = 'tr-tp-tab' + (tab === 'buy' ? ' active buy' : '');
+  document.getElementById('trTabSell').className = 'tr-tp-tab' + (tab === 'sell' ? ' active sell' : '');
+  const btn = document.getElementById('trBtn');
+  btn.className = 'tr-buy-btn ' + tab;
+  if (currentUser) btn.textContent = (tab === 'buy' ? 'Buy ' : 'Sell ') + trCurrentToken.symbol;
+}
+
+// ── UNISWAP SWAP ROUTER (Base Mainnet) ──
+const SWAP_ROUTER     = '0x2626664c2603336E57B271c5C0b26F421741e481'; // SwapRouter02 Base
+const USDC_BASE       = '0x833589fCd6eDb6E08f4c7C32D4f71b54bdA02913';
+const FEE_TIER        = 10000; // 1%
+
+function hexPad(val, bytes=32) {
+  return val.toString(16).replace('0x','').padStart(bytes*2,'0');
+}
+
+async function getERC20Balance(tokenAddr, walletAddr) {
+  const data = '0x70a08231' + hexPad(walletAddr.replace('0x',''));
+  const res = await rpcCall('eth_call',[{to:tokenAddr,data},'latest']);
+  return BigInt(res || '0x0');
+}
+
+async function checkAllowance(tokenAddr, owner, spender) {
+  const data = '0xdd62ed3e' + hexPad(owner.replace('0x','')) + hexPad(spender.replace('0x',''));
+  const res = await rpcCall('eth_call',[{to:tokenAddr,data},'latest']);
+  return BigInt(res || '0x0');
+}
+
+async function approveToken(tokenAddr, spender) {
+  const provider = getProvider();
+  const MAX = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+  const data = '0x095ea7b3' + hexPad(spender.replace('0x','')) + MAX;
+  const tx = await provider.request({ method:'eth_sendTransaction', params:[{
+    from: currentUser.address, to: tokenAddr,
+    data, gas: '0x' + (80000).toString(16)
+  }]});
+  showToast('info', 'Approving... waiting confirmation');
+  await waitTx(tx, 30);
+  showToast('success', 'Approved!');
+}
+
+async function trExecute() {
+  if (!currentUser) { openWalletModal(); return; }
+  const t = trCurrentToken;
+  const isBuy = trTab === 'buy';
+
+  // For non-live tokens, show coming soon
+  if (!t.live || !t.address) {
+    showToast('info', `${t.symbol} pool coming soon!`);
+    return;
+  }
+
+  const amtStr = document.getElementById('trAmtIn').value;
+  const amt = parseFloat(amtStr) || 0;
+  if (amt <= 0) { showToast('error', 'Enter an amount'); return; }
+
+  const btn = document.getElementById('trBtn');
+  btn.disabled = true;
+
+  try {
+    const provider = getProvider();
+    const tokenIn  = isBuy ? USDC_BASE : t.address;
+    const tokenOut = isBuy ? t.address : USDC_BASE;
+    const decimalsIn = isBuy ? 6 : 18;
+    const amountIn = BigInt(Math.floor(amt * 10**decimalsIn));
+    const deadline = Math.floor(Date.now()/1000) + 1200; // 20 min
+
+    // 1. Check & approve
+    btn.textContent = 'Checking approval...';
+    const allowance = await checkAllowance(tokenIn, currentUser.address, SWAP_ROUTER);
+    if (allowance < amountIn) {
+      showToast('info', `Approving ${isBuy ? 'USDC' : t.symbol}... confirm in MetaMask`);
+      btn.textContent = 'Approving...';
+      await approveToken(tokenIn, SWAP_ROUTER);
+    }
+
+    // 2. exactInputSingle via SwapRouter02
+    // function exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))
+    // selector: 0x414bf389
+    btn.textContent = 'Confirm in MetaMask...';
+    showToast('info', 'Confirm swap in MetaMask...');
+
+    const p = hexPad;
+    const calldata = '0x414bf389'
+      + p(tokenIn.replace('0x',''))
+      + p(tokenOut.replace('0x',''))
+      + p(FEE_TIER)
+      + p(currentUser.address.replace('0x',''))
+      + p(deadline)
+      + p(amountIn.toString(16))
+      + p(0)  // amountOutMinimum = 0 (no slippage protection for simplicity)
+      + p(0); // sqrtPriceLimitX96 = 0
+
+    const txHash = await provider.request({ method:'eth_sendTransaction', params:[{
+      from: currentUser.address,
+      to: SWAP_ROUTER,
+      data: calldata,
+      gas: '0x' + (350000).toString(16)
+    }]});
+
+    btn.textContent = 'Waiting on-chain...';
+    showToast('info', `TX sent: ${txHash.slice(0,10)}...`);
+
+    const receipt = await waitTx(txHash, 30);
+    if (receipt?.status === '0x1') {
+      showToast('success', `✅ Swap confirmed! ${isBuy ? 'Bought' : 'Sold'} ${t.symbol}`);
+      document.getElementById('trAmtIn').value = '';
+      trCalc();
+      // Refresh USDC balance
+      const bal = await getERC20Balance(USDC_BASE, currentUser.address);
+      const el = document.getElementById('trBalIn');
+      if (el) el.textContent = (Number(bal)/1e6).toFixed(2) + ' USDC';
+      // Link to BaseScan
+      setTimeout(() => {
+        if (confirm('View on BaseScan?')) window.open('https://basescan.org/tx/' + txHash, '_blank');
+      }, 500);
+    } else {
+      showToast('error', 'Swap failed! Check: basescan.org/tx/' + txHash.slice(0,10));
+    }
+  } catch(e) {
+    if (e.code === 4001) showToast('info', 'Cancelled');
+    else showToast('error', e.message?.slice(0,80) || 'Swap failed');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = (trTab==='buy'?'Buy ':'Sell ') + t.symbol;
+  }
+}
+
+async function loadTradeBalance() {
+  if (!currentUser) return;
+  try {
+    const bal = await getERC20Balance(USDC_BASE, currentUser.address);
+    const el = document.getElementById('trBalIn');
+    if (el) el.textContent = (Number(bal)/1e6).toFixed(2) + ' USDC';
+  } catch(e) {}
+}
+
+
+function trDrawChart() {
+  const svg = document.getElementById('trChartSvg');
+  const frame = document.getElementById('trDexFrame');
+  const dexLink = document.getElementById('trDexLink');
+  const t = trCurrentToken;
+
+  if (t.live && t.pool) {
+    svg.style.display = 'none';
+    frame.style.display = 'block';
+    const poolAddr = t.pool.toLowerCase();
+    frame.src = `https://dexscreener.com/base/${poolAddr}?embed=1&theme=dark&info=0&trades=0&chart=1`;
+    if (dexLink) {
+      dexLink.href = `https://dexscreener.com/base/${poolAddr}`;
+      dexLink.style.display = 'flex';
+    }
+    return;
+  }
+
+  svg.style.display = 'block';
+  frame.style.display = 'none';
+  if (dexLink) dexLink.style.display = 'none';
+
+  const W = svg.clientWidth || 500;
+  const H = svg.clientHeight || 200;
+  if (!W || !H) return;
+
+  if (!trPriceHistory[trCurrentToken.id]) {
+    const candles = [];
+    let price = trCurrentToken.price * (0.85 + Math.random() * 0.1);
+    for (let i = 99; i >= 0; i--) {
+      const open = price;
+      const change = (Math.random() - 0.48) * 0.03 * price;
+      const close = Math.max(open + change, 0.001);
+      const high = Math.max(open, close) * (1 + Math.random() * 0.015);
+      const low = Math.min(open, close) * (1 - Math.random() * 0.015);
+      candles.push({ open, high, low, close });
+      price = close;
+    }
+    candles[candles.length-1].close = trCurrentToken.price;
+    trPriceHistory[trCurrentToken.id] = candles;
+  }
+
+  const candles = trPriceHistory[trCurrentToken.id];
+  const prices = candles.flatMap(c => [c.high, c.low]);
+  const minP = Math.min(...prices) * 0.998;
+  const maxP = Math.max(...prices) * 1.002;
+  const range = maxP - minP || 1;
+  const padL = 55, padR = 8, padT = 8, padB = 24;
+  const cW = (W - padL - padR) / candles.length;
+  const toX = i => padL + i * cW + cW/2;
+  const toY = p => padT + (1 - (p - minP) / range) * (H - padT - padB);
+
+  const isUp = trCurrentToken.change >= 0;
+  const mainColor = isUp ? '#16A34A' : '#DC2626';
+
+  let html = `<defs>
+    <linearGradient id="trGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${mainColor}" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="${mainColor}" stop-opacity="0"/>
+    </linearGradient>
+  </defs>`;
+
+  // Grid
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (i/4) * (H - padT - padB);
+    const p = maxP - (i/4) * range;
+    html += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>`;
+    html += `<text x="${padL-4}" y="${y+4}" fill="rgba(0,0,0,0.3)" font-size="9" font-family="Geist Mono" text-anchor="end">$${p.toFixed(2)}</text>`;
+  }
+
+  // Area
+  const areaLine = candles.map((c,i) => `${toX(i)},${toY(c.close)}`).join(' ');
+  html += `<polyline points="${areaLine} ${toX(candles.length-1)},${H-padB} ${toX(0)},${H-padB}" fill="url(#trGrad)" stroke="none"/>`;
+
+  // Candles
+  candles.forEach((c, i) => {
+    const x = toX(i);
+    const green = c.close >= c.open;
+    const color = green ? '#16A34A' : '#DC2626';
+    const bTop = toY(Math.max(c.open, c.close));
+    const bBot = toY(Math.min(c.open, c.close));
+    const bH = Math.max(bBot - bTop, 1);
+    const bW = Math.max(cW * 0.65, 2);
+    html += `<line x1="${x}" y1="${toY(c.high)}" x2="${x}" y2="${toY(c.low)}" stroke="${color}" stroke-width="0.8" opacity="0.7"/>`;
+    html += `<rect x="${x-bW/2}" y="${bTop}" width="${bW}" height="${bH}" fill="${color}" opacity="0.9" rx="0.5"/>`;
+  });
+
+  // Current price
+  const curY = toY(trCurrentToken.price);
+  html += `<line x1="${padL}" y1="${curY}" x2="${W-padR}" y2="${curY}" stroke="${mainColor}" stroke-width="1" stroke-dasharray="3,3" opacity="0.7"/>`;
+  html += `<rect x="${W-padR-44}" y="${curY-8}" width="44" height="16" fill="${mainColor}" rx="3" opacity="0.9"/>`;
+  html += `<text x="${W-padR-22}" y="${curY+5}" fill="white" font-size="9" font-family="Geist Mono" font-weight="600" text-anchor="middle">$${trCurrentToken.price.toFixed(2)}</text>`;
+
+  svg.innerHTML = html;
+}
+
+function trSetTf(tf, btn) {
+  trChartTf = tf;
+  document.querySelectorAll('.tr-chart-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  delete trPriceHistory[trCurrentToken.id];
+  trDrawChart();
+}
+
+function trStartPriceFeed() {
+  setInterval(() => {
+    TRADE_TOKENS.forEach(t => {
+      if (t.live) return;
+      const d = (Math.random() - 0.49) * 0.002 * t.price;
+      t.price = Math.max(t.price + d, 0.001);
+      t.change = parseFloat((t.change + (Math.random()-0.5)*0.08).toFixed(2));
+    });
+    renderTrTokenList();
+    if (document.getElementById('page-trade').classList.contains('active')) {
+      trCurrentToken = TRADE_TOKENS[trCurrentToken.id];
+      trUpdateHeader();
+      if (trPriceHistory[trCurrentToken.id]) {
+        const h = trPriceHistory[trCurrentToken.id];
+        const last = h[h.length-1];
+        last.close = trCurrentToken.price;
+        last.high = Math.max(last.high, last.close);
+        last.low = Math.min(last.low, last.close);
+      }
+      trDrawChart();
+    }
+  }, 3000);
+}
+
+// ── BASESCAN TOKEN LINKS ──
+function openBaseScan(tokenId) {
+  const t = TRADE_TOKENS[tokenId];
+  if (t?.address) window.open('https://basescan.org/token/' + t.address, '_blank');
+}
+
+console.log('✅ Trade page ready');
+
+console.log('✅ Reliqt loaded | Contract:', CONTRACT);
+</script>
+</body>
+</html>
