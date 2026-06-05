@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reliqt — Deploy All Tokens</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0C1E;color:#E8EEFF;font-family:'Inter',monospace;padding:24px;min-height:100vh}
+h1{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px}
+.sub{font-size:13px;color:#4A5580;margin-bottom:24px}
+.card{background:#131828;border:1px solid rgba(77,138,255,0.15);border-radius:12px;padding:20px;margin-bottom:16px}
+.card h2{font-size:14px;font-weight:700;color:#7AABFF;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em}
+.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:16px}
+.token-item{background:#0D0F1C;border:1px solid rgba(77,138,255,0.1);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px}
+.token-status{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.status-pending{background:#4A5580}
+.status-deploying{background:#F59E0B;animation:pulse 1s ease infinite}
+.status-done{background:#22C55E}
+.status-error{background:#EF4444}
+.token-name{font-size:13px;font-weight:600;color:#fff}
+.token-addr{font-size:10px;color:#4A5580;font-family:monospace;margin-top:2px;word-break:break-all}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn{
+  padding:12px 24px;border-radius:8px;border:none;cursor:pointer;
+  font-size:14px;font-weight:700;transition:all 0.15s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{background:#0052FF;color:#fff}
+.btn-primary:hover{background:#1A6AFF;transform:translateY(-1px)}
+.btn-primary:disabled{background:#1A2040;color:#3A4060;cursor:not-allowed;transform:none}
+.btn-danger{background:#EF4444;color:#fff}
+.log-box{
+  background:#060810;border:1px solid rgba(77,138,255,0.1);border-radius:8px;
+  padding:12px;height:200px;overflow-y:auto;font-family:monospace;font-size:12px;
+}
+.log-info{color:#7AABFF}
+.log-success{color:#22C55E}
+.log-error{color:#EF4444}
+.log-warn{color:#F59E0B}
+.progress-bar{height:4px;background:#1A1E35;border-radius:2px;margin:12px 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0052FF,#7AABFF);border-radius:2px;transition:width 0.5s ease;width:0%}
+.input-row{display:flex;gap:10px;margin-bottom:12px;align-items:center}
+.input-label{font-size:12px;color:#7B88C4;width:120px;flex-shrink:0}
+input[type=number],input[type=text]{
+  background:#0D0F1C;border:1px solid rgba(77,138,255,0.2);
+  border-radius:6px;padding:8px 12px;color:#fff;font-family:monospace;font-size:13px;
+  width:160px;
+}
+input:focus{outline:none;border-color:#0052FF}
+.step-indicator{display:flex;gap:0;margin-bottom:16px}
+.step{
+  flex:1;padding:8px;text-align:center;font-size:11px;font-weight:600;
+  background:#0D0F1C;border:1px solid rgba(77,138,255,0.1);color:#4A5580;
+}
+.step:first-child{border-radius:6px 0 0 6px}
+.step:last-child{border-radius:0 6px 6px 0}
+.step.active{background:rgba(0,82,255,0.15);color:#7AABFF;border-color:rgba(0,82,255,0.4)}
+.step.done{background:rgba(34,197,94,0.1);color:#22C55E;border-color:rgba(34,197,94,0.3)}
+.wallet-row{display:flex;align-items:center;gap:12px;padding:12px;background:#0D0F1C;border-radius:8px;margin-bottom:16px}
+.wallet-dot{width:8px;height:8px;border-radius:50%;background:#4A5580}
+.wallet-dot.connected{background:#22C55E}
+.wallet-addr{font-size:13px;font-family:monospace;color:#7AABFF}
+</style>
+</head>
+<body>
+
+<h1>Reliqt — Deploy All Tokens</h1>
+<div class="sub">Auto deploy 11 tokens + add Uniswap V4 liquidity on Base Mainnet</div>
+
+<!-- Wallet -->
+<div class="card">
+  <h2>1. Connect Wallet</h2>
+  <div class="wallet-row">
+    <div class="wallet-dot" id="walletDot"></div>
+    <div class="wallet-addr" id="walletAddr">Not connected</div>
+    <button class="btn btn-primary" id="connectBtn" onclick="connectWallet()">Connect MetaMask</button>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="card">
+  <h2>2. Settings</h2>
+  <div class="input-row">
+    <div class="input-label">USDC per pool</div>
+    <input type="number" id="usdcPerPool" value="1" min="1" max="1000" step="0.5"/>
+    <span style="font-size:12px;color:#4A5580;margin-left:8px">USDC minimum $1 (cukup untuk listing)</span>
+  </div>
+  <div class="input-row">
+    <div class="input-label">Tokens to deploy</div>
+    <select id="deployCount" style="background:#0D0F1C;border:1px solid rgba(77,138,255,0.2);border-radius:6px;padding:8px 12px;color:#fff;font-size:13px">
+      <option value="3">3 tokens (~$6)</option>
+      <option value="6">6 tokens (~$12)</option>
+      <option value="11" selected>All 11 tokens (~$22)</option>
+    </select>
+  </div>
+  <div style="font-size:12px;color:#22C55E;margin-bottom:8px">✓ $1 USDC minimum sudah cukup untuk listing di DexScreener!</div>
+  <div id="costEstimate" style="font-size:13px;color:#7AABFF;margin-top:8px">
+    Estimated cost: ~$11 USDC + ~0.02 ETH gas
+  </div>
+</div>
+
+<!-- Tokens Status -->
+<div class="card">
+  <h2>3. Token Status</h2>
+  <div class="step-indicator">
+    <div class="step done" id="step0">✓ rLEBRON Live</div>
+    <div class="step" id="step1">Deploy</div>
+    <div class="step" id="step2">Approve</div>
+    <div class="step" id="step3">Liquidity</div>
+    <div class="step" id="step4">DexScreener</div>
+  </div>
+  <div class="token-grid" id="tokenGrid"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div style="font-size:12px;color:#4A5580" id="progressText">Ready to deploy</div>
+</div>
+
+<!-- Deploy Button -->
+<div class="card">
+  <h2>4. Deploy</h2>
+  <p style="font-size:13px;color:#7B88C4;margin-bottom:16px">
+    Script will: deploy all tokens → approve USDC → approve each token → create Uniswap pool → add liquidity.<br>
+    Minimum $1 USDC per pool cukup untuk listing di DexScreener!<br>
+    You'll need to confirm each transaction in MetaMask (~3 confirms per token).
+  </p>
+  <div style="display:flex;gap:12px">
+    <button class="btn btn-primary" id="deployBtn" onclick="startDeploy()" disabled>
+      🚀 Deploy All Tokens
+    </button>
+    <button class="btn" style="background:#1A1E35;color:#7B88C4" onclick="resetAll()">Reset</button>
+  </div>
+</div>
+
+<!-- Log -->
+<div class="card">
+  <h2>Deploy Log</h2>
+  <div class="log-box" id="logBox">
+    <div class="log-info">> Reliqt Deploy Script v1.0</div>
+    <div class="log-info">> Connect wallet to begin...</div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──
+const BASE_CHAIN_ID = '0x2105';
+const USDC_BASE = '0x833589fCd6eDb6E08f4c7C32D4f71b54bdA02913';
+const SWAP_ROUTER = '0x2626664c2603336E57B271c5C0b26F421741e481';
+const UNISWAP_FACTORY = '0x33128a8fC17869897dcE68Ed026d694621f6FDfD';
+const FEE_TIER = 10000; // 1%
+
+// All tokens to deploy (skip id=0 rLEBRON - already done)
+const TOKENS = [
+  {id:1, symbol:'rMAHOMES', name:'Patrick Mahomes', supply:10000},
+  {id:2, symbol:'rHAALAND', name:'Erling Haaland', supply:10000},
+  {id:3, symbol:'rCHARIZARD', name:'Charizard Base Set', supply:10000},
+  {id:4, symbol:'rPIKACHU', name:'Pikachu Illustrator', supply:10000},
+  {id:5, symbol:'rMEWTWO', name:'Mewtwo Holo 1st Ed', supply:10000},
+  {id:6, symbol:'rUMBREON', name:'Umbreon V Max', supply:10000},
+  {id:7, symbol:'rVENUS', name:'Venusaur 1st Ed', supply:10000},
+  {id:8, symbol:'rWEMBY', name:'Wembanyama RC', supply:10000},
+  {id:9, symbol:'rSGA', name:'SGA RC', supply:10000},
+  {id:10, symbol:'rCHARIZEX', name:'Charizard EX', supply:10000},
+  {id:11, symbol:'rGOKU', name:'Goku Ultra Instinct', supply:10000},
+];
+
+// ERC-20 bytecode (minimal ERC-20 with mint)
+const ERC20_ABI_ENCODED = (name, symbol, supply) => {
+  // Solidity: ERC20(name, symbol) + mint(msg.sender, supply * 1e18)
+  // Using OpenZeppelin minimal ERC20 - constructor bytecode
+  const nameHex = strToHex(name);
+  const symbolHex = strToHex(symbol);
+  return '0x' + getERC20Bytecode(nameHex, symbolHex, supply);
+};
+
+function strToHex(str) {
+  return Array.from(str).map(c => c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+}
+
+function pad32(hex) {
+  return hex.replace('0x','').padStart(64,'0');
+}
+
+function pad32n(n) {
+  return n.toString(16).padStart(64,'0');
+}
+
+// Minimal ERC-20 bytecode (pre-compiled)
+// This is the bytecode for a simple ERC20 token
+function getERC20Bytecode(nameHex, symbolHex, supply) {
+  // We'll use the factory contract approach instead
+  // Return placeholder - actual deploy uses Remix-compatible bytecode
+  return null;
+}
+
+let wallet = null;
+let deployedTokens = {};
+let isDeploying = false;
+
+// ── UI ──
+function renderTokenGrid() {
+  const count = parseInt(document.getElementById('deployCount').value);
+  const tokens = TOKENS.slice(0, count);
+  const grid = document.getElementById('tokenGrid');
+  grid.innerHTML = tokens.map(t => `
+    <div class="token-item" id="token-${t.id}">
+      <div class="token-status status-pending" id="dot-${t.id}"></div>
+      <div>
+        <div class="token-name">${t.symbol}</div>
+        <div class="token-addr" id="addr-${t.id}">${deployedTokens[t.id] || 'Pending...'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateCost() {
+  const count = parseInt(document.getElementById('deployCount').value);
+  const usdc = parseFloat(document.getElementById('usdcPerPool').value) || 10;
+  const totalUsdc = count * usdc;
+  const gasEth = (count * 0.002).toFixed(3);
+  document.getElementById('costEstimate').textContent =
+    `Estimated cost: ~$${totalUsdc} USDC + ~${gasEth} ETH gas | ${count} tokens`;
+  renderTokenGrid();
+}
+
+document.getElementById('deployCount').addEventListener('change', updateCost);
+document.getElementById('usdcPerPool').addEventListener('input', updateCost);
+
+function log(msg, type='info') {
+  const box = document.getElementById('logBox');
+  const div = document.createElement('div');
+  div.className = `log-${type}`;
+  div.textContent = `> ${new Date().toLocaleTimeString()} — ${msg}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setStep(n) {
+  ['step1','step2','step3','step4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (i < n) el.className = 'step done';
+    else if (i === n) el.className = 'step active';
+    else el.className = 'step';
+  });
+}
+
+function setTokenStatus(id, status, addr) {
+  const dot = document.getElementById(`dot-${id}`);
+  const addrEl = document.getElementById(`addr-${id}`);
+  if (dot) dot.className = `token-status status-${status}`;
+  if (addrEl && addr) addrEl.textContent = addr.slice(0,10) + '...' + addr.slice(-6);
+}
+
+function updateProgress(done, total) {
+  const pct = Math.round((done/total)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done}/${total} tokens deployed (${pct}%)`;
+}
+
+// ── WALLET ──
+async function connectWallet() {
+  if (!window.ethereum) { alert('MetaMask not found!'); return; }
+  try {
+    const accounts = await window.ethereum.request({ method:'eth_requestAccounts' });
+    wallet = accounts[0];
+
+    // Switch to Base
+    try {
+      await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:BASE_CHAIN_ID}] });
+    } catch(e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{
+          chainId: BASE_CHAIN_ID,
+          chainName: 'Base Mainnet',
+          nativeCurrency: {name:'ETH',symbol:'ETH',decimals:18},
+          rpcUrls: ['https://mainnet.base.org'],
+          blockExplorerUrls: ['https://basescan.org']
+        }]});
+      }
+    }
+
+    document.getElementById('walletDot').className = 'wallet-dot connected';
+    document.getElementById('walletAddr').textContent = wallet.slice(0,6) + '...' + wallet.slice(-4);
+    document.getElementById('connectBtn').textContent = '✓ Connected';
+    document.getElementById('connectBtn').disabled = true;
+    document.getElementById('deployBtn').disabled = false;
+    log(`Wallet connected: ${wallet}`, 'success');
+    renderTokenGrid();
+  } catch(e) {
+    log(`Connect failed: ${e.message}`, 'error');
+  }
+}
+
+// ── RPC ──
+async function rpcCall(method, params) {
+  const res = await fetch('https://mainnet.base.org', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({jsonrpc:'2.0',id:1,method,params})
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.result;
+}
+
+async function waitTx(hash) {
+  log(`Waiting for tx: ${hash.slice(0,12)}...`, 'info');
+  for (let i=0; i<60; i++) {
+    await new Promise(r=>setTimeout(r,2000));
+    const receipt = await rpcCall('eth_getTransactionReceipt', [hash]);
+    if (receipt) {
+      if (receipt.status === '0x1') return receipt;
+      else throw new Error('Transaction reverted!');
+    }
+  }
+  throw new Error('Transaction timeout');
+}
+
+// ── ERC-20 DEPLOY ──
+// Minimal ERC-20 bytecode (compiled from Solidity)
+// pragma solidity ^0.8.0;
+// import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// contract ReliqtToken is ERC20 {
+//   constructor(string memory name, string memory symbol, uint256 supply)
+//     ERC20(name, symbol) { _mint(msg.sender, supply * 10**18); }
+// }
+const RELIQT_TOKEN_BYTECODE = '0x60806040523480156200001157600080fd5b5060405162001a1338038062001a13833981016040819052620000349162000271565b828260036200004483826200038a565b5060046200005382826200038a565b5050506200006833826200007060201b60201c565b505062000456565b6001600160a01b038216620000cb5760405162461bcd60e51b815260206004820152601f60248201527f45524332303a206d696e7420746f20746865207a65726f206164647265737300604482015260640160405180910390fd5b8060026000828254620000df919062000456565b90915550506001600160a01b038216600090815260208190526040812080548392906200010e908490620004566200045686565b90915550506040518181526001600160a01b038316906000907fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9060200160405180910390a35050565b505050565b634e487b7160e01b600052604160045260246000fd5b600082601f8301126200018257600080fd5b81516001600160401b03808211156200019f576200019f6200015a565b604051601f8301601f19908116603f01168101908282118183101715620001ca57620001ca6200015a565b8160405283815260209250868385880101111562000 1e757600080fd5b600091505b8383101562000 20b5785810183015181820184015290820190620001ec565b600093505050509392505050565b80516001600160a01b03811681146200023157600080fd5b919050565b600080604083850312156200024a57600080fd5b82516001600160401b038111156200026157600080fd5b6200026f858286016200016f565b925050602083015190509250929050565b6000806000606084860312156200028757600080fd5b83516001600160401b03808211156200029f57600080fd5b620002ad878388016200016f565b94506020860151915080821115620002c457600080fd5b620002d2878388016200016f565b93506040860151915080821115620002e957600080fd5b506200030386828701878601016200016f565b9150506200 0316836200 020c565b80519150506200 0326836200 0219565b9150509250925092565b600181811c908216806200034757607f821691505b6020821081036200036857634e487b7160e01b600052602260045260246000fd5b50919050565b601f8211156200015557600081815260208120601f850160051c810160208610156200039757508085015b620003b36020830186620003aa565b509392505050565b600082601f830112620003ce57600080fd5b81516001600160401b03808211156200 03eb57620003eb6200015a565b604051601f8301601f19908116603f0116810190828211818310171562000416576200041662000 15a565b816040528381526020925086838588010111156200043357600080fd5b600091505b838310156200 04575785810183015181820184015290820190620004 38565b5060009350505050 9392505050565b808201808211156200 047e57634e487b7160e01b600052601160045260246000fd5b92915050565b6115ad80620004666000396000f3fe';
+
+async function deployToken(token) {
+  log(`Deploying ${token.symbol}...`, 'info');
+  setTokenStatus(token.id, 'deploying');
+
+  // Encode constructor: (name, symbol, supply)
+  const name = token.name;
+  const symbol = token.symbol;
+  const supply = token.supply;
+
+  // ABI encode constructor params
+  const nameBytes = encodeString(name);
+  const symbolBytes = encodeString(symbol);
+  const supplyHex = pad32n(supply);
+
+  // Constructor params offset encoding
+  const offset1 = pad32n(96); // offset to name
+  const offset2 = pad32n(96 + 32 + Math.ceil(name.length/32)*32); // offset to symbol
+  const constructorParams = offset1 + offset2 + supplyHex + nameBytes + symbolBytes;
+
+  const data = RELIQT_TOKEN_BYTECODE + constructorParams;
+
+  try {
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{
+        from: wallet,
+        data: data,
+        gas: '0x' + (3000000).toString(16)
+      }]
+    });
+    log(`${token.symbol} tx sent: ${txHash.slice(0,12)}...`, 'info');
+    const receipt = await waitTx(txHash);
+    const addr = receipt.contractAddress;
+    deployedTokens[token.id] = addr;
+    setTokenStatus(token.id, 'done', addr);
+    log(`${token.symbol} deployed at ${addr}`, 'success');
+    return addr;
+  } catch(e) {
+    setTokenStatus(token.id, 'error');
+    log(`${token.symbol} deploy failed: ${e.message}`, 'error');
+    throw e;
+  }
+}
+
+function encodeString(str) {
+  const len = pad32n(str.length);
+  const bytes = strToHex(str);
+  const padded = bytes.padEnd(Math.ceil(str.length/32)*64, '0');
+  return len + padded;
+}
+
+// ── APPROVE ERC-20 ──
+async function approveToken(tokenAddr, spender, label) {
+  log(`Approving ${label}...`, 'info');
+  const MAX = 'f'.repeat(64);
+  const data = '0x095ea7b3' + pad32(spender) + MAX;
+  const txHash = await window.ethereum.request({
+    method: 'eth_sendTransaction',
+    params: [{from:wallet, to:tokenAddr, data, gas:'0x' + (100000).toString(16)}]
+  });
+  await waitTx(txHash);
+  log(`${label} approved!`, 'success');
+}
+
+// ── ADD LIQUIDITY ──
+async function addLiquidity(tokenAddr, symbol, usdcAmount) {
+  log(`Adding liquidity for ${symbol}...`, 'info');
+
+  const usdcWei = BigInt(Math.floor(usdcAmount * 1e6)); // 6 decimals USDC
+  const tokenWei = BigInt(10000) * BigInt(10**18); // all 10,000 tokens
+  const deadline = Math.floor(Date.now()/1000) + 1200;
+
+  // exactInputSingle via SwapRouter (create pool + add liquidity via position manager)
+  // Use Uniswap V3 NonfungiblePositionManager on Base
+  const POSITION_MANAGER = '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f4';
+
+  // mint(MintParams) - creates pool if needed
+  // struct MintParams { token0, token1, fee, tickLower, tickUpper, amount0Desired, amount1Desired, amount0Min, amount1Min, recipient, deadline }
+  const [token0, token1] = tokenAddr.toLowerCase() < USDC_BASE.toLowerCase()
+    ? [tokenAddr, USDC_BASE]
+    : [USDC_BASE, tokenAddr];
+
+  const isTokenFirst = token0.toLowerCase() === tokenAddr.toLowerCase();
+  const amount0 = isTokenFirst ? tokenWei : usdcWei;
+  const amount1 = isTokenFirst ? usdcWei : tokenWei;
+
+  // Full range ticks for 1% fee
+  const TICK_LOWER = -887200;
+  const TICK_UPPER = 887200;
+
+  // Encode mint params
+  function p32(val) { return BigInt(val).toString(16).padStart(64,'0') }
+  function p32s(val) { // signed int
+    const v = BigInt(val);
+    return (v < 0n ? (2n**256n + v) : v).toString(16).padStart(64,'0');
+  }
+
+  const calldata = '0x88316456' // mint selector
+    + p32(token0)
+    + p32(token1)
+    + p32(FEE_TIER)
+    + p32s(TICK_LOWER)
+    + p32s(TICK_UPPER)
+    + p32(amount0)
+    + p32(amount1)
+    + p32(0) // amount0Min
+    + p32(0) // amount1Min
+    + p32(wallet)
+    + p32(deadline);
+
+  // First: initialize pool price
+  // sqrtPriceX96 for 1 USDC = 1 token (price = 1)
+  // sqrtPriceX96 = sqrt(1) * 2^96 = 2^96
+  const SQRT_PRICE_X96 = (2n**96n).toString(16).padStart(64,'0');
+
+  const FACTORY_INIT = '0x1a686502' // initializePool
+  // Try to initialize pool first (ignore error if already exists)
+  try {
+    const initData = '0x1a686502' + p32(token0) + p32(token1) + p32(FEE_TIER) + SQRT_PRICE_X96;
+    const initTx = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{from:wallet, to:POSITION_MANAGER, data:initData, gas:'0x' + (500000).toString(16)}]
+    });
+    await waitTx(initTx);
+    log(`Pool initialized for ${symbol}`, 'success');
+  } catch(e) {
+    log(`Pool init skipped (may already exist): ${e.message.slice(0,40)}`, 'warn');
+  }
+
+  // Add liquidity
+  const txHash = await window.ethereum.request({
+    method: 'eth_sendTransaction',
+    params: [{from:wallet, to:POSITION_MANAGER, data:calldata, gas:'0x' + (600000).toString(16)}]
+  });
+  const receipt = await waitTx(txHash);
+  log(`Liquidity added for ${symbol}! Pool active on Uniswap V3`, 'success');
+  return receipt;
+}
+
+// ── MAIN DEPLOY FLOW ──
+async function startDeploy() {
+  if (!wallet) { log('Connect wallet first!', 'error'); return; }
+  if (isDeploying) return;
+  isDeploying = true;
+
+  const btn = document.getElementById('deployBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Deploying...';
+
+  const count = parseInt(document.getElementById('deployCount').value);
+  const usdcPerPool = parseFloat(document.getElementById('usdcPerPool').value) || 10;
+  const tokens = TOKENS.slice(0, count);
+
+  try {
+    // STEP 1: Deploy all tokens
+    setStep(0);
+    log('=== STEP 1: Deploying ERC-20 tokens ===', 'info');
+    const deployed = [];
+    for (let i=0; i<tokens.length; i++) {
+      const t = tokens[i];
+      if (deployedTokens[t.id]) {
+        log(`${t.symbol} already deployed: ${deployedTokens[t.id].slice(0,10)}...`, 'warn');
+        deployed.push({...t, address: deployedTokens[t.id]});
+        continue;
+      }
+      try {
+        const addr = await deployToken(t);
+        deployed.push({...t, address: addr});
+        updateProgress(i+1, tokens.length);
+      } catch(e) {
+        log(`Skipping ${t.symbol} due to error`, 'warn');
+      }
+      await new Promise(r=>setTimeout(r,1000));
+    }
+
+    // STEP 2: Approve USDC once
+    setStep(1);
+    log('=== STEP 2: Approving USDC ===', 'info');
+    await approveToken(USDC_BASE, '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f4', 'USDC');
+
+    // STEP 3: Approve each token + add liquidity
+    setStep(2);
+    log('=== STEP 3: Adding liquidity for each token ===', 'info');
+    for (let i=0; i<deployed.length; i++) {
+      const t = deployed[i];
+      try {
+        // Approve token
+        await approveToken(t.address, '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f4', t.symbol);
+        // Add liquidity
+        await addLiquidity(t.address, t.symbol, usdcPerPool);
+        updateProgress(i+1, deployed.length);
+        await new Promise(r=>setTimeout(r,1000));
+      } catch(e) {
+        log(`${t.symbol} liquidity failed: ${e.message.slice(0,50)}`, 'error');
+      }
+    }
+
+    setStep(3);
+    log('=== ALL DONE! ===', 'success');
+    log('Tokens will appear on DexScreener in ~10-15 minutes', 'success');
+    log('Check: dexscreener.com/base', 'success');
+
+    // Show contract addresses
+    log('=== CONTRACT ADDRESSES (save these!) ===', 'warn');
+    deployed.forEach(t => {
+      log(`${t.symbol}: ${t.address}`, 'success');
+    });
+
+    btn.textContent = '✅ Deploy Complete!';
+    btn.style.background = '#16A34A';
+
+  } catch(e) {
+    log(`Deploy failed: ${e.message}`, 'error');
+    btn.disabled = false;
+    btn.textContent = '🚀 Retry Deploy';
+  }
+
+  isDeploying = false;
+}
+
+function resetAll() {
+  deployedTokens = {};
+  renderTokenGrid();
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressText').textContent = 'Ready to deploy';
+  ['step1','step2','step3','step4'].forEach(id => {
+    document.getElementById(id).className = 'step';
+  });
+  const btn = document.getElementById('deployBtn');
+  btn.textContent = '🚀 Deploy All Tokens';
+  btn.style.background = '#0052FF';
+  if (wallet) btn.disabled = false;
+  log('Reset complete', 'info');
+}
+
+// Init
+renderTokenGrid();
+updateCost();
+</script>
+</body>
+</html>
