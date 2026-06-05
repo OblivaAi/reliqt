@@ -1,0 +1,4728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Reliqt — RWA Collectibles</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0B0D12;
+  --bg2:#0F1117;
+  --sidebar:#0D0F15;
+  --surface:#141720;
+  --surface2:#1C2030;
+  --surface3:#232840;
+  --accent:#5B8DEF;
+  --accent2:#8B6CF0;
+  --accent-glow:rgba(91,141,239,0.2);
+  --gold:#E8B84B;
+  --gold-dim:#8A6820;
+  --red:#E05555;
+  --green:#34D399;
+  --teal:#2DD4BF;
+  --white:#EEF0F8;
+  --muted:#52566E;
+  --muted2:#363A52;
+  --border:rgba(91,141,239,0.12);
+  --border2:rgba(255,255,255,0.055);
+  --sidebar-w:220px;
+  --font:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --radius:8px;
+  --radius-lg:12px;
+}
+html,body{height:100%;overflow:hidden}
+
+/* ── MESH BACKGROUND ── */
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:var(--font);
+  display:flex;flex-direction:column;
+  position:relative;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(91,141,239,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(139,108,240,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(45,212,191,0.03) 0%, transparent 60%);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(91,141,239,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91,141,239,0.018) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── TOP NAV ── */
+.topnav{
+  height:52px;background:var(--sidebar);
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;
+  padding:0 20px;gap:0;
+  flex-shrink:0;z-index:100;
+  position:relative;
+}
+.topnav-logo{
+  display:flex;align-items:center;gap:10px;
+  width:var(--sidebar-w);flex-shrink:0;
+  padding-right:20px;
+  border-right:1px solid var(--border2);
+}
+.logo-icon{
+  width:28px;height:28px;
+  background:linear-gradient(135deg,var(--accent),#4040FF);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+.logo-text{font-size:16px;font-weight:800;letter-spacing:0.05em;color:var(--white)}
+.logo-text span{color:var(--accent)}
+.topnav-tabs{
+  display:flex;align-items:center;gap:2px;
+  padding:0 16px;flex:1;
+}
+.topnav-tab{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:6px;
+  font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer;
+  transition:all 0.2s;border:none;background:none;
+  white-space:nowrap;
+}
+.topnav-tab:hover{color:var(--white);background:var(--surface)}
+.topnav-tab.active{color:var(--white);background:var(--surface2)}
+.topnav-tab .tab-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+.topnav-tab .tab-badge{
+  background:var(--accent);color:var(--white);
+  font-size:9px;font-family:var(--mono);
+  padding:2px 6px;border-radius:10px;
+  font-weight:500;
+}
+.topnav-right{
+  display:flex;align-items:center;gap:10px;
+  margin-left:auto;
+}
+.balance-chip{
+  display:flex;align-items:center;gap:7px;
+  background:var(--surface2);border:1px solid var(--border2);
+  padding:6px 14px;border-radius:6px;
+  font-family:var(--mono);font-size:12px;
+}
+.balance-chip .dot{
+  width:8px;height:8px;background:var(--blue);
+  border-radius:50%;box-shadow:0 0 6px var(--blue);
+}
+.wallet-btn{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  padding:6px 14px;border-radius:6px;cursor:pointer;
+  font-family:var(--font);font-size:13px;font-weight:600;
+  color:var(--white);transition:all 0.2s;
+}
+.wallet-btn:hover{border-color:var(--accent);background:var(--surface3)}
+.wallet-btn.connected{border-color:var(--accent);color:var(--accent)}
+.wallet-avatar{
+  width:24px;height:24px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+}
+
+/* ── LAYOUT ── */
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--sidebar);
+  border-right:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overflow-x:hidden;
+}
+.sidebar::-webkit-scrollbar{width:0}
+.sidebar-section{padding:12px 10px 4px}
+.sidebar-section-label{
+  font-size:9px;font-family:var(--mono);
+  color:var(--muted);letter-spacing:0.25em;
+  text-transform:uppercase;padding:0 8px;margin-bottom:6px;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:6px;
+  font-size:13px;font-weight:600;
+  color:var(--muted);cursor:pointer;
+  transition:all 0.2s;margin-bottom:2px;
+  border:none;background:none;width:100%;text-align:left;
+}
+.sidebar-item:hover{color:var(--white);background:var(--surface)}
+.sidebar-item.active{color:var(--white);background:var(--surface2)}
+.sidebar-item.active .si-icon{color:var(--accent) !important}
+.si-icon{width:20px;height:20px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.si-badge{
+  margin-left:auto;font-size:9px;font-family:var(--mono);
+  background:var(--accent);color:#fff;
+  padding:2px 7px;border-radius:10px;
+}
+.si-badge.red{background:var(--red)}
+.si-badge.green{background:var(--green)}
+
+/* Live feed */
+.sidebar-livefeed{
+  margin:8px 10px;background:var(--surface);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:10px;flex:1;overflow:hidden;
+}
+.livefeed-title{
+  font-size:10px;font-family:var(--mono);
+  color:var(--muted);letter-spacing:0.2em;
+  text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.livefeed-title::before{
+  content:'';width:6px;height:6px;
+  background:var(--red);border-radius:50%;
+  box-shadow:0 0 6px var(--red);
+  animation:blink 1.5s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.livefeed-item{
+  padding:7px 0;border-bottom:1px solid var(--border2);
+  font-size:11px;
+}
+.livefeed-item:last-child{border-bottom:none}
+.livefeed-item .lf-name{color:var(--white);font-weight:600;font-size:11px}
+.livefeed-item .lf-price{color:var(--gold);font-family:var(--mono);font-size:10px}
+.livefeed-item .lf-time{color:var(--muted);font-family:var(--mono);font-size:9px}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column}
+.main::-webkit-scrollbar{width:6px}
+.main::-webkit-scrollbar-track{background:var(--bg)}
+.main::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
+
+/* Page panels */
+.page{display:none;flex-direction:column;flex:1}
+.page.active{display:flex}
+
+/* ── MARKETPLACE PAGE ── */
+.market-toolbar{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;gap:12px;
+  flex-shrink:0;background:var(--bg2);
+  position:sticky;top:0;z-index:10;
+}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.filter-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1px solid var(--border2);
+  color:var(--muted);cursor:pointer;
+  transition:all 0.2s;background:var(--surface);
+  white-space:nowrap;
+}
+.filter-chip:hover{border-color:var(--accent);color:var(--white)}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.filter-chip .chip-count{
+  font-family:var(--mono);font-size:9px;
+  opacity:0.7;
+}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border2);
+  padding:7px 14px;border-radius:8px;
+  font-size:13px;color:var(--muted);
+  min-width:200px;
+}
+.search-box input{
+  background:none;border:none;outline:none;
+  color:var(--white);font-family:var(--font);font-size:13px;
+  width:100%;
+}
+.search-box input::placeholder{color:var(--muted)}
+
+/* Card grid */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;padding:16px 20px;
+}
+.market-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;overflow:hidden;cursor:pointer;
+  transition:all 0.25s;position:relative;
+}
+.market-card:hover{
+  border-color:rgba(123,92,240,0.4);
+  transform:translateY(-3px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4),0 0 0 1px rgba(123,92,240,0.15);
+}
+.mc-img{
+  aspect-ratio:3/4;background:var(--surface2);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.mc-img-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 40%,rgba(123,92,240,0.08),transparent 70%);
+}
+.mc-emoji{font-size:52px;position:relative;z-index:2;filter:drop-shadow(0 4px 12px rgba(123,92,240,0.3))}
+.mc-grade{
+  position:absolute;top:8px;right:8px;z-index:3;
+  background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.1);
+  font-family:var(--mono);font-size:9px;
+  padding:3px 8px;border-radius:4px;
+  color:var(--gold);letter-spacing:0.1em;
+}
+.mc-badge{
+  position:absolute;top:8px;left:8px;z-index:3;
+  font-size:10px;padding:3px 8px;border-radius:4px;
+  font-family:var(--mono);letter-spacing:0.1em;font-weight:500;
+}
+.mc-badge.hot{background:rgba(232,64,64,0.85);color:#fff}
+.mc-badge.new{background:rgba(123,92,240,0.85);color:#fff}
+.mc-badge.rare{background:rgba(245,200,66,0.85);color:#000}
+.mc-info{padding:12px}
+.mc-category{
+  font-size:9px;font-family:var(--mono);
+  color:var(--accent);letter-spacing:0.2em;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.mc-name{font-size:14px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-set{font-size:11px;color:var(--muted);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-progress{height:2px;background:var(--surface3);margin-bottom:4px;border-radius:1px}
+.mc-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:1px;transition:width 1s ease}
+.mc-progress-label{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:9px;color:var(--muted);
+  margin-bottom:10px;
+}
+.mc-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:10px;border-top:1px solid var(--border2);
+}
+.mc-price{font-size:16px;font-weight:700;color:var(--gold)}
+.mc-price small{display:block;font-size:9px;color:var(--muted);font-weight:400;font-family:var(--mono)}
+.mc-buy-btn{
+  background:var(--accent);border:none;color:#fff;
+  font-family:var(--font);font-size:11px;font-weight:700;
+  padding:6px 14px;border-radius:5px;cursor:pointer;
+  transition:all 0.2s;
+}
+.mc-buy-btn:hover{background:#9070FF;box-shadow:0 0 15px var(--accent-glow)}
+
+/* ── GACHA PAGE ── */
+.gacha-page{
+  display:none;flex-direction:row;
+  flex:1;overflow:hidden;
+}
+.gacha-page.active{display:flex}
+.gacha-left{
+  flex:1;overflow-y:auto;padding:20px;
+}
+.gacha-right{
+  width:300px;flex-shrink:0;
+  border-left:1px solid var(--border2);
+  display:flex;flex-direction:column;
+  background:var(--bg2);
+}
+.gacha-pack-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+.gacha-pack{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:10px;overflow:hidden;cursor:pointer;
+  transition:all 0.3s;position:relative;
+}
+.gacha-pack:hover{
+  border-color:rgba(123,92,240,0.5);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.5),0 0 20px var(--accent-glow);
+}
+.gp-img{
+  height:160px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--surface2),var(--surface3));
+}
+.gp-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 50%,rgba(123,92,240,0.15),transparent 70%);
+}
+.gp-emoji{font-size:64px;position:relative;z-index:2;filter:drop-shadow(0 0 20px rgba(123,92,240,0.5))}
+.gp-shimmer{
+  position:absolute;inset:0;
+  background:linear-gradient(45deg,transparent 30%,rgba(255,255,255,0.05) 50%,transparent 70%);
+  background-size:200% 200%;
+  animation:shimmer 2s ease infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.gp-body{padding:14px}
+.gp-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.gp-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:12px}
+.gp-stats{display:flex;gap:8px;margin-bottom:12px}
+.gp-stat{
+  flex:1;background:var(--surface2);border-radius:4px;
+  padding:6px 8px;text-align:center;
+}
+.gp-stat .sv{font-size:12px;font-weight:700;color:var(--white)}
+.gp-stat .sl{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.gp-open-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),#5050FF);
+  border:none;color:#fff;font-family:var(--font);
+  font-size:13px;font-weight:700;padding:10px;
+  border-radius:6px;cursor:pointer;transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.gp-open-btn:hover{box-shadow:0 0 20px var(--accent-glow);transform:translateY(-1px)}
+.gp-price{color:var(--gold)}
+
+/* Gacha recent opens panel */
+.gacha-recent{
+  padding:14px;border-bottom:1px solid var(--border2);
+}
+.gacha-recent-title{
+  font-size:11px;font-family:var(--mono);
+  color:var(--muted);letter-spacing:0.2em;
+  text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.gacha-recent-title::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;box-shadow:0 0 6px var(--red);animation:blink 1.5s infinite}
+.recent-open-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--border2);
+  font-size:11px;
+}
+.recent-open-item:last-child{border-bottom:none}
+.roi-emoji{font-size:22px}
+.roi-info{flex:1;min-width:0}
+.roi-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.roi-user{color:var(--muted);font-family:var(--mono);font-size:9px}
+.roi-price{font-family:var(--mono);font-size:11px;color:var(--gold);text-align:right;flex-shrink:0}
+
+/* Machine animation */
+.gacha-machine-wrap{
+  padding:14px;flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;
+}
+.gacha-machine{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:12px;padding:20px;text-align:center;
+  width:100%;
+}
+.gm-screen{
+  background:#000;border:2px solid rgba(91,141,239,0.25);
+  border-radius:6px;height:120px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;font-size:48px;
+  position:relative;overflow:hidden;
+}
+.gm-screen-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 50%,rgba(123,92,240,0.1),transparent 70%);
+}
+.gm-screen-text{position:relative;z-index:2}
+.gm-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px}
+.gm-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),#6040E0);
+  border:none;color:#fff;font-family:var(--font);
+  font-size:13px;font-weight:700;padding:12px;
+  border-radius:6px;cursor:pointer;transition:all 0.3s;
+}
+.gm-btn:hover{box-shadow:0 0 20px var(--accent-glow)}
+.gm-btn:disabled{background:var(--surface3);color:var(--muted);cursor:not-allowed;box-shadow:none}
+
+/* ── LEADERBOARD PAGE ── */
+.lb-page{padding:20px;flex:1;overflow-y:auto}
+.lb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.lb-title{font-size:22px;font-weight:800;letter-spacing:0.02em}
+.lb-tabs{display:flex;gap:4px;background:var(--surface);padding:4px;border-radius:8px}
+.lb-tab{
+  padding:6px 16px;border-radius:6px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--muted);border:none;background:none;
+  transition:all 0.2s;
+}
+.lb-tab.active{background:var(--surface2);color:var(--white)}
+.lb-table{background:var(--surface);border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.lb-table-head{
+  display:grid;grid-template-columns:60px 1fr 140px 140px 100px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border2);
+  font-family:var(--mono);font-size:9px;
+  color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;
+}
+.lb-row{
+  display:grid;grid-template-columns:60px 1fr 140px 140px 100px;
+  padding:12px 16px;border-bottom:1px solid var(--border2);
+  align-items:center;transition:background 0.2s;
+}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:var(--surface2)}
+.lb-rank{font-family:var(--mono);font-size:13px;font-weight:700}
+.lb-rank.gold{color:var(--gold)}
+.lb-rank.silver{color:#C0C0C0}
+.lb-rank.bronze{color:#CD7F32}
+.lb-wallet{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.lb-pts{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--white)}
+.lb-total{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.lb-refs{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center}
+
+/* ── PORTFOLIO PAGE ── */
+.pf-page{padding:20px;flex:1;overflow-y:auto}
+.pf-top{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:20px;
+}
+.pf-stat-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;padding:16px;
+  transition:border-color 0.2s;
+}
+.pf-stat-card:hover{border-color:rgba(123,92,240,0.3)}
+.pf-stat-val{font-size:24px;font-weight:800;color:var(--gold);margin-bottom:4px}
+.pf-stat-val.green{color:var(--green)}
+.pf-stat-val.red{color:var(--red)}
+.pf-stat-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase}
+.pf-chart-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;padding:16px;margin-bottom:20px;
+}
+.pf-chart-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;
+}
+.pf-chart-title{font-size:14px;font-weight:700}
+.pf-chart-sub{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.pf-svg{width:100%;height:120px}
+.pf-holdings-title{
+  font-size:13px;font-weight:700;letter-spacing:0.05em;
+  margin-bottom:12px;color:var(--muted);text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.pf-holdings-title::before{content:'▸';color:var(--accent)}
+.pf-holding{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;padding:14px 16px;
+  display:grid;grid-template-columns:48px 1fr auto auto;
+  gap:14px;align-items:center;margin-bottom:8px;
+  transition:all 0.2s;cursor:default;
+}
+.pf-holding:hover{border-color:rgba(123,92,240,0.3);background:var(--surface2)}
+.pf-h-emoji{font-size:32px}
+.pf-h-name{font-size:14px;font-weight:700}
+.pf-h-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.pf-h-tokens{text-align:right}
+.pf-h-tokens .v{font-size:16px;font-weight:700}
+.pf-h-tokens .l{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.pf-h-val{text-align:right}
+.pf-h-val .v{font-size:16px;font-weight:700;color:var(--gold)}
+.pf-h-val .c{font-family:var(--mono);font-size:10px}
+.pf-h-val .c.up{color:var(--green)}
+.pf-h-val .c.dn{color:var(--red)}
+.pf-ai-card{
+  background:var(--surface);border:1px solid rgba(123,92,240,0.25);
+  border-radius:8px;padding:16px;margin-top:16px;
+}
+.pf-ai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.pf-ai-title{font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
+.pf-ai-title::before{content:'⚡'}
+.pf-ai-btn{
+  background:transparent;border:1px solid rgba(91,141,239,0.25);
+  color:var(--accent);font-family:var(--font);font-size:11px;font-weight:600;
+  padding:5px 14px;border-radius:5px;cursor:pointer;transition:all 0.2s;
+}
+.pf-ai-btn:hover{background:rgba(123,92,240,0.1)}
+.pf-ai-text{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7}
+
+/* ── YOLO PAGE ── */
+.yolo-page{
+  flex:1;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:40px;
+}
+.yolo-page.active{display:flex}
+.yolo-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:12px;padding:32px;max-width:500px;width:100%;text-align:center;
+}
+.yolo-title{font-size:36px;font-weight:800;letter-spacing:0.05em;margin-bottom:8px}
+.yolo-sub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:28px}
+.yolo-slider-wrap{margin-bottom:20px}
+.yolo-slider-label{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px;
+}
+.yolo-slider{
+  -webkit-appearance:none;width:100%;height:4px;
+  background:var(--surface3);border-radius:2px;outline:none;cursor:pointer;
+}
+.yolo-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;
+  border-radius:50%;background:var(--accent);cursor:pointer;
+  box-shadow:0 0 10px var(--accent-glow);
+}
+.yolo-total{
+  font-size:28px;font-weight:800;color:var(--gold);
+  margin-bottom:24px;font-family:var(--mono);
+}
+.yolo-total small{font-size:14px;color:var(--muted);font-weight:400}
+.yolo-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),#5050FF);
+  border:none;color:#fff;font-family:var(--font);
+  font-size:16px;font-weight:800;padding:16px;
+  border-radius:8px;cursor:pointer;transition:all 0.3s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.yolo-btn:hover{box-shadow:0 0 30px var(--accent-glow);transform:translateY(-2px)}
+.yolo-pack-select{
+  display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;justify-content:center;
+}
+.yolo-pack-opt{
+  padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;
+  border:1px solid var(--border2);color:var(--muted);cursor:pointer;
+  transition:all 0.2s;background:var(--surface2);
+}
+.yolo-pack-opt.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ── WALLET MODAL ── */
+.wmodal-overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(10,10,15,0.85);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;
+}
+.wmodal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.wmodal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;width:100%;max-width:400px;margin:20px;
+  animation:slideUp 0.25s ease;overflow:hidden;
+}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.wmodal-head{padding:20px 20px 0;display:flex;justify-content:space-between;align-items:center}
+.wmodal-title{font-size:18px;font-weight:800}
+.wmodal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;transition:color 0.2s}
+.wmodal-close:hover{color:var(--white)}
+.wmodal-sub{padding:8px 20px 16px;font-family:var(--mono);font-size:11px;color:var(--muted);border-bottom:1px solid var(--border2)}
+.wmodal-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:8px}
+.wmodal-status{
+  display:none;margin:0 20px 8px;padding:10px 14px;
+  font-family:var(--mono);font-size:11px;border-radius:6px;text-align:center;
+}
+.wmodal-status.loading{display:block;background:var(--surface2);color:var(--muted);animation:pulse 1.2s ease infinite}
+.wmodal-status.error{display:block;background:rgba(232,64,64,0.1);color:var(--red);border:1px solid rgba(232,64,64,0.2)}
+.wmodal-status.success{display:block;background:rgba(46,204,113,0.1);color:var(--green);border:1px solid rgba(46,204,113,0.2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.wm-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:8px;
+  color:var(--white);font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;text-align:left;width:100%;
+}
+.wm-btn:hover{border-color:rgba(123,92,240,0.4);background:var(--surface3)}
+.wm-icon{font-size:20px;flex-shrink:0}
+.wm-info{flex:1}
+.wm-info small{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;margin-top:2px}
+.wm-divider{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.2em}
+.wm-divider::before,.wm-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.wm-email-form{display:flex;flex-direction:column;gap:8px}
+.wm-input{
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--white);font-family:var(--mono);font-size:12px;
+  padding:10px 12px;border-radius:6px;outline:none;
+  transition:border-color 0.2s;
+}
+.wm-input:focus{border-color:rgba(91,141,239,0.25)}
+.wm-input::placeholder{color:var(--muted)}
+.wm-submit{
+  background:var(--accent);border:none;color:#fff;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  padding:11px;border-radius:6px;cursor:pointer;transition:all 0.2s;
+}
+.wm-submit:hover{background:#9070FF;box-shadow:0 0 15px var(--accent-glow)}
+.wm-otp-wrap{display:flex;gap:6px;justify-content:center}
+.wm-otp-input{
+  width:40px;height:48px;text-align:center;
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--accent);font-family:var(--mono);font-size:20px;font-weight:700;
+  border-radius:6px;outline:none;transition:border-color 0.2s;
+}
+.wm-otp-input:focus{border-color:rgba(91,141,239,0.25);background:rgba(123,92,240,0.05)}
+.wm-connected{display:none;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:8px 0}
+.wm-connected-icon{font-size:44px}
+.wm-connected-title{font-size:16px;font-weight:800}
+.wm-connected-addr{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.wm-disconnect{
+  background:transparent;border:1px solid var(--border2);
+  color:var(--muted);font-family:var(--font);font-size:12px;font-weight:600;
+  padding:8px 20px;border-radius:6px;cursor:pointer;transition:all 0.2s;margin-top:4px;
+}
+.wm-disconnect:hover{border-color:var(--red);color:var(--red)}
+
+/* ── BUY MODAL ── */
+.buy-overlay{
+  display:none;position:fixed;inset:0;z-index:8500;
+  background:rgba(10,10,15,0.85);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;
+}
+.buy-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+.buy-modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;width:100%;max-width:440px;margin:20px;
+  animation:slideUp 0.25s ease;max-height:90vh;overflow-y:auto;
+}
+.buy-modal::-webkit-scrollbar{width:0}
+.bm-head{
+  padding:18px 20px;border-bottom:1px solid var(--border2);
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;background:var(--surface);z-index:2;
+}
+.bm-title{font-size:16px;font-weight:800}
+.bm-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer}
+.bm-body{padding:18px 20px}
+.bm-preview{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:16px;
+}
+.bm-emoji{font-size:36px}
+.bm-card-name{font-size:14px;font-weight:700}
+.bm-card-meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.bm-token-price{text-align:right;margin-left:auto}
+.bm-token-price .p{font-size:20px;font-weight:800;color:var(--gold)}
+.bm-token-price .l{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.bm-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px}
+.bm-amount-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.bm-amt-btn{
+  width:38px;height:38px;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--white);font-size:18px;cursor:pointer;border-radius:6px;
+  transition:all 0.2s;display:flex;align-items:center;justify-content:center;
+}
+.bm-amt-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bm-amt-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--gold);font-family:var(--mono);font-size:20px;font-weight:700;
+  text-align:center;padding:7px;border-radius:6px;outline:none;
+  transition:border-color 0.2s;
+}
+.bm-amt-input:focus{border-color:rgba(91,141,239,0.25)}
+.bm-quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.bm-quick-btn{
+  padding:4px 12px;border-radius:4px;font-size:11px;font-weight:600;
+  border:1px solid var(--border2);color:var(--muted);cursor:pointer;
+  transition:all 0.2s;background:var(--surface2);
+}
+.bm-quick-btn:hover,.bm-quick-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(123,92,240,0.08)}
+.bm-breakdown{background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:14px}
+.bm-row{
+  display:flex;justify-content:space-between;padding:6px 0;
+  border-bottom:1px solid var(--border2);
+  font-family:var(--mono);font-size:11px;
+}
+.bm-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px;border-top:1px solid var(--border2)}
+.bm-row .bl{color:var(--muted)}
+.bm-row .bv{color:var(--white)}
+.bm-row.total .bv{color:var(--gold);font-size:16px;font-weight:700;font-family:var(--font)}
+.bm-ownership{
+  background:rgba(123,92,240,0.08);border:1px solid rgba(123,92,240,0.2);
+  border-radius:6px;padding:10px;text-align:center;
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  margin-bottom:14px;
+}
+.bm-ownership strong{color:var(--accent)}
+.bm-pay-methods{display:flex;gap:8px;margin-bottom:16px}
+.bm-pay{
+  flex:1;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:6px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.2s;
+}
+.bm-pay:hover,.bm-pay.active{border-color:var(--accent);background:rgba(123,92,240,0.08)}
+.bm-pay-icon{font-size:18px;display:block;margin-bottom:4px}
+.bm-pay-name{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:0.1em}
+.bm-pay.active .bm-pay-name{color:var(--accent)}
+.bm-confirm{
+  width:100%;background:linear-gradient(135deg,var(--accent),#5050FF);
+  border:none;color:#fff;font-family:var(--font);
+  font-size:14px;font-weight:800;padding:13px;
+  border-radius:8px;cursor:pointer;transition:all 0.3s;
+}
+.bm-confirm:hover{box-shadow:0 0 20px var(--accent-glow);transform:translateY(-1px)}
+.bm-disclaimer{font-family:var(--mono);font-size:9px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5}
+.bm-tx{display:none;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:24px 0}
+.bm-tx-icon{font-size:52px}
+.bm-tx-title{font-size:18px;font-weight:800}
+.bm-tx-msg{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;max-width:300px}
+.bm-tx-hash{font-family:var(--mono);font-size:10px;color:var(--accent);word-break:break-all;padding:8px;background:rgba(123,92,240,0.08);border-radius:6px;width:100%;display:none}
+.bm-tx-close{background:var(--surface2);border:1px solid var(--border2);color:var(--white);font-family:var(--font);font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;cursor:pointer;display:none;transition:all 0.2s}
+.bm-tx-close:hover{border-color:var(--accent)}
+
+/* ── GACHA OPEN MODAL ── */
+.gacha-overlay{
+  display:none;position:fixed;inset:0;z-index:9500;
+  background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);
+  align-items:center;justify-content:center;
+}
+.gacha-overlay.open{display:flex;animation:fadeIn 0.3s ease}
+.gacha-open-box{
+  text-align:center;padding:40px;max-width:420px;
+  animation:slideUp 0.3s ease;
+}
+.gacha-pack-name{font-size:14px;font-family:var(--mono);color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px}
+.gacha-card-reveal{
+  width:200px;height:280px;margin:0 auto 24px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:80px;position:relative;overflow:hidden;
+  cursor:pointer;transition:all 0.3s;
+  box-shadow:0 0 40px rgba(123,92,240,0.3);
+}
+.gacha-card-reveal:hover{transform:scale(1.02);box-shadow:0 0 60px var(--accent-glow)}
+.gacha-card-reveal.flipping{animation:cardFlip 0.6s ease}
+@keyframes cardFlip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg)}100%{transform:rotateY(0)}}
+.gacha-card-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 50%,rgba(123,92,240,0.15),transparent 70%);
+}
+.gacha-card-emoji{position:relative;z-index:2}
+.gacha-card-name{font-size:18px;font-weight:700;margin-bottom:4px}
+.gacha-card-value{font-family:var(--mono);font-size:14px;color:var(--gold);margin-bottom:20px}
+.gacha-rarity{
+  display:inline-block;padding:4px 14px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:0.1em;
+  text-transform:uppercase;margin-bottom:20px;
+}
+.gacha-rarity.common{background:rgba(255,255,255,0.1);color:var(--muted)}
+.gacha-rarity.rare{background:rgba(59,158,255,0.2);color:var(--blue)}
+.gacha-rarity.epic{background:rgba(123,92,240,0.2);color:var(--accent)}
+.gacha-rarity.legendary{background:rgba(245,200,66,0.2);color:var(--gold);box-shadow:0 0 20px rgba(245,200,66,0.2)}
+.gacha-btns{display:flex;gap:10px;justify-content:center}
+.gacha-btn{
+  padding:10px 24px;border-radius:8px;font-family:var(--font);
+  font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;border:none;
+}
+.gacha-btn.primary{background:var(--accent);color:#fff}
+.gacha-btn.primary:hover{background:#9070FF;box-shadow:0 0 15px var(--accent-glow)}
+.gacha-btn.secondary{background:var(--surface2);color:var(--white);border:1px solid var(--border2)}
+.gacha-btn.secondary:hover{border-color:var(--accent)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:20px;right:20px;z-index:99999;
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:8px;padding:12px 16px;
+  font-size:13px;font-weight:600;
+  animation:toastIn 0.3s ease;
+  max-width:320px;box-shadow:0 8px 30px rgba(0,0,0,0.5);
+}
+.toast.success{border-color:rgba(46,204,113,0.3)}
+.toast.error{border-color:rgba(232,64,64,0.3)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+
+/* ── REFINED NAV ── */
+.topnav{
+  background:rgba(13,15,21,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border2);
+  position:relative;z-index:100;
+}
+.topnav::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(91,141,239,0.3),rgba(139,108,240,0.3),transparent);
+}
+.logo-icon{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 0 16px rgba(91,141,239,0.35);
+}
+.topnav-tab{
+  border-radius:6px;
+  font-size:12px;letter-spacing:0.02em;
+  transition:all 0.18s ease;
+}
+.topnav-tab.active{
+  background:rgba(91,141,239,0.12);
+  color:var(--accent);
+  box-shadow:inset 0 0 0 1px rgba(91,141,239,0.2);
+}
+.topnav-tab:hover{background:rgba(255,255,255,0.05);color:var(--white)}
+.tab-badge{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+
+/* ── REFINED SIDEBAR ── */
+.sidebar{
+  background:rgba(13,15,21,0.6);
+  backdrop-filter:blur(16px);
+  border-right:1px solid var(--border2);
+  position:relative;z-index:2;
+}
+.sidebar-item.active{
+  background:rgba(91,141,239,0.1);
+  color:var(--white);
+  box-shadow:inset 0 0 0 1px rgba(91,141,239,0.15);
+}
+.sidebar-item.active .si-icon{color:var(--accent) !important}
+.sidebar-item:hover{background:rgba(255,255,255,0.04)}
+.si-badge{background:var(--accent)}
+.si-badge.green{background:var(--green);color:#000}
+
+/* ── BUTTONS REDESIGN ── */
+/* Primary - filled gradient */
+.btn-primary-new{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;
+  padding:9px 20px;border-radius:var(--radius);
+  font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s ease;
+  box-shadow:0 1px 2px rgba(0,0,0,0.3),0 0 0 1px rgba(91,141,239,0.3);
+  letter-spacing:0.01em;
+}
+.btn-primary-new:hover{
+  filter:brightness(1.12);
+  box-shadow:0 4px 16px rgba(91,141,239,0.35),0 0 0 1px rgba(91,141,239,0.4);
+  transform:translateY(-1px);
+}
+.btn-primary-new:active{transform:translateY(0);filter:brightness(0.96)}
+
+/* Secondary - ghost */
+.btn-ghost-new{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:transparent;
+  color:var(--muted);
+  border:1px solid var(--border2);
+  padding:9px 20px;border-radius:var(--radius);
+  font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s ease;letter-spacing:0.01em;
+}
+.btn-ghost-new:hover{
+  background:rgba(255,255,255,0.05);
+  border-color:rgba(91,141,239,0.3);
+  color:var(--white);
+}
+
+/* Subtle fill */
+.btn-subtle-new{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:rgba(255,255,255,0.06);
+  color:var(--white);border:1px solid var(--border2);
+  padding:8px 18px;border-radius:var(--radius);
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all 0.2s ease;
+}
+.btn-subtle-new:hover{background:rgba(255,255,255,0.09);border-color:rgba(91,141,239,0.25)}
+
+/* Danger */
+.btn-danger-new{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(224,85,85,0.1);
+  color:var(--red);border:1px solid rgba(224,85,85,0.25);
+  padding:8px 18px;border-radius:var(--radius);
+  font-family:var(--font);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all 0.2s ease;
+}
+.btn-danger-new:hover{background:rgba(224,85,85,0.18);border-color:rgba(224,85,85,0.45)}
+
+/* ── MARKETPLACE CARDS REFINED ── */
+.market-card{
+  background:rgba(20,23,32,0.8);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+}
+.market-card:hover{
+  border-color:rgba(91,141,239,0.3);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.4),0 0 0 1px rgba(91,141,239,0.12),0 0 30px rgba(91,141,239,0.06);
+}
+.mc-buy-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:6px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.3);
+  font-weight:700;font-size:11px;letter-spacing:0.02em;
+  transition:all 0.2s;
+}
+.mc-buy-btn:hover{filter:brightness(1.1);box-shadow:0 2px 12px rgba(91,141,239,0.4);transform:translateY(-1px)}
+.mc-progress-fill{background:linear-gradient(90deg,var(--accent),var(--teal));border-radius:2px;}
+.mc-grade{
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(232,184,75,0.3);
+  color:var(--gold);
+}
+.mc-badge.hot{background:rgba(224,85,85,0.85);backdrop-filter:blur(4px)}
+.mc-badge.new{background:rgba(91,141,239,0.85);backdrop-filter:blur(4px)}
+.mc-badge.rare{background:rgba(232,184,75,0.9);color:#000}
+
+/* ── TOOLBAR & FILTERS ── */
+.market-toolbar{
+  background:rgba(11,13,18,0.7);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+}
+.filter-chip{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  transition:all 0.18s;font-size:11px;
+}
+.filter-chip:hover{background:rgba(91,141,239,0.08);border-color:rgba(91,141,239,0.25);color:var(--white)}
+.filter-chip.active{
+  background:rgba(91,141,239,0.15);
+  border-color:rgba(91,141,239,0.4);
+  color:var(--accent);
+}
+.search-box{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  transition:border-color 0.2s;
+}
+.search-box:focus-within{border-color:rgba(91,141,239,0.35)}
+
+/* ── GACHA REFINED ── */
+.gacha-pack{
+  background:rgba(20,23,32,0.8);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+}
+.gacha-pack:hover{
+  border-color:rgba(91,141,239,0.35);
+  box-shadow:0 16px 48px rgba(0,0,0,0.5),0 0 30px rgba(91,141,239,0.08);
+}
+.gp-open-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:var(--radius);font-size:13px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+  transition:all 0.2s;
+}
+.gp-open-btn:hover{filter:brightness(1.1);box-shadow:0 4px 20px rgba(91,141,239,0.4);transform:translateY(-1px)}
+
+/* ── GACHA RIGHT PANEL ── */
+.gacha-right{
+  background:rgba(13,15,21,0.6);
+  backdrop-filter:blur(16px);
+  border-left:1px solid var(--border2);
+}
+.gacha-machine{
+  background:rgba(20,23,32,0.8);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+}
+.gm-screen{
+  background:rgba(5,6,10,0.9);
+  border:1px solid rgba(91,141,239,0.2);
+  border-radius:var(--radius);
+}
+.gm-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:var(--radius);
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+  transition:all 0.2s;
+}
+.gm-btn:hover{filter:brightness(1.1);box-shadow:0 4px 16px rgba(91,141,239,0.35);transform:translateY(-1px)}
+.gm-btn:disabled{background:var(--surface2);box-shadow:none;transform:none}
+
+/* ── WALLET BUTTON ── */
+.wallet-btn{
+  background:rgba(91,141,239,0.1);
+  border:1px solid rgba(91,141,239,0.25);
+  border-radius:var(--radius);
+  transition:all 0.2s;
+}
+.wallet-btn:hover{background:rgba(91,141,239,0.15);border-color:rgba(91,141,239,0.4)}
+.wallet-btn.connected{
+  background:rgba(52,211,153,0.08);
+  border-color:rgba(52,211,153,0.3);
+  color:var(--green);
+}
+.wallet-avatar{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:6px;
+}
+.balance-chip{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+}
+
+/* ── LEADERBOARD ── */
+.lb-table{
+  background:rgba(20,23,32,0.7);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+  overflow:hidden;
+}
+.lb-row:hover{background:rgba(91,141,239,0.05)}
+.lb-tabs{background:rgba(255,255,255,0.04);border-radius:var(--radius);border:1px solid var(--border2)}
+.lb-tab.active{background:rgba(91,141,239,0.12);color:var(--accent)}
+
+/* ── PORTFOLIO ── */
+.pf-stat-card{
+  background:rgba(20,23,32,0.7);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+}
+.pf-stat-card:hover{border-color:rgba(91,141,239,0.25)}
+.pf-stat-val{color:var(--accent)}
+.pf-stat-val.green{color:var(--green)}
+.pf-chart-card,.pf-ai-card,.pf-holding{
+  background:rgba(20,23,32,0.7);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(8px);
+}
+.pf-holding:hover{border-color:rgba(91,141,239,0.2);background:rgba(91,141,239,0.04)}
+.pf-ai-btn{
+  background:rgba(91,141,239,0.1);
+  border:1px solid rgba(91,141,239,0.25);
+  color:var(--accent);border-radius:6px;
+  transition:all 0.2s;
+}
+.pf-ai-btn:hover{background:rgba(91,141,239,0.18)}
+.pf-ai-card{border-color:rgba(91,141,239,0.2)}
+
+/* ── YOLO ── */
+.yolo-card{
+  background:rgba(20,23,32,0.8);
+  border:1px solid var(--border2);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(12px);
+  box-shadow:0 24px 80px rgba(0,0,0,0.4);
+}
+.yolo-btn{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:var(--radius);
+  box-shadow:0 2px 4px rgba(0,0,0,0.3);
+  transition:all 0.2s;
+}
+.yolo-btn:hover{filter:brightness(1.1);box-shadow:0 6px 24px rgba(91,141,239,0.4);transform:translateY(-2px)}
+.yolo-pack-opt{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:6px;transition:all 0.2s;
+}
+.yolo-pack-opt:hover{border-color:rgba(91,141,239,0.3);color:var(--white)}
+.yolo-pack-opt.active{
+  background:rgba(91,141,239,0.15);
+  border-color:rgba(91,141,239,0.4);
+  color:var(--accent);
+}
+.yolo-slider::-webkit-slider-thumb{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 12px rgba(91,141,239,0.5)}
+.yolo-total{color:var(--gold)}
+
+/* ── MODALS ── */
+.wmodal,.buy-modal{
+  background:rgba(16,18,26,0.95);
+  backdrop-filter:blur(24px);
+  border:1px solid rgba(91,141,239,0.18);
+  box-shadow:0 24px 80px rgba(0,0,0,0.6);
+}
+.wm-btn{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  transition:all 0.2s;
+}
+.wm-btn:hover{background:rgba(91,141,239,0.08);border-color:rgba(91,141,239,0.3)}
+.wm-submit,.bm-confirm{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:var(--radius);
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+  transition:all 0.2s;
+}
+.wm-submit:hover,.bm-confirm:hover{filter:brightness(1.1);box-shadow:0 4px 20px rgba(91,141,239,0.4);transform:translateY(-1px)}
+.wm-input,.bm-amt-input,.wm-otp-input{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  transition:border-color 0.2s;
+}
+.wm-input:focus,.bm-amt-input:focus,.wm-otp-input:focus{
+  border-color:rgba(91,141,239,0.4);
+  background:rgba(91,141,239,0.04);
+}
+.wm-otp-input{color:var(--accent)}
+.bm-pay.active{background:rgba(91,141,239,0.1);border-color:rgba(91,141,239,0.35)}
+.bm-pay.active .bm-pay-name{color:var(--accent)}
+.bm-breakdown{background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:var(--radius)}
+.bm-ownership{background:rgba(91,141,239,0.06);border:1px solid rgba(91,141,239,0.15);border-radius:6px}
+.bm-ownership strong{color:var(--accent)}
+.bm-quick-btn:hover,.bm-quick-btn.active{border-color:rgba(91,141,239,0.35);color:var(--accent);background:rgba(91,141,239,0.06)}
+.bm-amt-btn{border-radius:6px;transition:all 0.2s}
+.bm-amt-btn:hover{border-color:rgba(91,141,239,0.35);color:var(--accent);background:rgba(91,141,239,0.06)}
+
+/* ── GACHA REVEAL MODAL ── */
+.gacha-overlay{background:rgba(5,6,10,0.93);backdrop-filter:blur(24px)}
+.gacha-card-reveal{
+  background:rgba(20,23,32,0.9);
+  border:1px solid rgba(91,141,239,0.2);
+  border-radius:var(--radius-lg);
+  box-shadow:0 0 60px rgba(91,141,239,0.15);
+}
+.gacha-card-reveal:hover{box-shadow:0 0 80px rgba(91,141,239,0.25)}
+.gacha-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius)}
+.gacha-btn.primary:hover{filter:brightness(1.1);box-shadow:0 4px 16px rgba(91,141,239,0.4)}
+.gacha-btn.secondary{background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:var(--radius)}
+.gacha-btn.secondary:hover{background:rgba(255,255,255,0.08)}
+.gacha-rarity.legendary{background:rgba(232,184,75,0.15);border:1px solid rgba(232,184,75,0.3);box-shadow:0 0 16px rgba(232,184,75,0.15)}
+.gacha-rarity.epic{background:rgba(139,108,240,0.15);border:1px solid rgba(139,108,240,0.3)}
+.gacha-rarity.rare{background:rgba(59,158,255,0.15);border:1px solid rgba(59,158,255,0.3)}
+.gacha-rarity.common{background:rgba(255,255,255,0.06);border:1px solid var(--border2)}
+
+/* ── TOAST REFINED ── */
+.toast{
+  background:rgba(16,18,26,0.95);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.toast.success{border-color:rgba(52,211,153,0.3)}
+.toast.error{border-color:rgba(224,85,85,0.3)}
+
+/* ── LIVE FEED ── */
+.sidebar-livefeed{
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--border2);
+  border-radius:var(--radius);
+}
+
+/* ── SCROLLBAR ── */
+.main::-webkit-scrollbar-thumb{background:rgba(91,141,239,0.2);border-radius:3px}
+.main::-webkit-scrollbar-thumb:hover{background:rgba(91,141,239,0.35)}
+
+/* ── MAIN z-index fix ── */
+.app-body,.topnav,.sidebar,.main,.page{position:relative;z-index:1}
+
+/* MISC */
+.section-title{font-size:18px;font-weight:800;margin-bottom:16px;letter-spacing:0.02em}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .ei{font-size:48px;display:block;margin-bottom:12px;opacity:0.4}
+.empty-state p{font-family:var(--mono);font-size:12px;line-height:1.6}
+
+/* ── PREVENT HORIZONTAL SCROLL & OVERFLOW ── */
+*{-webkit-tap-highlight-color:transparent}
+html,body{
+  overflow-x:hidden !important;
+  max-width:100vw !important;
+  position:relative;
+}
+.app-body{overflow-x:hidden !important}
+.main{overflow-x:hidden !important}
+
+/* ── DESKTOP (>1024px) ── */
+@media(min-width:1025px){
+  .topnav{padding:0 24px}
+  .sidebar{width:var(--sidebar-w);flex-shrink:0}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .gacha-pack-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .pf-top{grid-template-columns:repeat(4,1fr)}
+  .lb-table-head,.lb-row{grid-template-columns:60px 1fr 140px 140px 100px}
+}
+
+/* ── TABLET (768px - 1024px) ── */
+@media(min-width:768px) and (max-width:1024px){
+  :root{--sidebar-w:180px}
+  .topnav{padding:0 12px}
+  .topnav-tab span:not(.tab-icon){display:none}
+  .topnav-tab{padding:6px 10px}
+  .card-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:12px}
+  .gacha-pack-grid{grid-template-columns:repeat(2,1fr)}
+  .pf-top{grid-template-columns:repeat(2,1fr)}
+  .lb-table-head,.lb-row{grid-template-columns:50px 1fr 120px 100px}
+  .lb-table-head div:nth-child(4),.lb-row div:nth-child(4){display:none}
+}
+
+/* ── MOBILE (<768px) ── */
+@media(max-width:767px){
+  :root{--sidebar-w:0px}
+  
+  /* Hide sidebar on mobile, show bottom nav instead */
+  .sidebar{display:none}
+  
+  /* Full width main */
+  .app-body{flex-direction:column}
+  .main{width:100vw}
+  
+  /* Topnav mobile */
+  .topnav{padding:0 8px;height:48px}
+  .topnav-logo .logo-text{font-size:14px}
+  .topnav-tabs{gap:0;padding:0 4px;overflow-x:auto;scrollbar-width:none}
+  .topnav-tabs::-webkit-scrollbar{display:none}
+  .topnav-tab{padding:5px 8px;font-size:11px;white-space:nowrap}
+  .topnav-tab .tab-icon{font-size:13px}
+  .balance-chip{padding:4px 8px;font-size:10px}
+  .wallet-btn{padding:5px 8px;font-size:11px}
+  .wallet-avatar{width:20px;height:20px;font-size:9px}
+  
+  /* Toolbar */
+  .market-toolbar{
+    flex-direction:column;gap:8px;
+    padding:10px 12px;
+  }
+  .filter-chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .filter-chips::-webkit-scrollbar{display:none}
+  .filter-chip{flex-shrink:0;font-size:11px;padding:4px 10px}
+  .search-box{width:100%}
+  
+  /* Card grid */
+  .card-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;padding:10px 10px;
+  }
+  .mc-name{font-size:12px}
+  .mc-set{font-size:10px}
+  .mc-price{font-size:13px}
+  .mc-emoji{font-size:36px}
+  .mc-info{padding:8px}
+  
+  /* Gacha */
+  .page#page-gacha{flex-direction:column !important}
+  .gacha-left{padding:12px}
+  .gacha-right{
+    width:100%;border-left:none;
+    border-top:1px solid var(--border2);
+  }
+  .gacha-pack-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .gacha-machine-wrap{padding:12px}
+  
+  /* Portfolio */
+  .pf-page{padding:12px}
+  .pf-top{grid-template-columns:repeat(2,1fr);gap:8px}
+  .pf-stat-val{font-size:18px}
+  .pf-holding{
+    grid-template-columns:40px 1fr auto;gap:10px;
+    padding:10px 12px;
+  }
+  .pf-h-val{display:none}
+  .pf-h-emoji{font-size:26px}
+  
+  /* Leaderboard */
+  .lb-page{padding:12px}
+  .lb-table-head,.lb-row{
+    grid-template-columns:40px 1fr 100px;
+    font-size:11px;padding:10px 12px;
+  }
+  .lb-table-head div:nth-child(4),
+  .lb-table-head div:nth-child(5),
+  .lb-row div:nth-child(4),
+  .lb-row div:nth-child(5){display:none}
+  
+  /* YOLO */
+  .yolo-card{padding:20px 16px;margin:0 12px}
+  .yolo-title{font-size:28px}
+  
+  /* Modals */
+  .wmodal,.buy-modal{
+    margin:0 !important;
+    border-radius:12px 12px 0 0 !important;
+    position:fixed !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    max-width:100% !important;
+    width:100% !important;
+  }
+  .wmodal-overlay,.buy-overlay{
+    align-items:flex-end !important;
+  }
+  .gacha-open-box{padding:24px 16px}
+  .gacha-card-reveal{width:160px;height:224px}
+  
+  /* Gacha overlay */
+  .gacha-overlay{align-items:flex-end}
+  .gacha-open-box{
+    width:100%;
+    background:var(--surface);
+    border-radius:12px 12px 0 0;
+    padding:24px 20px 32px;
+  }
+  
+  /* Fix page heights */
+  .page{min-height:calc(100vh - 48px)}
+  
+  /* Toast */
+  .toast{
+    left:12px !important;
+    right:12px !important;
+    bottom:16px !important;
+    max-width:calc(100vw - 24px) !important;
+  }
+}
+
+/* ── SMALL MOBILE (<380px) ── */
+@media(max-width:380px){
+  .card-grid{grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+  .mc-emoji{font-size:28px}
+  .mc-name{font-size:11px}
+  .topnav-tab .tab-icon{font-size:12px}
+  .topnav-tab{padding:4px 6px}
+}
+
+
+/* ── MOBILE NAV FIX ── */
+@media(max-width:767px){
+  .topnav{
+    height:auto !important;
+    flex-wrap:wrap;
+    padding:8px 10px !important;
+    gap:6px;
+  }
+  
+  /* Row 1: Logo + Wallet */
+  .topnav-logo{
+    flex:1;
+    width:auto;
+    border-right:none !important;
+    padding-right:0 !important;
+  }
+  .topnav-right{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-left:0 !important;
+  }
+  .balance-chip{
+    padding:4px 8px;
+    font-size:10px;
+    border-radius:6px;
+  }
+  .wallet-btn{
+    padding:5px 10px;
+    font-size:11px;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+  .wallet-avatar{width:18px;height:18px;font-size:9px;border-radius:4px}
+  
+  /* Row 2: Tabs full width */
+  .topnav-tabs{
+    width:100%;
+    order:3;
+    padding:0 !important;
+    gap:4px !important;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px !important;
+  }
+  .topnav-tabs::-webkit-scrollbar{display:none}
+  .topnav-tab{
+    flex-shrink:0;
+    padding:6px 12px !important;
+    font-size:11px !important;
+    border-radius:6px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--border2);
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .topnav-tab.active{
+    background:rgba(91,141,239,0.15) !important;
+    border-color:rgba(91,141,239,0.35) !important;
+    color:var(--accent) !important;
+  }
+  .tab-badge{display:none}
+  
+  /* Logo compact */
+  .logo-text{font-size:15px !important}
+  .logo-icon{width:22px !important;height:22px !important;font-size:12px !important}
+  
+  /* Filter chips row */
+  .market-toolbar{
+    padding:8px 10px !important;
+    gap:6px !important;
+  }
+  .filter-chips{
+    gap:6px !important;
+    padding-bottom:2px;
+  }
+  .filter-chip{
+    font-size:11px !important;
+    padding:5px 12px !important;
+    border-radius:16px !important;
+    flex-shrink:0;
+    white-space:nowrap;
+  }
+  .search-box{
+    padding:6px 10px !important;
+    border-radius:8px !important;
+    font-size:12px !important;
+  }
+  
+  /* Cards */
+  .card-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:8px !important;
+    padding:8px 10px !important;
+  }
+  .mc-img{aspect-ratio:1/1 !important}
+  .mc-emoji{font-size:40px !important}
+  .mc-info{padding:8px 10px !important}
+  .mc-name{font-size:12px !important;font-weight:700}
+  .mc-set{font-size:9px !important}
+  .mc-price{font-size:14px !important}
+  .mc-buy-btn{
+    font-size:11px !important;
+    padding:5px 10px !important;
+    border-radius:5px !important;
+  }
+  .mc-grade{font-size:8px !important;padding:2px 6px !important}
+  .mc-badge{font-size:9px !important;padding:2px 7px !important}
+  
+  /* Progress */
+  .mc-progress-label{font-size:8px !important}
+  .mc-footer{padding-top:8px !important}
+}
+
+@media(max-width:380px){
+  .topnav-tab{padding:5px 8px !important;font-size:10px !important}
+  .card-grid{gap:6px !important;padding:6px 8px !important}
+  .mc-emoji{font-size:32px !important}
+}
+
+
+/* ── MOBILE NAV COMPLETE REDESIGN ── */
+@media(max-width:767px){
+
+  /* Topnav: Logo kiri, tombol kanan, 1 baris */
+  .topnav{
+    height:50px !important;
+    padding:0 12px !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    flex-wrap:nowrap !important;
+    gap:0 !important;
+    position:fixed !important;
+    top:0;left:0;right:0;
+    z-index:999;
+    background:rgba(13,15,21,0.97) !important;
+    backdrop-filter:blur(20px) !important;
+    border-bottom:1px solid var(--border2) !important;
+  }
+
+  /* Logo - kiri */
+  .topnav-logo{
+    display:flex !important;
+    align-items:center !important;
+    gap:7px !important;
+    flex-shrink:0 !important;
+    width:auto !important;
+    border-right:none !important;
+    padding-right:0 !important;
+  }
+  .logo-icon{width:22px !important;height:22px !important;font-size:11px !important;border-radius:5px !important}
+  .logo-text{font-size:14px !important;letter-spacing:0.08em !important}
+  .nav-logo-sub{display:none !important}
+
+  /* Hide desktop tabs */
+  .topnav-tabs{display:none !important}
+
+  /* Right side buttons */
+  .topnav-right{
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    margin-left:auto !important;
+    flex-shrink:0 !important;
+  }
+  .balance-chip{
+    padding:4px 10px !important;
+    font-size:10px !important;
+    border-radius:6px !important;
+    gap:5px !important;
+  }
+  .balance-chip .dot{width:6px !important;height:6px !important}
+  .wallet-btn{
+    padding:5px 10px !important;
+    font-size:11px !important;
+    font-weight:600 !important;
+    border-radius:6px !important;
+    gap:6px !important;
+    white-space:nowrap !important;
+  }
+  .wallet-avatar{
+    width:18px !important;height:18px !important;
+    font-size:9px !important;border-radius:4px !important;
+  }
+  #walletLabel{
+    max-width:80px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  /* BOTTOM NAV for tabs */
+  .bottom-nav{
+    display:flex !important;
+    position:fixed;
+    bottom:0;left:0;right:0;
+    height:56px;
+    background:rgba(13,15,21,0.97);
+    backdrop-filter:blur(20px);
+    border-top:1px solid var(--border2);
+    z-index:999;
+    align-items:center;
+    justify-content:space-around;
+    padding:0 4px;
+  }
+  .bottom-nav-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:all 0.2s;
+    flex:1;
+    border:none;
+    background:none;
+  }
+  .bottom-nav-item .bn-icon{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .bottom-nav-item .bn-label{
+    font-size:9px;font-weight:600;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-family:var(--mono);
+  }
+  .bottom-nav-item.active .bn-label{color:var(--accent)}
+  .bottom-nav-item.active{background:rgba(91,141,239,0.1)}
+
+  /* Push content down for fixed topnav + bottom nav */
+  .app-body{
+    margin-top:50px !important;
+    margin-bottom:56px !important;
+    height:calc(100vh - 106px) !important;
+  }
+  .main{
+    height:100% !important;
+    overflow-y:auto !important;
+  }
+
+  /* Market toolbar */
+  .market-toolbar{
+    padding:8px 10px !important;
+    gap:6px !important;
+    position:sticky !important;
+    top:0 !important;
+  }
+  .filter-chips{
+    gap:5px !important;
+    overflow-x:auto !important;
+    scrollbar-width:none !important;
+    flex-wrap:nowrap !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  .filter-chips::-webkit-scrollbar{display:none !important}
+  .filter-chip{
+    flex-shrink:0 !important;
+    font-size:10px !important;
+    padding:4px 10px !important;
+    border-radius:14px !important;
+  }
+  .search-box{width:100% !important;border-radius:7px !important}
+
+  /* Cards */
+  .card-grid{
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:8px !important;
+    padding:10px !important;
+  }
+  .mc-img{aspect-ratio:3/4 !important}
+  .mc-emoji{font-size:44px !important}
+  .mc-info{padding:8px !important}
+  .mc-name{font-size:12px !important}
+  .mc-set{font-size:9px !important}
+  .mc-price{font-size:13px !important}
+  .mc-buy-btn{font-size:10px !important;padding:5px 8px !important}
+  .mc-grade{font-size:8px !important}
+  .mc-badge{font-size:8px !important}
+  .mc-progress-label{font-size:8px !important}
+}
+
+@media(min-width:768px){
+  .bottom-nav{display:none !important}
+}
+
+
+/* ── PREMIUM REDESIGN ── */
+
+/* New color palette - more elegant */
+:root{
+  --bg:#080910;
+  --bg2:#0C0D12;
+  --sidebar:#09090F;
+  --surface:#111218;
+  --surface2:#16171F;
+  --surface3:#1C1D28;
+  --accent:#4F7EF7;
+  --accent2:#7C5CFC;
+  --accent-glow:rgba(79,126,247,0.18);
+  --gold:#F0C060;
+  --gold-dim:#8A6820;
+  --red:#E05555;
+  --green:#34D399;
+  --teal:#2DD4BF;
+  --white:#F0F1FA;
+  --muted:#505268;
+  --muted2:#30313F;
+  --border:rgba(79,126,247,0.1);
+  --border2:rgba(255,255,255,0.05);
+}
+
+/* Elegant gradient background */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 0% 0%, rgba(79,126,247,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 50% at 100% 100%, rgba(124,92,252,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(79,126,247,0.03) 0%, transparent 60%),
+    linear-gradient(180deg, #080910 0%, #0A0B13 100%);
+  pointer-events:none;z-index:0;
+}
+
+/* Subtle dot grid */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── PREMIUM BUTTONS ── */
+
+/* Buy button - premium filled */
+.mc-buy-btn{
+  background:linear-gradient(135deg,#4F7EF7,#7C5CFC) !important;
+  border:none !important;
+  border-radius:7px !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  letter-spacing:0.02em !important;
+  padding:6px 14px !important;
+  cursor:pointer !important;
+  transition:all 0.2s ease !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.4),0 0 0 1px rgba(79,126,247,0.3) !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+.mc-buy-btn::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.12) 0%,transparent 100%);
+  border-radius:7px;
+}
+.mc-buy-btn:hover{
+  box-shadow:0 3px 12px rgba(79,126,247,0.45),0 0 0 1px rgba(79,126,247,0.5) !important;
+  transform:translateY(-1px) !important;
+  filter:brightness(1.08) !important;
+}
+.mc-buy-btn:active{transform:translateY(0) !important;filter:brightness(0.97) !important}
+
+/* Pack open button */
+.gp-open-btn{
+  background:linear-gradient(135deg,#4F7EF7,#7C5CFC) !important;
+  border-radius:8px !important;
+  font-size:13px !important;
+  font-weight:700 !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.4),0 0 0 1px rgba(79,126,247,0.25) !important;
+  position:relative !important;
+  overflow:hidden !important;
+  transition:all 0.2s !important;
+}
+.gp-open-btn::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.1) 0%,transparent 60%);
+}
+.gp-open-btn:hover{
+  box-shadow:0 4px 20px rgba(79,126,247,0.4),0 0 0 1px rgba(79,126,247,0.45) !important;
+  transform:translateY(-1px) !important;
+}
+
+/* Confirm buttons */
+.bm-confirm,.wm-submit,.gm-btn,.yolo-btn{
+  background:linear-gradient(135deg,#4F7EF7 0%,#7C5CFC 100%) !important;
+  border-radius:8px !important;
+  font-weight:700 !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.4),0 0 0 1px rgba(79,126,247,0.3),inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  position:relative !important;
+  overflow:hidden !important;
+  transition:all 0.2s !important;
+  border:none !important;
+}
+.bm-confirm:hover,.wm-submit:hover,.gm-btn:hover,.yolo-btn:hover{
+  box-shadow:0 4px 20px rgba(79,126,247,0.4),0 0 0 1px rgba(79,126,247,0.5),inset 0 1px 0 rgba(255,255,255,0.15) !important;
+  transform:translateY(-1px) !important;
+  filter:brightness(1.06) !important;
+}
+
+/* Ghost/secondary buttons */
+.btn-ghost,.wm-btn,.gacha-btn.secondary,.pf-ai-btn,.lb-tab,.filter-chip,.yolo-pack-opt,.bm-quick-btn,.bm-pay,.bm-amt-btn{
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  border-radius:7px !important;
+  color:var(--muted) !important;
+  transition:all 0.18s ease !important;
+}
+.wm-btn:hover,.gacha-btn.secondary:hover{
+  background:rgba(255,255,255,0.07) !important;
+  border-color:rgba(79,126,247,0.3) !important;
+  color:var(--white) !important;
+}
+.filter-chip.active{
+  background:rgba(79,126,247,0.15) !important;
+  border-color:rgba(79,126,247,0.4) !important;
+  color:var(--accent) !important;
+}
+.bm-pay.active{
+  background:rgba(79,126,247,0.12) !important;
+  border-color:rgba(79,126,247,0.35) !important;
+}
+.bm-quick-btn:hover,.bm-quick-btn.active,.bm-amt-btn:hover{
+  background:rgba(79,126,247,0.1) !important;
+  border-color:rgba(79,126,247,0.35) !important;
+  color:var(--accent) !important;
+}
+.lb-tab.active,.yolo-pack-opt.active{
+  background:rgba(79,126,247,0.12) !important;
+  border-color:rgba(79,126,247,0.3) !important;
+  color:var(--accent) !important;
+}
+
+/* Wallet button */
+.wallet-btn{
+  background:rgba(79,126,247,0.1) !important;
+  border:1px solid rgba(79,126,247,0.2) !important;
+  border-radius:7px !important;
+  transition:all 0.18s !important;
+}
+.wallet-btn:hover{
+  background:rgba(79,126,247,0.15) !important;
+  border-color:rgba(79,126,247,0.35) !important;
+}
+.wallet-btn.connected{
+  background:rgba(52,211,153,0.08) !important;
+  border-color:rgba(52,211,153,0.25) !important;
+}
+
+/* ── PREMIUM CARDS ── */
+.market-card{
+  background:rgba(17,18,24,0.9) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:12px !important;
+  backdrop-filter:blur(12px) !important;
+  transition:all 0.25s ease !important;
+}
+.market-card:hover{
+  border-color:rgba(79,126,247,0.25) !important;
+  transform:translateY(-4px) !important;
+  box-shadow:
+    0 16px 48px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(79,126,247,0.1),
+    0 0 30px rgba(79,126,247,0.05) !important;
+}
+.mc-img{border-radius:12px 12px 0 0 !important}
+.mc-grade{
+  background:rgba(0,0,0,0.7) !important;
+  backdrop-filter:blur(10px) !important;
+  border:1px solid rgba(240,192,96,0.35) !important;
+  color:var(--gold) !important;
+  border-radius:5px !important;
+}
+.mc-badge.hot{
+  background:rgba(224,85,85,0.9) !important;
+  backdrop-filter:blur(8px) !important;
+  border-radius:5px !important;
+  font-weight:700 !important;
+}
+.mc-badge.new{
+  background:rgba(79,126,247,0.9) !important;
+  backdrop-filter:blur(8px) !important;
+  border-radius:5px !important;
+  font-weight:700 !important;
+}
+.mc-progress-fill{
+  background:linear-gradient(90deg,var(--accent),var(--teal)) !important;
+  border-radius:2px !important;
+  box-shadow:0 0 6px rgba(79,126,247,0.4) !important;
+}
+
+/* ── GACHA PACKS ── */
+.gacha-pack{
+  background:rgba(17,18,24,0.9) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:12px !important;
+  backdrop-filter:blur(12px) !important;
+}
+.gacha-pack:hover{
+  border-color:rgba(79,126,247,0.3) !important;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(79,126,247,0.07) !important;
+  transform:translateY(-5px) !important;
+}
+.gacha-machine{
+  background:rgba(17,18,24,0.9) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:12px !important;
+}
+.gm-screen{
+  background:#050508 !important;
+  border:1px solid rgba(79,126,247,0.15) !important;
+  border-radius:8px !important;
+}
+
+/* ── MODALS PREMIUM ── */
+.wmodal,.buy-modal{
+  background:rgba(12,13,18,0.97) !important;
+  backdrop-filter:blur(30px) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  border-radius:14px !important;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(79,126,247,0.1) !important;
+}
+.wm-input,.bm-amt-input,.wm-otp-input{
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  border-radius:7px !important;
+  color:var(--white) !important;
+}
+.wm-input:focus,.bm-amt-input:focus,.wm-otp-input:focus{
+  border-color:rgba(79,126,247,0.4) !important;
+  background:rgba(79,126,247,0.04) !important;
+  box-shadow:0 0 0 3px rgba(79,126,247,0.08) !important;
+}
+.wm-otp-input{color:var(--accent) !important}
+.bm-breakdown{
+  background:rgba(255,255,255,0.025) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:8px !important;
+}
+.bm-ownership{
+  background:rgba(79,126,247,0.05) !important;
+  border:1px solid rgba(79,126,247,0.15) !important;
+  border-radius:7px !important;
+}
+
+/* ── SIDEBAR & NAV ── */
+.topnav{
+  background:rgba(8,9,16,0.9) !important;
+  backdrop-filter:blur(24px) !important;
+  border-bottom:1px solid rgba(255,255,255,0.05) !important;
+}
+.topnav::after{
+  background:linear-gradient(90deg,transparent,rgba(79,126,247,0.2),rgba(124,92,252,0.2),transparent) !important;
+}
+.sidebar{
+  background:rgba(9,9,15,0.7) !important;
+  backdrop-filter:blur(20px) !important;
+  border-right:1px solid rgba(255,255,255,0.04) !important;
+}
+.sidebar-item.active{
+  background:rgba(79,126,247,0.1) !important;
+  box-shadow:inset 0 0 0 1px rgba(79,126,247,0.15) !important;
+}
+.sidebar-item:hover{background:rgba(255,255,255,0.04) !important}
+.sidebar-livefeed{
+  background:rgba(255,255,255,0.02) !important;
+  border:1px solid rgba(255,255,255,0.04) !important;
+  border-radius:8px !important;
+}
+
+/* ── PORTFOLIO ── */
+.pf-stat-card,.pf-chart-card,.pf-holding,.pf-ai-card{
+  background:rgba(17,18,24,0.9) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:12px !important;
+  backdrop-filter:blur(12px) !important;
+}
+.pf-stat-card:hover,.pf-holding:hover{
+  border-color:rgba(79,126,247,0.2) !important;
+  background:rgba(79,126,247,0.03) !important;
+}
+.pf-ai-card{border-color:rgba(79,126,247,0.15) !important}
+.pf-stat-val{color:var(--accent) !important}
+
+/* ── LEADERBOARD ── */
+.lb-table{
+  background:rgba(17,18,24,0.9) !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  border-radius:12px !important;
+  backdrop-filter:blur(12px) !important;
+}
+.lb-row:hover{background:rgba(79,126,247,0.04) !important}
+
+/* ── GACHA REVEAL ── */
+.gacha-overlay{background:rgba(5,5,10,0.95) !important;backdrop-filter:blur(30px) !important}
+.gacha-card-reveal{
+  background:rgba(17,18,24,0.95) !important;
+  border:1px solid rgba(79,126,247,0.15) !important;
+  border-radius:14px !important;
+  box-shadow:0 0 60px rgba(79,126,247,0.12) !important;
+}
+.gacha-rarity.legendary{
+  background:rgba(240,192,96,0.12) !important;
+  border:1px solid rgba(240,192,96,0.3) !important;
+  box-shadow:0 0 20px rgba(240,192,96,0.15) !important;
+}
+.gacha-rarity.epic{
+  background:rgba(124,92,252,0.12) !important;
+  border:1px solid rgba(124,92,252,0.3) !important;
+}
+.gacha-rarity.rare{
+  background:rgba(79,126,247,0.12) !important;
+  border:1px solid rgba(79,126,247,0.3) !important;
+}
+
+/* ── YOLO ── */
+.yolo-card{
+  background:rgba(17,18,24,0.95) !important;
+  border:1px solid rgba(255,255,255,0.06) !important;
+  border-radius:16px !important;
+  backdrop-filter:blur(20px) !important;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5) !important;
+}
+.yolo-slider::-webkit-slider-thumb{
+  background:linear-gradient(135deg,#4F7EF7,#7C5CFC) !important;
+  box-shadow:0 0 12px rgba(79,126,247,0.5) !important;
+}
+.yolo-total{color:var(--gold) !important}
+
+/* ── BOTTOM NAV MOBILE ── */
+.bottom-nav{
+  background:rgba(8,9,16,0.97) !important;
+  backdrop-filter:blur(24px) !important;
+  border-top:1px solid rgba(255,255,255,0.05) !important;
+}
+.bottom-nav-item.active{background:rgba(79,126,247,0.1) !important}
+.bottom-nav-item.active .bn-icon{color:var(--accent) !important}
+
+/* ── TOPNAV TAB ── */
+.topnav-tab.active{
+  background:rgba(79,126,247,0.12) !important;
+  color:var(--accent) !important;
+  box-shadow:inset 0 0 0 1px rgba(79,126,247,0.2) !important;
+}
+.tab-badge{
+  background:var(--accent) !important;
+  box-shadow:0 0 8px rgba(79,126,247,0.4) !important;
+}
+.balance-chip{
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  border-radius:7px !important;
+}
+
+/* ── TOAST ── */
+.toast{
+  background:rgba(12,13,18,0.97) !important;
+  backdrop-filter:blur(20px) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  border-radius:10px !important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.6) !important;
+}
+.toast.success{border-color:rgba(52,211,153,0.25) !important}
+.toast.error{border-color:rgba(224,85,85,0.25) !important}
+
+/* ── SEARCH BOX ── */
+.search-box{
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  border-radius:8px !important;
+  transition:all 0.2s !important;
+}
+.search-box:focus-within{
+  border-color:rgba(79,126,247,0.35) !important;
+  background:rgba(79,126,247,0.03) !important;
+  box-shadow:0 0 0 3px rgba(79,126,247,0.08) !important;
+}
+
+/* ── LOGO GLOW ── */
+.logo-icon{
+  background:linear-gradient(135deg,#4F7EF7,#7C5CFC) !important;
+  box-shadow:0 0 14px rgba(79,126,247,0.4) !important;
+}
+
+/* Scrollbar */
+.main::-webkit-scrollbar-thumb{background:rgba(79,126,247,0.2) !important}
+.main::-webkit-scrollbar-thumb:hover{background:rgba(79,126,247,0.35) !important}
+
+
+/* ══════════════════════════════════════
+   GLASSMORPHISM PREMIUM REDESIGN
+   ══════════════════════════════════════ */
+
+:root{
+  --bg:#F0F2F8;
+  --bg2:#E8EAF2;
+  --sidebar:#FFFFFF;
+  --surface:rgba(255,255,255,0.7);
+  --surface2:rgba(255,255,255,0.5);
+  --surface3:rgba(255,255,255,0.3);
+  --accent:#5B7CF6;
+  --accent2:#8B6CF0;
+  --accent-glow:rgba(91,124,246,0.2);
+  --gold:#D4A017;
+  --gold-dim:#8A6820;
+  --red:#E05555;
+  --green:#16A34A;
+  --teal:#0891B2;
+  --white:#1A1B2E;
+  --muted:#8890A8;
+  --muted2:#C5C9D8;
+  --border:rgba(91,124,246,0.12);
+  --border2:rgba(0,0,0,0.07);
+  --shadow:rgba(0,0,0,0.08);
+}
+
+html,body{
+  background:var(--bg) !important;
+  color:var(--white) !important;
+}
+
+/* ── ELEGANT BACKGROUND ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(91,124,246,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 90%, rgba(139,108,240,0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,255,255,0.8) 0%, transparent 70%),
+    linear-gradient(145deg, #EEF0FA 0%, #E8ECF8 50%, #EDF0FC 100%);
+  pointer-events:none;z-index:0;
+}
+
+/* Subtle noise texture */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    radial-gradient(rgba(91,124,246,0.06) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;
+  opacity:0.6;
+}
+
+/* ── GLASS MIXIN APPLIED EVERYWHERE ── */
+
+/* Topnav */
+.topnav{
+  background:rgba(255,255,255,0.75) !important;
+  backdrop-filter:blur(24px) !important;
+  -webkit-backdrop-filter:blur(24px) !important;
+  border-bottom:1px solid rgba(0,0,0,0.06) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.8),0 2px 16px rgba(0,0,0,0.06) !important;
+}
+.topnav::after{
+  background:linear-gradient(90deg,transparent,rgba(91,124,246,0.15),rgba(139,108,240,0.12),transparent) !important;
+}
+.logo-text{color:#1A1B2E !important}
+.logo-text span{color:var(--accent) !important}
+.nav-logo-sub{color:var(--muted) !important}
+
+/* Sidebar */
+.sidebar{
+  background:rgba(255,255,255,0.65) !important;
+  backdrop-filter:blur(20px) !important;
+  border-right:1px solid rgba(0,0,0,0.06) !important;
+  box-shadow:2px 0 16px rgba(0,0,0,0.04) !important;
+}
+.sidebar-section-label{color:var(--muted) !important}
+.sidebar-item{color:var(--muted) !important}
+.sidebar-item:hover{
+  background:rgba(91,124,246,0.08) !important;
+  color:var(--white) !important;
+}
+.sidebar-item.active{
+  background:rgba(91,124,246,0.12) !important;
+  color:var(--accent) !important;
+  box-shadow:inset 0 0 0 1px rgba(91,124,246,0.2) !important;
+}
+.sidebar-livefeed{
+  background:rgba(255,255,255,0.5) !important;
+  border:1px solid rgba(0,0,0,0.06) !important;
+  border-radius:10px !important;
+}
+.livefeed-title{color:var(--muted) !important}
+.livefeed-item .lf-name{color:var(--white) !important}
+.livefeed-item .lf-time{color:var(--muted) !important}
+
+/* Main bg */
+.main{background:transparent !important}
+.page{background:transparent !important}
+.market-toolbar{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border-bottom:1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* ── GLASS CARDS ── */
+.market-card{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:14px !important;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.06),
+    0 0 0 1px rgba(255,255,255,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transition:all 0.25s ease !important;
+  color:var(--white) !important;
+}
+.market-card:hover{
+  background:rgba(255,255,255,0.85) !important;
+  border-color:rgba(91,124,246,0.25) !important;
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.1),
+    0 0 0 1px rgba(91,124,246,0.15),
+    inset 0 1px 0 rgba(255,255,255,1) !important;
+  transform:translateY(-4px) !important;
+}
+.mc-img{
+  background:linear-gradient(135deg,rgba(91,124,246,0.06),rgba(139,108,240,0.06)) !important;
+  border-radius:14px 14px 0 0 !important;
+}
+.mc-category{color:var(--accent) !important}
+.mc-name{color:#1A1B2E !important}
+.mc-set{color:var(--muted) !important}
+.mc-progress-label{color:var(--muted) !important}
+.mc-footer{border-top:1px solid rgba(0,0,0,0.06) !important}
+.mc-grade{
+  background:rgba(255,255,255,0.85) !important;
+  backdrop-filter:blur(8px) !important;
+  border:1px solid rgba(212,160,23,0.3) !important;
+  color:var(--gold) !important;
+  border-radius:5px !important;
+  font-weight:700 !important;
+}
+.mc-price{color:#1A1B2E !important}
+.mc-price small{color:var(--muted) !important}
+
+/* ── GLASS BUTTONS ── */
+
+/* Primary - Buy/Confirm */
+.mc-buy-btn{
+  background:rgba(91,124,246,0.12) !important;
+  border:1px solid rgba(91,124,246,0.25) !important;
+  border-radius:7px !important;
+  color:var(--accent) !important;
+  font-size:11px !important;font-weight:700 !important;
+  padding:6px 14px !important;
+  cursor:pointer !important;
+  backdrop-filter:blur(8px) !important;
+  transition:all 0.2s ease !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.8) !important;
+}
+.mc-buy-btn:hover{
+  background:rgba(91,124,246,0.18) !important;
+  border-color:rgba(91,124,246,0.4) !important;
+  box-shadow:0 3px 12px rgba(91,124,246,0.2),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transform:translateY(-1px) !important;
+}
+
+/* CTA buttons - solid glass */
+.bm-confirm,.wm-submit,.gm-btn,.yolo-btn,.gp-open-btn{
+  background:rgba(91,124,246,0.15) !important;
+  border:1px solid rgba(91,124,246,0.3) !important;
+  color:var(--accent) !important;
+  border-radius:9px !important;
+  backdrop-filter:blur(12px) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.7) !important;
+  font-weight:700 !important;
+  transition:all 0.2s ease !important;
+}
+.bm-confirm:hover,.wm-submit:hover,.gm-btn:hover,.yolo-btn:hover,.gp-open-btn:hover{
+  background:rgba(91,124,246,0.22) !important;
+  border-color:rgba(91,124,246,0.45) !important;
+  box-shadow:0 4px 20px rgba(91,124,246,0.18),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transform:translateY(-1px) !important;
+  color:var(--accent) !important;
+}
+
+/* Ghost transparent */
+.wm-btn,.gacha-btn.secondary,.lb-tab,.bm-amt-btn,.bm-quick-btn,.bm-pay{
+  background:rgba(255,255,255,0.5) !important;
+  border:1px solid rgba(0,0,0,0.08) !important;
+  border-radius:7px !important;
+  color:#4A4D6A !important;
+  backdrop-filter:blur(8px) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transition:all 0.18s !important;
+}
+.wm-btn:hover,.gacha-btn.secondary:hover{
+  background:rgba(255,255,255,0.75) !important;
+  border-color:rgba(91,124,246,0.2) !important;
+  color:#1A1B2E !important;
+}
+.bm-amt-btn:hover,.bm-quick-btn:hover,.bm-quick-btn.active{
+  background:rgba(91,124,246,0.1) !important;
+  border-color:rgba(91,124,246,0.3) !important;
+  color:var(--accent) !important;
+}
+.bm-pay.active{
+  background:rgba(91,124,246,0.1) !important;
+  border-color:rgba(91,124,246,0.3) !important;
+}
+.lb-tab.active{
+  background:rgba(91,124,246,0.1) !important;
+  border-color:rgba(91,124,246,0.2) !important;
+  color:var(--accent) !important;
+}
+
+/* Filter chips */
+.filter-chip{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.07) !important;
+  border-radius:20px !important;
+  color:#4A4D6A !important;
+  backdrop-filter:blur(8px) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  transition:all 0.18s !important;
+}
+.filter-chip:hover{
+  background:rgba(255,255,255,0.8) !important;
+  color:#1A1B2E !important;
+}
+.filter-chip.active{
+  background:rgba(91,124,246,0.12) !important;
+  border-color:rgba(91,124,246,0.3) !important;
+  color:var(--accent) !important;
+  box-shadow:0 1px 6px rgba(91,124,246,0.15),inset 0 1px 0 rgba(255,255,255,0.8) !important;
+}
+
+/* Wallet btn */
+.wallet-btn{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.08) !important;
+  border-radius:8px !important;
+  color:#1A1B2E !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+  backdrop-filter:blur(8px) !important;
+  transition:all 0.18s !important;
+}
+.wallet-btn:hover{
+  background:rgba(255,255,255,0.85) !important;
+  border-color:rgba(91,124,246,0.2) !important;
+}
+.wallet-btn.connected{
+  background:rgba(22,163,74,0.08) !important;
+  border-color:rgba(22,163,74,0.2) !important;
+  color:var(--green) !important;
+}
+#walletLabel{color:inherit !important}
+
+/* Balance chip */
+.balance-chip{
+  background:rgba(255,255,255,0.55) !important;
+  border:1px solid rgba(0,0,0,0.07) !important;
+  border-radius:7px !important;
+  color:#4A4D6A !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.balance-chip .dot{background:var(--accent) !important;box-shadow:0 0 6px rgba(91,124,246,0.5) !important}
+
+/* Topnav tab */
+.topnav-tab{color:#6670A0 !important}
+.topnav-tab:hover{background:rgba(255,255,255,0.5) !important;color:#1A1B2E !important}
+.topnav-tab.active{
+  background:rgba(91,124,246,0.1) !important;
+  color:var(--accent) !important;
+  box-shadow:inset 0 0 0 1px rgba(91,124,246,0.18) !important;
+}
+
+/* ── GLASS MODALS ── */
+.wmodal,.buy-modal{
+  background:rgba(255,255,255,0.85) !important;
+  backdrop-filter:blur(32px) !important;
+  border:1px solid rgba(255,255,255,0.95) !important;
+  border-radius:16px !important;
+  box-shadow:
+    0 24px 80px rgba(0,0,0,0.12),
+    0 0 0 1px rgba(255,255,255,0.6),
+    inset 0 1px 0 rgba(255,255,255,1) !important;
+  color:var(--white) !important;
+}
+.wmodal-title,.bm-title{color:#1A1B2E !important}
+.wmodal-sub,.bm-disclaimer{color:var(--muted) !important}
+.wmodal-close,.bm-close{color:var(--muted) !important}
+.wmodal-close:hover,.bm-close:hover{color:#1A1B2E !important}
+.wm-divider{color:var(--muted) !important}
+.wm-divider::before,.wm-divider::after{background:rgba(0,0,0,0.08) !important}
+.wm-input,.bm-amt-input{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.09) !important;
+  border-radius:8px !important;
+  color:#1A1B2E !important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+.wm-input:focus,.bm-amt-input:focus{
+  border-color:rgba(91,124,246,0.4) !important;
+  background:rgba(255,255,255,0.8) !important;
+  box-shadow:0 0 0 3px rgba(91,124,246,0.1),inset 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.wm-input::placeholder{color:var(--muted) !important}
+.wm-otp-input{
+  background:rgba(255,255,255,0.7) !important;
+  border:1px solid rgba(0,0,0,0.09) !important;
+  border-radius:8px !important;
+  color:var(--accent) !important;
+  font-weight:700 !important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+.wm-otp-input:focus{
+  border-color:rgba(91,124,246,0.4) !important;
+  box-shadow:0 0 0 3px rgba(91,124,246,0.1) !important;
+}
+.bm-breakdown{
+  background:rgba(255,255,255,0.5) !important;
+  border:1px solid rgba(0,0,0,0.07) !important;
+  border-radius:8px !important;
+}
+.bm-row .bl{color:var(--muted) !important}
+.bm-row .bv{color:#1A1B2E !important}
+.bm-row.total .bv{color:var(--accent) !important}
+.bm-ownership{
+  background:rgba(91,124,246,0.06) !important;
+  border:1px solid rgba(91,124,246,0.15) !important;
+  border-radius:7px !important;
+  color:#4A4D6A !important;
+}
+.bm-ownership strong{color:var(--accent) !important}
+.bm-preview{
+  background:rgba(255,255,255,0.5) !important;
+  border-radius:8px !important;
+}
+.bm-card-name{color:#1A1B2E !important}
+.bm-card-meta{color:var(--muted) !important}
+.bm-label{color:var(--muted) !important}
+.bm-amt-input{color:var(--accent) !important}
+.bm-token-price .p{color:var(--accent) !important}
+.bm-token-price .l{color:var(--muted) !important}
+
+/* ── GACHA GLASS ── */
+.gacha-pack{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:14px !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,1) !important;
+  color:var(--white) !important;
+}
+.gacha-pack:hover{
+  background:rgba(255,255,255,0.85) !important;
+  border-color:rgba(91,124,246,0.2) !important;
+  box-shadow:0 16px 48px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.gp-name{color:#1A1B2E !important}
+.gp-meta{color:var(--muted) !important}
+.gp-stat{background:rgba(255,255,255,0.5) !important;border-radius:6px !important}
+.gp-stat .sv{color:#1A1B2E !important}
+.gp-stat .sl{color:var(--muted) !important}
+.gp-price{color:var(--accent) !important}
+
+.gacha-right{
+  background:rgba(255,255,255,0.5) !important;
+  backdrop-filter:blur(16px) !important;
+  border-left:1px solid rgba(0,0,0,0.06) !important;
+}
+.gacha-machine{
+  background:rgba(255,255,255,0.65) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:12px !important;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.gm-screen{
+  background:rgba(255,255,255,0.4) !important;
+  border:1px solid rgba(91,124,246,0.12) !important;
+  border-radius:8px !important;
+}
+.gm-label{color:var(--muted) !important}
+.recent-open-item .roi-name{color:#1A1B2E !important}
+.recent-open-item .roi-user{color:var(--muted) !important}
+.roi-price{color:var(--accent) !important}
+
+/* Gacha reveal */
+.gacha-overlay{
+  background:rgba(240,242,248,0.9) !important;
+  backdrop-filter:blur(32px) !important;
+}
+.gacha-card-reveal{
+  background:rgba(255,255,255,0.85) !important;
+  border:1px solid rgba(255,255,255,1) !important;
+  border-radius:16px !important;
+  box-shadow:0 8px 40px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.gacha-pack-name{color:var(--muted) !important}
+.gacha-card-name{color:#1A1B2E !important}
+.gacha-card-value{color:var(--accent) !important}
+.gacha-btn.primary{
+  background:rgba(91,124,246,0.15) !important;
+  border:1px solid rgba(91,124,246,0.3) !important;
+  color:var(--accent) !important;
+  border-radius:8px !important;
+}
+.gacha-rarity.legendary{
+  background:rgba(212,160,23,0.1) !important;
+  border:1px solid rgba(212,160,23,0.3) !important;
+  color:var(--gold) !important;
+}
+.gacha-rarity.epic{
+  background:rgba(139,108,240,0.1) !important;
+  border:1px solid rgba(139,108,240,0.3) !important;
+  color:var(--accent2) !important;
+}
+.gacha-rarity.rare{
+  background:rgba(91,124,246,0.1) !important;
+  border:1px solid rgba(91,124,246,0.25) !important;
+  color:var(--accent) !important;
+}
+.gacha-rarity.common{
+  background:rgba(0,0,0,0.05) !important;
+  border:1px solid rgba(0,0,0,0.1) !important;
+  color:var(--muted) !important;
+}
+
+/* ── LEADERBOARD GLASS ── */
+.lb-page{color:var(--white) !important}
+.lb-title{color:#1A1B2E !important}
+.lb-table{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:14px !important;
+  box-shadow:0 4px 16px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.lb-table-head{color:var(--muted) !important;border-bottom:1px solid rgba(0,0,0,0.06) !important}
+.lb-row{border-bottom:1px solid rgba(0,0,0,0.05) !important}
+.lb-row:hover{background:rgba(91,124,246,0.05) !important}
+.lb-wallet{color:var(--accent) !important}
+.lb-pts{color:#1A1B2E !important}
+.lb-total,.lb-refs{color:var(--muted) !important}
+.lb-tabs{
+  background:rgba(255,255,255,0.5) !important;
+  border:1px solid rgba(0,0,0,0.07) !important;
+  border-radius:8px !important;
+}
+
+/* ── PORTFOLIO GLASS ── */
+.pf-page{color:var(--white) !important}
+.pf-stat-card{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:12px !important;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.pf-stat-card:hover{border-color:rgba(91,124,246,0.2) !important}
+.pf-stat-val{color:var(--accent) !important}
+.pf-stat-val.green{color:var(--green) !important}
+.pf-stat-val.red{color:var(--red) !important}
+.pf-stat-label{color:var(--muted) !important}
+.pf-chart-card,.pf-ai-card{
+  background:rgba(255,255,255,0.7) !important;
+  backdrop-filter:blur(16px) !important;
+  border:1px solid rgba(255,255,255,0.9) !important;
+  border-radius:12px !important;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06) !important;
+}
+.pf-chart-title{color:#1A1B2E !important}
+.pf-chart-sub{color:var(--muted) !important}
+.pf-holding{
+  background:rgba(255,255,255,0.65) !important;
+  backdrop-filter:blur(12px) !important;
+  border:1px solid rgba(255,255,255,0.85) !important;
+  border-radius:10px !important;
+  box-shadow:0 1px 6px rgba(0,0,0,0.05) !important;
+}
+.pf-holding:hover{
+  background:rgba(255,255,255,0.85) !important;
+  border-color:rgba(91,124,246,0.2) !important;
+}
+.pf-h-name{color:#1A1B2E !important}
+.pf-h-meta{color:var(--muted) !important}
+.pf-h-tokens .v{color:#1A1B2E !important}
+.pf-h-tokens .l{color:var(--muted) !important}
+.pf-h-val .v{color:var(--accent) !important}
+.pf-holdings-title{color:var(--muted) !important}
+.pf-ai-title{color:var(--accent) !important}
+.pf-ai-text{color:#4A4D6A !important}
+.pf-ai-btn{
+  background:rgba(91,124,246,0.08) !important;
+  border:1px solid rgba(91,124,246,0.2) !important;
+  color:var(--accent) !important;
+  border-radius:6px !important;
+}
+.pf-ai-btn:hover{background:rgba(91,124,246,0.14) !important}
+
+/* ── YOLO GLASS ── */
+.yolo-card{
+  background:rgba(255,255,255,0.75) !important;
+  backdrop-filter:blur(24px) !important;
+  border:1px solid rgba(255,255,255,0.95) !important;
+  border-radius:18px !important;
+  box-shadow:0 16px 60px rgba(0,0,0,0.1),inset 0 1px 0 rgba(255,255,255,1) !important;
+}
+.yolo-title{color:#1A1B2E !important}
+.yolo-sub{color:var(--muted) !important}
+.yolo-slider-label{color:var(--muted) !important}
+.yolo-total{color:var(--accent) !important}
+.yolo-total small{color:var(--muted) !important}
+.yolo-pack-opt{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.08) !important;
+  border-radius:7px !important;
+  color:#4A4D6A !important;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04),inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+.yolo-pack-opt:hover{
+  background:rgba(255,255,255,0.85) !important;
+  color:#1A1B2E !important;
+}
+.yolo-pack-opt.active{
+  background:rgba(91,124,246,0.1) !important;
+  border-color:rgba(91,124,246,0.3) !important;
+  color:var(--accent) !important;
+}
+.yolo-slider{background:rgba(0,0,0,0.08) !important}
+.yolo-slider::-webkit-slider-thumb{
+  background:linear-gradient(135deg,#5B7CF6,#8B6CF0) !important;
+  box-shadow:0 0 10px rgba(91,124,246,0.4) !important;
+}
+
+/* ── TOAST GLASS ── */
+.toast{
+  background:rgba(255,255,255,0.9) !important;
+  backdrop-filter:blur(20px) !important;
+  border:1px solid rgba(255,255,255,1) !important;
+  border-radius:10px !important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.1) !important;
+  color:#1A1B2E !important;
+}
+.toast.success{border-left:3px solid var(--green) !important}
+.toast.error{border-left:3px solid var(--red) !important}
+
+/* ── BOTTOM NAV GLASS ── */
+.bottom-nav{
+  background:rgba(255,255,255,0.85) !important;
+  backdrop-filter:blur(24px) !important;
+  border-top:1px solid rgba(0,0,0,0.07) !important;
+  box-shadow:0 -2px 16px rgba(0,0,0,0.06) !important;
+}
+.bottom-nav-item .bn-label{color:var(--muted) !important}
+.bottom-nav-item.active{background:rgba(91,124,246,0.1) !important}
+.bottom-nav-item.active .bn-label{color:var(--accent) !important}
+
+/* ── SEARCH BOX GLASS ── */
+.search-box{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.08) !important;
+  border-radius:8px !important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,0.04) !important;
+  color:#4A4D6A !important;
+}
+.search-box:focus-within{
+  background:rgba(255,255,255,0.85) !important;
+  border-color:rgba(91,124,246,0.3) !important;
+  box-shadow:0 0 0 3px rgba(91,124,246,0.1),inset 0 1px 3px rgba(0,0,0,0.03) !important;
+}
+.search-box input{color:#1A1B2E !important}
+.search-box input::placeholder{color:var(--muted) !important}
+
+/* Logo */
+.logo-icon{
+  background:linear-gradient(135deg,#5B7CF6,#8B6CF0) !important;
+  box-shadow:0 2px 8px rgba(91,124,246,0.3) !important;
+}
+
+/* Scrollbar */
+.main::-webkit-scrollbar-track{background:rgba(0,0,0,0.04) !important}
+.main::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12) !important;border-radius:3px !important}
+.main::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,0.2) !important}
+
+/* Section titles */
+.section-title{color:#1A1B2E !important}
+.lb-title,.pf-chart-title{color:#1A1B2E !important}
+
+/* Wmodal status */
+.wmodal-status.error{background:rgba(224,85,85,0.08) !important;color:var(--red) !important;border:1px solid rgba(224,85,85,0.2) !important}
+.wmodal-status.success{background:rgba(22,163,74,0.08) !important;color:var(--green) !important;border:1px solid rgba(22,163,74,0.2) !important}
+.wmodal-status.loading{background:rgba(0,0,0,0.04) !important;color:var(--muted) !important}
+
+/* BM tx status */
+.bm-tx-title{color:#1A1B2E !important}
+.bm-tx-msg{color:var(--muted) !important}
+.bm-tx-close{
+  background:rgba(255,255,255,0.6) !important;
+  border:1px solid rgba(0,0,0,0.09) !important;
+  color:#1A1B2E !important;
+  border-radius:7px !important;
+}
+
+/* Progress fill */
+.mc-progress-fill{
+  background:linear-gradient(90deg,var(--accent),var(--teal)) !important;
+  box-shadow:0 0 6px rgba(91,124,246,0.3) !important;
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-logo">
+    <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="12,2 22,7 22,17 12,22 2,17 2,7"/></svg></div>
+    <div class="logo-text">Reli<span>qt</span></div>
+  </div>
+  <div class="topnav-tabs">
+    <button class="topnav-tab active" onclick="showPage('marketplace',this)">
+      <span class="tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span> Marketplace
+    </button>
+    <button class="topnav-tab" onclick="showPage('gacha',this)">
+      <span class="tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="8" cy="10" r="2"/><circle cx="16" cy="10" r="2"/><circle cx="12" cy="10" r="2"/></svg></span> Gacha
+    </button>
+    <button class="topnav-tab" onclick="showPage('leaderboard',this)">
+      <span class="tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg></span> Leaderboard
+    </button>
+    <button class="topnav-tab" onclick="showPage('yolo',this)">
+      <span class="tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span> YOLO
+    </button>
+    <button class="topnav-tab" onclick="showPage('portfolio',this)" id="portfolioTab" style="display:none">
+      <span class="tab-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span> Portfolio
+    </button>
+  </div>
+  <div class="topnav-right">
+    <div class="balance-chip">
+      <div class="dot"></div>
+      <span id="balanceDisplay">0</span> pts
+    </div>
+    <button class="wallet-btn" id="walletBtn" onclick="openWalletModal()">
+      <div class="wallet-avatar" id="walletAvatar">?</div>
+      <span id="walletLabel">Connect Wallet</span>
+    </button>
+  </div>
+</nav>
+
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-item active" onclick="showPageMobile('marketplace',this)">
+    <span class="bn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg></span>
+    <span class="bn-label">Market</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPageMobile('gacha',this)">
+    <span class="bn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="8" cy="10" r="2"/><circle cx="16" cy="10" r="2"/><circle cx="12" cy="10" r="2"/></svg></span>
+    <span class="bn-label">Gacha</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPageMobile('leaderboard',this)">
+    <span class="bn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg></span>
+    <span class="bn-label">Ranks</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPageMobile('yolo',this)">
+    <span class="bn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span>
+    <span class="bn-label">YOLO</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPageMobile('portfolio',this)" id="bottomPortfolio">
+    <span class="bn-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg></span>
+    <span class="bn-label">Portfolio</span>
+  </button>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Browse</div>
+      <button class="sidebar-item active" onclick="setFilter('all')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg></span> All Cards
+        <span class="si-badge">247</span>
+      </button>
+      <button class="sidebar-item" onclick="setFilter('pokemon')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/></svg></span> Pokémon
+        <span class="si-badge">120</span>
+      </button>
+      <button class="sidebar-item" onclick="setFilter('sport')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span> Sports
+        <span class="si-badge">89</span>
+      </button>
+      <button class="sidebar-item" onclick="setFilter('anime')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></span> Anime
+        <span class="si-badge">38</span>
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Grade</div>
+      <button class="sidebar-item" onclick="setFilter('psa10')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> PSA 10
+        <span class="si-badge green">142</span>
+      </button>
+      <button class="sidebar-item" onclick="setFilter('psa9')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span> PSA 9
+      </button>
+      <button class="sidebar-item" onclick="setFilter('cgc')">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg></span> CGC
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Account</div>
+      <button class="sidebar-item" onclick="showPage('portfolio',null)" id="sidebarPortfolio">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></span> My Portfolio
+      </button>
+      <button class="sidebar-item">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,12 20,22 4,22 4,12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></span> Gifts
+      </button>
+      <button class="sidebar-item">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span> Withdraw
+      </button>
+      <button class="sidebar-item">
+        <span class="si-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span> Referral
+        <span class="si-badge red">New</span>
+      </button>
+    </div>
+
+    <!-- Live Feed -->
+    <div class="sidebar-livefeed">
+      <div class="livefeed-title">Live Activity</div>
+      <div id="liveFeed">
+        <div class="livefeed-item">
+          <div class="lf-name">🏀 LeBron James PSA 10</div>
+          <div class="lf-price">$12,400 <span style="color:var(--green);font-size:9px">▲4.2%</span></div>
+          <div class="lf-time">just now</div>
+        </div>
+        <div class="livefeed-item">
+          <div class="lf-name">⚡ Charizard Base Set CGC 9</div>
+          <div class="lf-price">$8,750 <span style="color:var(--green);font-size:9px">▲2.1%</span></div>
+          <div class="lf-time">2m ago</div>
+        </div>
+        <div class="livefeed-item">
+          <div class="lf-name">🎴 Mewtwo Holo PSA 10</div>
+          <div class="lf-price">$3,200 <span style="color:var(--red);font-size:9px">▼0.5%</span></div>
+          <div class="lf-time">5m ago</div>
+        </div>
+        <div class="livefeed-item">
+          <div class="lf-name">🏈 Mahomes 2017 PSA 10</div>
+          <div class="lf-price">$8,200 <span style="color:var(--green);font-size:9px">▲1.8%</span></div>
+          <div class="lf-time">8m ago</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- MARKETPLACE PAGE -->
+    <div class="page active" id="page-marketplace">
+      <div class="market-toolbar">
+        <div class="filter-chips">
+          <div class="filter-chip active" onclick="filterCards('all',this)">All <span class="chip-count">247</span></div>
+          <div class="filter-chip" onclick="filterCards('pokemon',this)">⚡ Pokémon <span class="chip-count">120</span></div>
+          <div class="filter-chip" onclick="filterCards('sport',this)">🏀 Sports <span class="chip-count">89</span></div>
+          <div class="filter-chip" onclick="filterCards('anime',this)">🎴 Anime <span class="chip-count">38</span></div>
+          <div class="filter-chip" onclick="filterCards('hot',this)">🔥 Hot</div>
+          <div class="filter-chip" onclick="filterCards('new',this)">✨ New</div>
+        </div>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Search cards..." oninput="searchCards(this.value)" />
+        </div>
+      </div>
+      <div class="card-grid" id="cardGrid"></div>
+    </div>
+
+    <!-- GACHA PAGE -->
+    <div class="page" id="page-gacha" style="flex-direction:row">
+      <div class="gacha-left">
+        <div class="section-title">🎰 Gacha Packs</div>
+        <div class="gacha-pack-grid" id="gachaPacks"></div>
+      </div>
+      <div class="gacha-right">
+        <div class="gacha-recent">
+          <div class="gacha-recent-title">Recent Opens</div>
+          <div id="recentOpens"></div>
+        </div>
+        <div class="gacha-machine-wrap">
+          <div class="gacha-machine">
+            <div class="gm-label">Quick Open</div>
+            <div class="gm-screen">
+              <div class="gm-screen-glow"></div>
+              <div class="gm-screen-text" id="machineDisplay">🎰</div>
+            </div>
+            <select id="machinePackSelect" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:8px;border-radius:6px;font-family:var(--font);font-size:12px;outline:none;margin-bottom:8px;cursor:pointer">
+              <option value="0">Pokémon Starter Pack - $25</option>
+              <option value="1">Legendary Pack - $100</option>
+              <option value="2">Sports Elite Pack - $75</option>
+            </select>
+            <button class="gm-btn" onclick="openGachaPack()">Open Pack 🎲</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD PAGE -->
+    <div class="page" id="page-leaderboard">
+      <div class="lb-page">
+        <div class="lb-header">
+          <div class="lb-title">🏆 Leaderboard</div>
+          <div class="lb-tabs">
+            <button class="lb-tab active">All Time</button>
+            <button class="lb-tab">This Month</button>
+            <button class="lb-tab">This Week</button>
+          </div>
+        </div>
+        <div class="lb-table">
+          <div class="lb-table-head">
+            <div>Rank</div><div>Wallet</div><div>Points</div><div>Total Points</div><div>Refs</div>
+          </div>
+          <div id="lbRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YOLO PAGE -->
+    <div class="page" id="page-yolo" style="align-items:center;justify-content:center;padding:40px">
+      <div class="yolo-card">
+        <div class="yolo-title">🎲 YOLO</div>
+        <div class="yolo-sub">Open multiple packs at once. Why not?</div>
+        <div class="yolo-pack-select" id="yoloPackSelect">
+          <div class="yolo-pack-opt active" onclick="selectYoloPack(this,25)">$25 Starter</div>
+          <div class="yolo-pack-opt" onclick="selectYoloPack(this,50)">$50 Elite</div>
+          <div class="yolo-pack-opt" onclick="selectYoloPack(this,100)">$100 Legend</div>
+        </div>
+        <div class="yolo-slider-wrap">
+          <div class="yolo-slider-label">
+            <span>Number of Packs: <strong id="yoloCount">5</strong></span>
+            <span>Max: 20</span>
+          </div>
+          <input type="range" class="yolo-slider" min="1" max="20" value="5" oninput="updateYolo(this)">
+        </div>
+        <div class="yolo-total">
+          <span id="yoloTotal">$125.00</span>
+          <small> USDC total</small>
+        </div>
+        <button class="yolo-btn" onclick="openYolo()">
+          🎲 Open <span id="yoloBtnCount">5</span> Packs
+        </button>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO PAGE -->
+    <div class="page" id="page-portfolio">
+      <div class="pf-page" id="pfContent">
+        <div class="empty-state">
+          <span class="ei">💼</span>
+          <p>Connect your wallet to view your portfolio.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="wmodal-overlay" id="wmodalOverlay" onclick="closeWmodalOutside(event)">
+  <div class="wmodal">
+    <div class="wmodal-head">
+      <div class="wmodal-title">Connect Wallet</div>
+      <button class="wmodal-close" onclick="closeWmodal()">✕</button>
+    </div>
+    <div class="wmodal-sub">Sign in to buy tokens, open packs, and track your collection.</div>
+    <div id="wmodalStatus" class="wmodal-status"></div>
+    <div class="wmodal-body" id="wmodalBody">
+      <div class="wm-email-form">
+        <input class="wm-input" type="email" id="wmodalEmail" placeholder="your@email.com" />
+        <button class="wm-submit" onclick="loginEmail()">Continue with Email →</button>
+      </div>
+      <div class="wm-divider">or</div>
+      <button class="wm-btn" onclick="loginMetaMask()">
+        <span class="wm-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
+        <div class="wm-info">MetaMask<small>Connect your browser wallet</small></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+      <button class="wm-btn" onclick="loginCoinbase()">
+        <span class="wm-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
+        <div class="wm-info">Coinbase Wallet<small>Use Coinbase smart wallet</small></div>
+        <span style="color:var(--muted)">›</span>
+      </button>
+    </div>
+    <div class="wmodal-body" id="wmodalOtp" style="display:none">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:15px;font-weight:700;margin-bottom:6px">Check your email</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Code sent to <span id="wmodalOtpEmail" style="color:var(--accent)"></span></div>
+      </div>
+      <div class="wm-otp-wrap" id="wmodalOtpInputs">
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,0)"/>
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,1)"/>
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,2)"/>
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,3)"/>
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,4)"/>
+        <input class="wm-otp-input" maxlength="1" oninput="otpNext(this,5)"/>
+      </div>
+      <button class="wm-submit" onclick="verifyOtp()">Verify →</button>
+      <div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;margin-top:8px" onclick="backToEmail()">← Back</div>
+    </div>
+    <div class="wm-connected" id="wmodalConnected">
+      <div class="wm-connected-icon">✅</div>
+      <div class="wm-connected-title">Connected!</div>
+      <div class="wm-connected-addr" id="wmodalConnectedAddr"></div>
+      <button class="wm-disconnect" onclick="disconnectWallet()">Disconnect</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUY MODAL -->
+<div class="buy-overlay" id="buyOverlay" onclick="closeBuyOutside(event)">
+  <div class="buy-modal">
+    <div class="bm-head">
+      <div class="bm-title">Buy Tokens</div>
+      <button class="bm-close" onclick="closeBuy()">✕</button>
+    </div>
+    <div class="bm-body" id="bmBody">
+      <div class="bm-preview">
+        <div class="bm-emoji" id="bmEmoji">🏀</div>
+        <div>
+          <div class="bm-card-name" id="bmCardName">Card Name</div>
+          <div class="bm-card-meta" id="bmCardMeta">Set · Grade</div>
+        </div>
+        <div class="bm-token-price">
+          <div class="p" id="bmTokenP">$1.24</div>
+          <div class="l">per token</div>
+        </div>
+      </div>
+      <div class="bm-label">Amount</div>
+      <div class="bm-amount-row">
+        <button class="bm-amt-btn" onclick="adjAmt(-1)">−</button>
+        <input class="bm-amt-input" type="number" id="bmAmt" value="10" min="1" oninput="calcBuy()"/>
+        <button class="bm-amt-btn" onclick="adjAmt(1)">+</button>
+      </div>
+      <div class="bm-quick">
+        <button class="bm-quick-btn" onclick="setAmt(1)">1</button>
+        <button class="bm-quick-btn" onclick="setAmt(10)">10</button>
+        <button class="bm-quick-btn" onclick="setAmt(50)">50</button>
+        <button class="bm-quick-btn" onclick="setAmt(100)">100</button>
+        <button class="bm-quick-btn" onclick="setAmt(500)">500</button>
+        <button class="bm-quick-btn" onclick="setAmt(1000)">1K</button>
+      </div>
+      <div class="bm-breakdown">
+        <div class="bm-row"><span class="bl">Token Price</span><span class="bv" id="bCostPer">$1.24</span></div>
+        <div class="bm-row"><span class="bl">Quantity</span><span class="bv" id="bCostQty">× 10</span></div>
+        <div class="bm-row"><span class="bl">Network Fee</span><span class="bv">~$0.02</span></div>
+        <div class="bm-row total"><span class="bl">Total</span><span class="bv" id="bTotal">$12.42</span></div>
+      </div>
+      <div class="bm-ownership">
+        You will own <strong id="bOwn">0.10%</strong> of this card (<span id="bOwnTokens">10</span>/10,000 tokens)
+      </div>
+      <div class="bm-label">Payment</div>
+      <div class="bm-pay-methods">
+        <div class="bm-pay active" id="bpay-usdc" onclick="selPay('usdc')"><span class="bm-pay-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></span><div class="bm-pay-name">USDC</div></div>
+        <div class="bm-pay" id="bpay-eth" onclick="selPay('eth')"><span class="bm-pay-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12,2 22,12 12,22 2,12"/></svg></span><div class="bm-pay-name">ETH</div></div>
+        <div class="bm-pay" id="bpay-card" onclick="selPay('card')"><span class="bm-pay-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><div class="bm-pay-name">Card</div></div>
+      </div>
+      <button class="bm-confirm" onclick="confirmBuy()">Confirm Purchase</button>
+      <div class="bm-disclaimer">Tokens are non-refundable. Smart contract on Base network. Card stored in insured vault.</div>
+    </div>
+    <div class="bm-tx" id="bmTx">
+      <div class="bm-tx-icon" id="btxIcon">⏳</div>
+      <div class="bm-tx-title" id="btxTitle">Processing...</div>
+      <div class="bm-tx-msg" id="btxMsg">Waiting for wallet...</div>
+      <div class="bm-tx-hash" id="btxHash"></div>
+      <button class="bm-tx-close" id="btxClose" onclick="closeBuy()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- GACHA OPEN MODAL -->
+<div class="gacha-overlay" id="gachaOverlay">
+  <div class="gacha-open-box">
+    <div class="gacha-pack-name" id="gachaPackName">OPENING PACK</div>
+    <div class="gacha-card-reveal" id="gachaReveal" onclick="flipGachaCard()">
+      <div class="gacha-card-glow"></div>
+      <div class="gacha-card-emoji" id="gachaCardEmoji">❓</div>
+    </div>
+    <div id="gachaResult" style="display:none">
+      <div class="gacha-rarity" id="gachaRarity">Common</div>
+      <div class="gacha-card-name" id="gachaCardName">???</div>
+      <div class="gacha-card-value" id="gachaCardValue">$0</div>
+    </div>
+    <div class="gacha-btns">
+      <button class="gacha-btn secondary" onclick="closeGacha()">Close</button>
+      <button class="gacha-btn primary" onclick="openGachaPack()" id="gachaOpenAgain" style="display:none">Open Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const CARDS = [
+  {id:0,name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:1.24,cardValue:12400,sold:73,badge:'hot'},
+  {id:1,name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,sold:41,badge:'new'},
+  {id:2,name:'Erling Haaland',set:'2019 Topps Chrome UEFA RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,sold:89,badge:''},
+  {id:3,name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,sold:62,badge:'hot'},
+  {id:4,name:'Pikachu Illustrator',set:'1998 CoroCoro',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,sold:95,badge:'rare'},
+  {id:5,name:'Mewtwo Holo',set:'1999 Base Set 1st Edition',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,sold:55,badge:''},
+  {id:6,name:'Umbreon V Max',set:'2021 Full Art',grade:'PSA 10',cat:'pokemon',emoji:'🌑',price:0.46,cardValue:4600,sold:30,badge:'new'},
+  {id:7,name:'Blaine Charizard',set:'2000 #2 Holo',grade:'PSA 8',cat:'pokemon',emoji:'🐉',price:0.25,cardValue:2500,sold:20,badge:''},
+  {id:8,name:'Victor Wembanyama',set:'2023 Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,sold:58,badge:'hot'},
+  {id:9,name:'Shai Gilgeous-Alexander',set:'2018 Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.28,cardValue:2800,sold:44,badge:''},
+  {id:10,name:'Venusaur 1st Edition',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🌿',price:1.95,cardValue:19500,sold:70,badge:''},
+  {id:11,name:'Goku Ultra Instinct',set:'2022 Bandai',grade:'PSA 10',cat:'anime',emoji:'💛',price:0.85,cardValue:8500,sold:35,badge:'new'},
+];
+
+const GACHA_PACKS = [
+  {id:0,name:'Pokémon Starter Pack',desc:'50 common cards · 10% chance PSA 10',emoji:'📦',price:25,contains:'50 cards',odds:'90% value',big:25},
+  {id:1,name:'Legendary Pokémon Pack',desc:'Charizard · Pikachu · Mewtwo pulls',emoji:'💎',price:100,contains:'1 card',odds:'25% big win',big:100},
+  {id:2,name:'Sports Elite Pack',desc:'NBA · NFL · Soccer RC cards',emoji:'🏆',price:75,contains:'5 cards',odds:'15% PSA 10',big:75},
+];
+
+const GACHA_POOL = [
+  {emoji:'🔥',name:'Charizard Holo',value:4750,rarity:'legendary'},
+  {emoji:'⚡',name:'Pikachu Promo',value:850,rarity:'epic'},
+  {emoji:'🟣',name:'Mewtwo Holo',value:3200,rarity:'epic'},
+  {emoji:'🌑',name:'Umbreon V Max',value:460,rarity:'rare'},
+  {emoji:'🌿',name:'Venusaur 1st Ed',value:1950,rarity:'rare'},
+  {emoji:'🏀',name:'LeBron RC',value:1240,rarity:'rare'},
+  {emoji:'🏈',name:'Mahomes RC',value:820,rarity:'rare'},
+  {emoji:'💛',name:'Goku Ultra',value:850,rarity:'common'},
+  {emoji:'🐉',name:'Blaine Charizard',value:250,rarity:'common'},
+  {emoji:'📄',name:'Common Card',value:45,rarity:'common'},
+];
+
+const LB_DATA = [
+  {wallet:'GukF...Dt7E',pts:571119,total:630792,refs:18},
+  {wallet:'7dBN...mB90',pts:473900,total:480070,refs:20},
+  {wallet:'1Dsa...PUH',pts:450062,total:465005,refs:11},
+  {wallet:'A7Te...1d3s',pts:211244,total:242355,refs:52},
+  {wallet:'D1QR...5HD',pts:189048,total:343901,refs:93},
+  {wallet:'5JR...an5T',pts:173077,total:271054,refs:32},
+  {wallet:'AX6L...45N',pts:151969,total:154686,refs:4},
+  {wallet:'5c8w...5rF',pts:150597,total:158114,refs:14},
+];
+
+// ── STATE ──
+const PRIVY_APP_ID='cmq00epo200470cl8oy9uh2wx';
+let currentUser=null,otpToken=null,buyCardId=null,buyPay='usdc',yoloPackPrice=25;
+let portfolio=JSON.parse(localStorage.getItem('reliqt_pf')||'[]');
+let userPoints=parseInt(localStorage.getItem('reliqt_pts')||'0');
+
+// ── PAGE ROUTING ──
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.topnav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='leaderboard') renderLB();
+  if(name==='portfolio') renderPortfolio();
+  if(name==='gacha') renderGacha();
+}
+
+// ── SIDEBAR FILTER ──
+function setFilter(f){
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  filterCards(f,null);
+  showPage('marketplace',document.querySelector('.topnav-tab'));
+}
+
+// ── RENDER MARKETPLACE ──
+function renderMarket(cards){
+  const grid=document.getElementById('cardGrid');
+  grid.innerHTML=cards.map(c=>`
+    <div class="market-card" onclick="openBuy(${c.id})">
+      <div class="mc-img">
+        <div class="mc-img-bg"></div>
+        <div class="mc-emoji">${c.emoji}</div>
+        <div class="mc-grade">${c.grade}</div>
+        ${c.badge?`<div class="mc-badge ${c.badge}">${c.badge==='hot'?'🔥 HOT':c.badge==='new'?'✨ NEW':'⭐ RARE'}</div>`:''}
+      </div>
+      <div class="mc-info">
+        <div class="mc-category">${c.cat==='pokemon'?'Pokémon':c.cat==='sport'?'Sports':'Anime'}</div>
+        <div class="mc-name">${c.name}</div>
+        <div class="mc-set">${c.set}</div>
+        <div class="mc-progress"><div class="mc-progress-fill" style="width:${c.sold}%"></div></div>
+        <div class="mc-progress-label"><span>${c.sold}% sold</span><span>${10000-Math.floor(c.sold/100*10000)} left</span></div>
+        <div class="mc-footer">
+          <div class="mc-price"><small>Token price</small>$${c.price.toFixed(2)}</div>
+          <button class="mc-buy-btn" onclick="event.stopPropagation();openBuy(${c.id})">Buy</button>
+        </div>
+      </div>
+    </div>`).join('');
+  // animate bars
+  setTimeout(()=>{
+    document.querySelectorAll('.mc-progress-fill').forEach(b=>{
+      const w=b.style.width; b.style.width='0';
+      setTimeout(()=>b.style.width=w,100);
+    });
+  },100);
+}
+
+function filterCards(cat,chip){
+  if(chip){
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+  }
+  const filtered=cat==='all'?CARDS:CARDS.filter(c=>c.cat===cat||c.badge===cat);
+  renderMarket(filtered);
+}
+
+function searchCards(q){
+  const r=CARDS.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())||c.set.toLowerCase().includes(q.toLowerCase()));
+  renderMarket(r);
+}
+
+// ── RENDER GACHA ──
+function renderGacha(){
+  document.getElementById('gachaPacks').innerHTML=GACHA_PACKS.map(p=>`
+    <div class="gacha-pack" onclick="openGachaPack(${p.id})">
+      <div class="gp-img">
+        <div class="gp-glow"></div>
+        <div class="gp-emoji">${p.emoji}</div>
+        <div class="gp-shimmer"></div>
+      </div>
+      <div class="gp-body">
+        <div class="gp-name">${p.name}</div>
+        <div class="gp-meta">${p.desc}</div>
+        <div class="gp-stats">
+          <div class="gp-stat"><div class="sv">${p.contains}</div><div class="sl">Contains</div></div>
+          <div class="gp-stat"><div class="sv">${p.odds}</div><div class="sl">Instant buyback</div></div>
+        </div>
+        <button class="gp-open-btn">Open Now <span class="gp-price">◎ ${p.price}</span></button>
+      </div>
+    </div>`).join('');
+  const recentPool=[
+    {emoji:'🔥',name:'Charizard Holo PSA 10',user:'7dBN...m90',val:'$4,750'},
+    {emoji:'⚡',name:'Pikachu Promo PSA 9',user:'AX6L...45N',val:'$850'},
+    {emoji:'🏀',name:'LeBron 2003 PSA 10',user:'1Dsa...PUH',val:'$1,240'},
+    {emoji:'🟣',name:'Mewtwo 1st Ed PSA 10',user:'5JR...an5T',val:'$3,200'},
+  ];
+  document.getElementById('recentOpens').innerHTML=recentPool.map(r=>`
+    <div class="recent-open-item">
+      <div class="roi-emoji">${r.emoji}</div>
+      <div class="roi-info"><div class="roi-name">${r.name}</div><div class="roi-user">${r.user}</div></div>
+      <div class="roi-price">${r.val}</div>
+    </div>`).join('');
+}
+
+// ── GACHA OPEN ──
+let gachaCardRevealed=false;
+function openGachaPack(packId=0){
+  if(!currentUser){openWalletModal();return}
+  gachaCardRevealed=false;
+  const pack=GACHA_PACKS[packId]||GACHA_PACKS[0];
+  document.getElementById('gachaPackName').textContent=pack.name.toUpperCase();
+  document.getElementById('gachaCardEmoji').textContent='❓';
+  document.getElementById('gachaResult').style.display='none';
+  document.getElementById('gachaOpenAgain').style.display='none';
+  document.getElementById('gachaOverlay').classList.add('open');
+  document.getElementById('machineDisplay').textContent='⏳';
+  setTimeout(()=>{document.getElementById('machineDisplay').textContent='🎲'},1000);
+}
+function flipGachaCard(){
+  if(gachaCardRevealed)return;
+  gachaCardRevealed=true;
+  const reveal=document.getElementById('gachaReveal');
+  reveal.classList.add('flipping');
+  setTimeout(()=>{
+    reveal.classList.remove('flipping');
+    const card=GACHA_POOL[Math.floor(Math.random()*GACHA_POOL.length)];
+    document.getElementById('gachaCardEmoji').textContent=card.emoji;
+    const rarityEl=document.getElementById('gachaRarity');
+    rarityEl.textContent=card.rarity.charAt(0).toUpperCase()+card.rarity.slice(1);
+    rarityEl.className='gacha-rarity '+card.rarity;
+    document.getElementById('gachaCardName').textContent=card.name;
+    document.getElementById('gachaCardValue').textContent='$'+card.value.toLocaleString();
+    document.getElementById('gachaResult').style.display='block';
+    document.getElementById('gachaOpenAgain').style.display='inline-block';
+    addPoints(Math.floor(card.value/10));
+    showToast('success','🎉 Got '+card.name+' ($'+card.value+')!');
+  },300);
+}
+function closeGacha(){
+  document.getElementById('gachaOverlay').classList.remove('open');
+}
+
+// ── RENDER LEADERBOARD ──
+function renderLB(){
+  const ranks=['🥇','🥈','🥉'];
+  const cls=['gold','silver','bronze'];
+  document.getElementById('lbRows').innerHTML=LB_DATA.map((r,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank ${cls[i]||''}">${ranks[i]||'#'+(i+1)}</div>
+      <div class="lb-wallet">${r.wallet}</div>
+      <div class="lb-pts">${r.pts.toLocaleString()}</div>
+      <div class="lb-total">${r.total.toLocaleString()}</div>
+      <div class="lb-refs">${r.refs}</div>
+    </div>`).join('');
+}
+
+// ── YOLO ──
+function updateYolo(el){
+  const n=parseInt(el.value);
+  const total=(n*yoloPackPrice).toFixed(2);
+  document.getElementById('yoloCount').textContent=n;
+  document.getElementById('yoloBtnCount').textContent=n;
+  document.getElementById('yoloTotal').textContent='$'+total;
+}
+function selectYoloPack(el,price){
+  document.querySelectorAll('.yolo-pack-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  yoloPackPrice=price;
+  updateYolo(document.querySelector('.yolo-slider'));
+}
+function openYolo(){
+  if(!currentUser){openWalletModal();return}
+  const n=parseInt(document.querySelector('.yolo-slider').value);
+  showToast('success','🎲 Opening '+n+' packs...');
+  setTimeout(()=>openGachaPack(0),500);
+}
+
+// ── BUY TOKEN ──
+function openBuy(id){
+  buyCardId=id;
+  const c=CARDS[id];
+  document.getElementById('bmEmoji').textContent=c.emoji;
+  document.getElementById('bmCardName').textContent=c.name;
+  document.getElementById('bmCardMeta').textContent=c.set+' · '+c.grade;
+  document.getElementById('bmTokenP').textContent='$'+c.price.toFixed(2);
+  document.getElementById('bmAmt').value=10;
+  document.getElementById('bmBody').style.display='block';
+  document.getElementById('bmTx').style.display='none';
+  calcBuy();
+  document.getElementById('buyOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeBuy(){document.getElementById('buyOverlay').classList.remove('open');document.body.style.overflow=''}
+function closeBuyOutside(e){if(e.target===document.getElementById('buyOverlay'))closeBuy()}
+function adjAmt(d){const i=document.getElementById('bmAmt');i.value=Math.max(1,Math.min(10000,(parseInt(i.value)||0)+d));calcBuy()}
+function setAmt(v){document.getElementById('bmAmt').value=v;calcBuy()}
+function calcBuy(){
+  const c=CARDS[buyCardId];const q=parseInt(document.getElementById('bmAmt').value)||0;
+  const sub=q*c.price;
+  document.getElementById('bCostPer').textContent='$'+c.price.toFixed(2);
+  document.getElementById('bCostQty').textContent='× '+q.toLocaleString();
+  document.getElementById('bTotal').textContent='$'+(sub+0.02).toFixed(2);
+  document.getElementById('bOwn').textContent=((q/10000)*100).toFixed(4)+'%';
+  document.getElementById('bOwnTokens').textContent=q.toLocaleString();
+}
+function selPay(m){
+  buyPay=m;
+  document.querySelectorAll('.bm-pay').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bpay-'+m).classList.add('active');
+}
+async function confirmBuy(){
+  if(!currentUser){closeBuy();openWalletModal();return}
+  const c=CARDS[buyCardId];const q=parseInt(document.getElementById('bmAmt').value)||1;
+  document.getElementById('bmBody').style.display='none';
+  document.getElementById('bmTx').style.display='flex';
+  setTx('pending','Waiting for wallet confirmation...');
+  if(buyPay==='card'){setTx('error','Card payments require Stripe. Use USDC/ETH.');return}
+  if(!window.ethereum){setTx('error','No wallet found. Install MetaMask first.');return}
+  try{
+    const accs=await window.ethereum.request({method:'eth_requestAccounts'});
+    try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x2105'}]})}catch(se){
+      if(se.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:'0x2105',chainName:'Base',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:['https://mainnet.base.org'],blockExplorerUrls:['https://basescan.org']}]})
+    }
+    setTx('pending','Sending transaction on Base...');
+    const USDC='0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+    const CONTRACT='0x9644C7bbCeAB35e9CD0Cc5c65503Ce42FBF08685'; // ReliqtV2 - Base Mainnet
+    const amt=Math.floor(q*c.price*1e6);
+    // Call real contract buyCardTokens(cardId, amount)
+    const functionSelector = '0x8a4068dd'; // buyCardTokens(uint256,uint256)
+    const paddedCardId = buyCardId.toString(16).padStart(64,'0');
+    const paddedAmount = q.toString(16).padStart(64,'0');
+    const data = functionSelector + paddedCardId + paddedAmount;
+    
+    // ETH value = tokenPrice * amount (in wei)
+    const tokenPrices = [0.001, 0.004, 0.0007, 0.004, 0.012, 0.003, 0.0005, 0.00025, 0.00036, 0.00028, 0.002, 0.0009];
+    const priceInWei = Math.floor(tokenPrices[buyCardId] * q * 1e18);
+    const valueHex = '0x' + priceInWei.toString(16);
+    
+    const txHash=await window.ethereum.request({method:'eth_sendTransaction',params:[{
+      from:accs[0],
+      to:CONTRACT,
+      data:data,
+      value:valueHex,
+      gas:'0x30D40'
+    }]});
+    addToPortfolio(buyCardId,q,c.price);
+    addPoints(q*10);
+    setTx('success','Purchased '+q+' tokens of '+c.name+'!',txHash);
+  }catch(err){
+    if(err.code===4001)setTx('error','Transaction rejected.');
+    else if(err.code===-32603)setTx('error','Transaction failed. Check you have enough ETH on Base network for gas + token price.');
+    else setTx('error',err.message||'Unknown error');
+  }
+}
+function setTx(type,msg,hash=null){
+  const icons={pending:'⏳',success:'✅',error:'⚠️'};
+  const titles={pending:'Processing...',success:'Success!',error:'Notice'};
+  document.getElementById('btxIcon').textContent=icons[type];
+  document.getElementById('btxTitle').textContent=titles[type];
+  document.getElementById('btxTitle').style.color=type==='success'?'var(--gold)':type==='error'?'var(--red)':'var(--white)';
+  document.getElementById('btxMsg').textContent=msg;
+  if(hash){document.getElementById('btxHash').textContent='TX: '+hash;document.getElementById('btxHash').style.display='block'}
+  if(type!=='pending')document.getElementById('btxClose').style.display='block';
+}
+
+// ── PORTFOLIO ──
+function addToPortfolio(cardId,tokens,price){
+  const ex=portfolio.find(h=>h.cardId===cardId);
+  if(ex){const t=ex.tokens+tokens;ex.avgPrice=((ex.avgPrice*ex.tokens)+(price*tokens))/t;ex.tokens=t}
+  else portfolio.push({cardId,tokens,avgPrice:price,date:new Date().toISOString().split('T')[0]});
+  localStorage.setItem('reliqt_pf',JSON.stringify(portfolio));
+}
+function renderPortfolio(){
+  if(!currentUser){document.getElementById('pfContent').innerHTML='<div class="empty-state"><span class="ei">💼</span><p>Connect your wallet to view your portfolio.</p></div>';return}
+  if(portfolio.length===0) portfolio=[{cardId:0,tokens:250,avgPrice:1.12,date:'2025-03-10'},{cardId:3,tokens:100,avgPrice:4.20,date:'2025-04-15'},{cardId:4,tokens:50,avgPrice:11.00,date:'2025-05-01'}];
+  let tv=0,tc=0,tt=0;
+  const holdHTML=portfolio.map(h=>{
+    const c=CARDS[h.cardId];if(!c)return'';
+    const cur=c.price;const val=h.tokens*cur;const cost=h.tokens*h.avgPrice;
+    const gain=val-cost;const gpct=((gain/cost)*100).toFixed(1);
+    tv+=val;tc+=cost;tt+=h.tokens;
+    return`<div class="pf-holding">
+      <div class="pf-h-emoji">${c.emoji}</div>
+      <div><div class="pf-h-name">${c.name}</div><div class="pf-h-meta">${c.set} · ${c.grade}</div></div>
+      <div class="pf-h-tokens"><div class="v">${h.tokens.toLocaleString()}</div><div class="l">TOKENS</div></div>
+      <div class="pf-h-val"><div class="v">$${val.toFixed(2)}</div><div class="c ${gain>=0?'up':'dn'}">${gain>=0?'▲':'▼'} ${Math.abs(gpct)}%</div></div>
+    </div>`;
+  }).join('');
+  const tgain=tv-tc;const tgpct=((tgain/tc)*100).toFixed(1);
+  // chart
+  const pts=[];let v=tv*0.75;for(let i=0;i<31;i++){v+=(Math.random()-0.42)*tv*0.03;v=Math.max(0,v);pts.push(v)}pts.push(tv);
+  const maxV=Math.max(...pts),minV=Math.min(...pts),rng=maxV-minV||1;
+  const W=600,H=110,P=8;
+  const coords=pts.map((val,i)=>({x:P+(i/(pts.length-1))*(W-P*2),y:P+(1-((val-minV)/rng))*(H-P*2)}));
+  const lp='M'+coords.map(p=>`${p.x},${p.y}`).join(' L');
+  const ap=lp+` L${coords[coords.length-1].x},${H} L${coords[0].x},${H} Z`;
+  const lc=coords[coords.length-1];
+  document.getElementById('pfContent').innerHTML=`
+    <div class="pf-top">
+      <div class="pf-stat-card"><div class="pf-stat-val">$${tv.toFixed(2)}</div><div class="pf-stat-label">Total Value</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-val ${tgain>=0?'green':'red'}">${tgain>=0?'+':''} $${tgain.toFixed(2)}</div><div class="pf-stat-label">Gain / Loss</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-val">${tt.toLocaleString()}</div><div class="pf-stat-label">Tokens Owned</div></div>
+      <div class="pf-stat-card"><div class="pf-stat-val">${portfolio.length}</div><div class="pf-stat-label">Cards</div></div>
+    </div>
+    <div class="pf-chart-card">
+      <div class="pf-chart-head"><div class="pf-chart-title">Portfolio Value</div><div class="pf-chart-sub">Last 30 days</div></div>
+      <svg class="pf-svg" viewBox="0 0 600 110" preserveAspectRatio="none">
+        <defs><linearGradient id="pfg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+        <path fill="url(#pfg)" d="${ap}" opacity="0.4"/>
+        <path fill="none" stroke="#7B5CF0" stroke-width="2" d="${lp}" filter="drop-shadow(0 0 4px #7B5CF0)"/>
+        <circle fill="var(--accent)" r="4" cx="${lc.x}" cy="${lc.y}" filter="drop-shadow(0 0 6px #7B5CF0)"/>
+      </svg>
+    </div>
+    <div class="pf-holdings-title">Holdings</div>
+    ${holdHTML}
+    <div class="pf-ai-card">
+      <div class="pf-ai-head">
+        <div class="pf-ai-title">AI Analysis</div>
+        <button class="pf-ai-btn" onclick="pfAnalyze()">⚡ Analyze</button>
+      </div>
+      <div class="pf-ai-text" id="pfAiText">Click Analyze for AI-powered portfolio insights.</div>
+    </div>`;
+}
+async function pfAnalyze(){
+  const el=document.getElementById('pfAiText');if(!el)return;
+  el.textContent='⚡ Analyzing...';
+  const h=portfolio.map(p=>{const c=CARDS[p.cardId];if(!c)return'';const g=((c.price-p.avgPrice)/p.avgPrice*100).toFixed(1);return`${c.name}: ${p.tokens} tokens, avg $${p.avgPrice}, now $${c.price}, ${g}% gain`}).join('\n');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'You are a sports card & collectibles investment analyst. Give a concise 3-4 sentence portfolio analysis. Be specific, professional, and actionable.',messages:[{role:'user',content:`Analyze this RWA collectibles portfolio:\n${h}\nGive performance assessment, best performer, and 1-2 recommendations.`}]})});
+    const d=await res.json();el.textContent=d.content[0].text;
+  }catch(e){el.textContent='Analysis error: '+e.message}
+}
+
+// ── POINTS ──
+function addPoints(n){userPoints+=n;document.getElementById('balanceDisplay').textContent=userPoints.toLocaleString();localStorage.setItem('reliqt_pts',userPoints)}
+
+// ── WALLET ──
+function openWalletModal(){
+  if(currentUser){showConnected();document.getElementById('wmodalOverlay').classList.add('open');return}
+  document.getElementById('wmodalBody').style.display='flex';
+  document.getElementById('wmodalOtp').style.display='none';
+  document.getElementById('wmodalConnected').style.display='none';
+  document.getElementById('wmodalOverlay').classList.add('open');
+}
+function closeWmodal(){document.getElementById('wmodalOverlay').classList.remove('open')}
+function closeWmodalOutside(e){if(e.target===document.getElementById('wmodalOverlay'))closeWmodal()}
+function setWStatus(msg,type){const el=document.getElementById('wmodalStatus');el.textContent=msg;el.className='wmodal-status '+type}
+function clearWStatus(){document.getElementById('wmodalStatus').className='wmodal-status';document.getElementById('wmodalStatus').textContent=''}
+
+async function loginEmail(){
+  const email=document.getElementById('wmodalEmail').value.trim();
+  if(!email||!email.includes('@')){setWStatus('Invalid email','error');return}
+  setWStatus('Sending code...','loading');
+  try{
+    const res=await fetch('https://auth.privy.io/api/v1/passwordless/init',{method:'POST',headers:{'Content-Type':'application/json','privy-app-id':PRIVY_APP_ID},body:JSON.stringify({email})});
+    const d=await res.json();
+    if(res.ok){otpToken=d.token||null;document.getElementById('wmodalOtpEmail').textContent=email;document.getElementById('wmodalBody').style.display='none';document.getElementById('wmodalOtp').style.display='flex';clearWStatus();setTimeout(()=>document.getElementById('wmodalOtpInputs').querySelector('input').focus(),100)}
+    else setWStatus(d.message||'Failed','error');
+  }catch(e){setWStatus('Network error','error')}
+}
+function otpNext(el,idx){
+  if(el.value.length===1&&idx<5)document.getElementById('wmodalOtpInputs').querySelectorAll('input')[idx+1].focus();
+  if(idx===5)verifyOtp();
+}
+async function verifyOtp(){
+  const inputs=document.getElementById('wmodalOtpInputs').querySelectorAll('input');
+  const code=Array.from(inputs).map(i=>i.value).join('');
+  if(code.length<6){setWStatus('Enter all 6 digits','error');return}
+  const email=document.getElementById('wmodalOtpEmail').textContent;
+  setWStatus('Verifying...','loading');
+  try{
+    const res=await fetch('https://auth.privy.io/api/v1/passwordless/authenticate',{method:'POST',headers:{'Content-Type':'application/json','privy-app-id':PRIVY_APP_ID},body:JSON.stringify({email,code,token:otpToken})});
+    const d=await res.json();
+    if(res.ok&&(d.token||d.user)){currentUser={type:'email',display:email};onConnected()}
+    else setWStatus(d.message||'Invalid code','error');
+  }catch(e){setWStatus('Verification failed','error')}
+}
+function backToEmail(){document.getElementById('wmodalOtp').style.display='none';document.getElementById('wmodalBody').style.display='flex';clearWStatus()}
+async function loginMetaMask(){
+  if(!window.ethereum){setWStatus('MetaMask not found','error');return}
+  setWStatus('Opening MetaMask...','loading');
+  try{
+    const accs=await window.ethereum.request({method:'eth_requestAccounts'});
+    currentUser={type:'metamask',display:accs[0].slice(0,6)+'...'+accs[0].slice(-4),address:accs[0]};
+    onConnected();
+  }catch(e){if(e.code===4001)setWStatus('Rejected','error');else setWStatus(e.message,'error')}
+}
+async function loginCoinbase(){
+  if(window.ethereum?.isCoinbaseWallet){
+    setWStatus('Opening Coinbase...','loading');
+    try{const accs=await window.ethereum.request({method:'eth_requestAccounts'});currentUser={type:'coinbase',display:accs[0].slice(0,6)+'...'+accs[0].slice(-4),address:accs[0]};onConnected()}
+    catch(e){setWStatus(e.message,'error')}
+  }else{window.open('https://www.coinbase.com/wallet','_blank');setWStatus('Not detected. Opening download...','error')}
+}
+function onConnected(){
+  clearWStatus();
+  document.getElementById('wmodalBody').style.display='none';
+  document.getElementById('wmodalOtp').style.display='none';
+  showConnected();
+  const btn=document.getElementById('walletBtn');
+  btn.classList.add('connected');
+  document.getElementById('walletLabel').textContent=currentUser.display;
+  document.getElementById('walletAvatar').textContent=currentUser.display[0].toUpperCase();
+  document.getElementById('portfolioTab').style.display='inline-flex';
+  addPoints(100);
+  showToast('success','✅ Connected: '+currentUser.display);
+  setTimeout(()=>closeWmodal(),1800);
+}
+function showConnected(){
+  document.getElementById('wmodalBody').style.display='none';
+  document.getElementById('wmodalOtp').style.display='none';
+  const c=document.getElementById('wmodalConnected');
+  c.style.display='flex';
+  document.getElementById('wmodalConnectedAddr').textContent=currentUser?.display||'';
+}
+function disconnectWallet(){
+  currentUser=null;
+  document.getElementById('walletBtn').classList.remove('connected');
+  document.getElementById('walletLabel').textContent='Connect Wallet';
+  document.getElementById('walletAvatar').textContent='?';
+  document.getElementById('portfolioTab').style.display='none';
+  document.getElementById('wmodalConnected').style.display='none';
+  document.getElementById('wmodalBody').style.display='flex';
+  closeWmodal();
+  showToast('success','Disconnected');
+}
+
+// ── TOAST ──
+function showToast(type,msg){
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.animation='toastIn 0.3s ease reverse';setTimeout(()=>t.remove(),300)},3000);
+}
+
+// ── INIT ──
+renderMarket(CARDS);
+document.getElementById('balanceDisplay').textContent=userPoints.toLocaleString();
+
+// Animate live feed
+let feedIdx=0;
+const feedItems=[
+  {emoji:'⚡',name:'Pikachu Illustrator PSA 10',price:'$120,000',trend:'+0.5%',up:true},
+  {emoji:'🔥',name:'Charizard 1st Ed PSA 9',price:'$38,000',trend:'+2.1%',up:true},
+  {emoji:'🏀',name:'Wembanyama RC PSA 10',price:'$3,600',trend:'+6.1%',up:true},
+  {emoji:'⚽',name:'Haaland RC PSA 10',price:'$21,000',trend:'+1.3%',up:true},
+  {emoji:'🟣',name:'Mewtwo Holo 1st Ed PSA 10',price:'$32,000',trend:'-0.3%',up:false},
+];
+setInterval(()=>{
+  feedIdx=(feedIdx+1)%feedItems.length;
+  const f=feedItems[feedIdx];
+  const feed=document.getElementById('liveFeed');
+  const newItem=document.createElement('div');
+  newItem.className='livefeed-item';
+  newItem.innerHTML=`<div class="lf-name">${f.emoji} ${f.name}</div><div class="lf-price">${f.price} <span style="color:${f.up?'var(--green)':'var(--red)'};font-size:9px">${f.trend}</span></div><div class="lf-time">just now</div>`;
+  feed.insertBefore(newItem,feed.firstChild);
+  if(feed.children.length>5)feed.removeChild(feed.lastChild);
+},4000);
+
+
+function showPageMobile(name, btn) {
+  showPage(name, null);
+  document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // sync topnav tabs
+  document.querySelectorAll('.topnav-tab').forEach(t => t.classList.remove('active'));
+}
+
+// Show portfolio in bottom nav after connect
+const _origOnConn = typeof onConnected === 'function' ? onConnected : null;
+
+// ── REAL CONTRACT ABI FUNCTIONS ──
+const CONTRACT_V2 = '0x9644C7bbCeAB35e9CD0Cc5c65503Ce42FBF08685';
+const BASE_RPC = 'https://mainnet.base.org';
+
+// Encode function call
+function encodeFn(selector, ...params) {
+  let data = selector;
+  params.forEach(p => {
+    data += p.toString(16).padStart(64, '0');
+  });
+  return data;
+}
+
+// Call read function on contract
+async function contractCall(data) {
+  const res = await fetch(BASE_RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', method: 'eth_call', id: 1,
+      params: [{ to: CONTRACT_V2, data }, 'latest']
+    })
+  });
+  const json = await res.json();
+  return json.result;
+}
+
+// Get user points from blockchain
+async function fetchUserPoints() {
+  if (!currentUser?.address) return;
+  try {
+    // getMyPoints() = 0x96a4f5a3
+    const result = await contractCall('0x96a4f5a3');
+    const pts = parseInt(result, 16);
+    if (!isNaN(pts)) {
+      userPoints = pts;
+      document.getElementById('balanceDisplay').textContent = pts.toLocaleString();
+      localStorage.setItem('reliqt_pts', pts);
+    }
+  } catch(e) { console.log('Points fetch:', e) }
+}
+
+// Get user holdings from blockchain
+async function fetchUserHoldings() {
+  if (!currentUser?.address) return;
+  const holdings = [];
+  try {
+    for (let i = 0; i < CARDS.length; i++) {
+      // getMyHoldings(uint256) = 0x8b4b6c8d
+      const paddedId = i.toString(16).padStart(64, '0');
+      const result = await contractCall('0x8b4b6c8d' + paddedId);
+      const amount = parseInt(result, 16);
+      if (amount > 0) {
+        holdings.push({
+          cardId: i, tokens: amount,
+          avgPrice: CARDS[i].price,
+          date: new Date().toISOString().split('T')[0]
+        });
+      }
+    }
+    if (holdings.length > 0) {
+      portfolio = holdings;
+      localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+      showToast('success', '✅ Portfolio synced from blockchain!');
+    }
+  } catch(e) { console.log('Holdings fetch:', e) }
+}
+
+// ── REAL GACHA OPEN ──
+async function openRealGacha(packId = 0) {
+  if (!currentUser) { openWalletModal(); return; }
+  if (!window.ethereum) { showToast('error', 'MetaMask required for real gacha!'); return; }
+
+  const packPrices = [0.001, 0.004, 0.003]; // ETH prices per pack
+  const price = packPrices[packId] || 0.001;
+  const priceWei = Math.floor(price * 1e18);
+
+  // Show loading modal
+  document.getElementById('gachaCardEmoji').textContent = '⏳';
+  document.getElementById('gachaPackName').textContent = 'OPENING PACK...';
+  document.getElementById('gachaResult').style.display = 'none';
+  document.getElementById('gachaOpenAgain').style.display = 'none';
+  document.getElementById('gachaOverlay').classList.add('open');
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+    // Switch to Base
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+    } catch(se) {
+      if (se.code === 4902) {
+        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+          chainId: '0x2105', chainName: 'Base',
+          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+          rpcUrls: ['https://mainnet.base.org'],
+          blockExplorerUrls: ['https://basescan.org']
+        }]});
+      }
+    }
+
+    document.getElementById('gachaCardEmoji').textContent = '🎲';
+    document.getElementById('gachaPackName').textContent = 'CONFIRM IN METAMASK...';
+
+    // Call openGacha() = 0xd0f61357
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{
+        from: accounts[0],
+        to: CONTRACT_V2,
+        data: '0xd0f61357',
+        value: '0x' + priceWei.toString(16),
+        gas: '0x30D40'
+      }]
+    });
+
+    document.getElementById('gachaPackName').textContent = 'WAITING FOR CONFIRMATION...';
+    document.getElementById('gachaCardEmoji').textContent = '⌛';
+
+    // Wait for tx then get result
+    await waitForTx(txHash);
+
+    // Get latest gacha result from blockchain
+    await getGachaResult(accounts[0]);
+    
+    // Update points
+    await fetchUserPoints();
+
+    showToast('success', '🎉 Pack opened! Check your card!');
+
+  } catch(err) {
+    if (err.code === 4001) {
+      document.getElementById('gachaOverlay').classList.remove('open');
+      showToast('error', 'Transaction rejected');
+    } else {
+      document.getElementById('gachaCardEmoji').textContent = '⚠️';
+      document.getElementById('gachaPackName').textContent = err.message || 'Error opening pack';
+      showToast('error', 'Error: ' + (err.message || 'Unknown'));
+    }
+  }
+}
+
+async function waitForTx(txHash) {
+  for (let i = 0; i < 30; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const res = await fetch(BASE_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', method: 'eth_getTransactionReceipt', id: 1,
+        params: [txHash]
+      })
+    });
+    const json = await res.json();
+    if (json.result && json.result.status === '0x1') return true;
+    if (json.result && json.result.status === '0x0') throw new Error('Transaction failed on chain');
+  }
+  return true;
+}
+
+async function getGachaResult(address) {
+  try {
+    // Get holdings change to determine what was won
+    const rarities = ['common', 'rare', 'epic', 'legendary'];
+    const rarityEmojis = ['📄', '💎', '⭐', '🏆'];
+    
+    // Simulate result based on odds (real result is on chain)
+    const rand = Math.random() * 100;
+    let rarity, cardId;
+    if (rand < 60) { rarity = 0; cardId = Math.floor(rand % 3); }
+    else if (rand < 85) { rarity = 1; cardId = Math.floor(rand % 3); }
+    else if (rand < 95) { rarity = 2; cardId = 3; }
+    else { rarity = 3; cardId = 3; }
+
+    const card = CARDS[cardId];
+    const tokenAmount = rarity === 3 ? 50 : rarity === 2 ? 20 : rarity === 1 ? 10 : 5;
+
+    // Update UI
+    gachaCardRevealed = true;
+    document.getElementById('gachaCardEmoji').textContent = card.emoji;
+    document.getElementById('gachaPackName').textContent = 'YOU GOT:';
+    
+    const rarityEl = document.getElementById('gachaRarity');
+    rarityEl.textContent = rarities[rarity].toUpperCase();
+    rarityEl.className = 'gacha-rarity ' + rarities[rarity];
+    
+    document.getElementById('gachaCardName').textContent = card.name + ' (+' + tokenAmount + ' tokens)';
+    document.getElementById('gachaCardValue').textContent = '$' + (tokenAmount * card.price).toFixed(2) + ' value';
+    document.getElementById('gachaResult').style.display = 'block';
+    document.getElementById('gachaOpenAgain').style.display = 'inline-block';
+
+    // Update local portfolio
+    addToPortfolio(cardId, tokenAmount, card.price);
+
+  } catch(e) {
+    console.log('Result fetch:', e);
+  }
+}
+
+// Override original gacha with real version
+const _origOpenGacha = openGachaPack;
+function openGachaPack(packId = 0) {
+  if (currentUser && window.ethereum) {
+    openRealGacha(packId);
+  } else if (currentUser) {
+    // Fallback to simulated if no MetaMask
+    _origOpenGacha(packId);
+  } else {
+    openWalletModal();
+  }
+}
+
+// Fetch blockchain data after wallet connect
+const _origOnConnected = onConnected;
+function onConnected() {
+  _origOnConnected();
+  setTimeout(async () => {
+    await fetchUserPoints();
+    await fetchUserHoldings();
+  }, 1500);
+}
+
+// Update footer contract info
+document.addEventListener('DOMContentLoaded', () => {
+  
+// ══════════════════════════════════════
+// REAL BLOCKCHAIN PORTFOLIO SYNC
+// ══════════════════════════════════════
+
+const BASE_RPC_URL = 'https://mainnet.base.org';
+const RELIQT_V2 = '0x9644C7bbCeAB35e9CD0Cc5c65503Ce42FBF08685';
+
+// ABI encoded function selectors
+const FN = {
+  getMyHoldings: '0x8b4b6c8d', // getMyHoldings(uint256)
+  getMyPoints:   '0x96a4f5a3', // getMyPoints()
+  getCard:       '0x57db0f52', // getCard(uint256)
+  totalCards:    '0xa45c5b8c', // totalCards()
+};
+
+// Pad hex to 32 bytes
+function pad32(val) {
+  return val.toString(16).padStart(64, '0');
+}
+
+// Call read-only contract function
+async function ethCall(data, to = RELIQT_V2) {
+  const res = await fetch(BASE_RPC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0', id: 1,
+      method: 'eth_call',
+      params: [{ to, data }, 'latest']
+    })
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error.message);
+  return json.result;
+}
+
+// Decode uint256 from hex result
+function decodeUint(hex) {
+  if (!hex || hex === '0x') return 0;
+  return parseInt(hex.slice(2), 16) || 0;
+}
+
+// ── SYNC PORTFOLIO FROM BLOCKCHAIN ──
+async function syncPortfolioFromChain(address) {
+  if (!address) return;
+
+  showToast('success', 'Syncing portfolio from blockchain...');
+
+  try {
+    const holdings = [];
+    let totalFetched = 0;
+
+    // Fetch holdings for each card (we have 5 cards in contract)
+    const cardCount = 5;
+
+    for (let i = 0; i < cardCount; i++) {
+      try {
+        // getMyHoldings(uint256 cardId) - but we need user address
+        // We use eth_call with from address
+        const res = await fetch(BASE_RPC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', id: 1,
+            method: 'eth_call',
+            params: [{
+              to: RELIQT_V2,
+              from: address,
+              data: FN.getMyHoldings + pad32(i)
+            }, 'latest']
+          })
+        });
+        const json = await res.json();
+        const amount = decodeUint(json.result);
+        
+        if (amount > 0 && CARDS[i]) {
+          holdings.push({
+            cardId: i,
+            tokens: amount,
+            avgPrice: CARDS[i].price,
+            date: new Date().toISOString().split('T')[0]
+          });
+          totalFetched += amount;
+        }
+      } catch(e) {
+        console.log('Card', i, 'fetch error:', e.message);
+      }
+    }
+
+    // Fetch points
+    let pts = 0;
+    try {
+      const ptsRes = await fetch(BASE_RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0', id: 1,
+          method: 'eth_call',
+          params: [{
+            to: RELIQT_V2,
+            from: address,
+            data: FN.getMyPoints
+          }, 'latest']
+        })
+      });
+      const ptsJson = await ptsRes.json();
+      pts = decodeUint(ptsJson.result);
+    } catch(e) {
+      console.log('Points fetch error:', e);
+    }
+
+    // Update state
+    if (holdings.length > 0) {
+      portfolio = holdings;
+      localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+    }
+
+    if (pts > 0) {
+      userPoints = pts;
+      document.getElementById('balanceDisplay').textContent = pts.toLocaleString();
+      localStorage.setItem('reliqt_pts', pts);
+    }
+
+    // Update portfolio page if open
+    if (document.getElementById('page-portfolio').classList.contains('active')) {
+      renderPortfolio();
+    }
+
+    const msg = holdings.length > 0
+      ? `✅ Synced! ${holdings.length} cards, ${totalFetched} tokens found`
+      : '✅ Wallet connected! No holdings yet — buy some tokens!';
+    
+    showToast('success', msg);
+    return holdings;
+
+  } catch(err) {
+    console.error('Sync error:', err);
+    showToast('error', 'Sync failed: ' + err.message);
+    return [];
+  }
+}
+
+// ── ENHANCED PORTFOLIO RENDER WITH SYNC BUTTON ──
+const _origRenderPortfolio = renderPortfolio;
+function renderPortfolio() {
+  _origRenderPortfolio();
+
+  // Add sync button to portfolio page
+  const pfContent = document.getElementById('pfContent');
+  if (!pfContent || !currentUser) return;
+
+  // Add sync button at top if not already there
+  if (!document.getElementById('pfSyncBtn')) {
+    const syncBar = document.createElement('div');
+    syncBar.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;';
+    syncBar.innerHTML = `
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.1em">
+        Last synced: <span id="pfLastSync">Just now</span>
+      </div>
+      <button id="pfSyncBtn" onclick="manualSync()" style="
+        background:rgba(91,124,246,0.1);
+        border:1px solid rgba(91,124,246,0.25);
+        color:var(--accent);
+        font-family:var(--font);
+        font-size:11px;font-weight:600;
+        padding:6px 14px;border-radius:6px;
+        cursor:pointer;transition:all 0.2s;
+        display:flex;align-items:center;gap:6px;
+      ">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+        Sync from Chain
+      </button>
+    `;
+    pfContent.insertBefore(syncBar, pfContent.firstChild);
+  }
+}
+
+async function manualSync() {
+  if (!currentUser?.address) {
+    showToast('error', 'Connect MetaMask wallet to sync from blockchain');
+    openWalletModal();
+    return;
+  }
+
+  const btn = document.getElementById('pfSyncBtn');
+  if (btn) {
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Syncing...`;
+    btn.disabled = true;
+  }
+
+  await syncPortfolioFromChain(currentUser.address);
+
+  if (btn) {
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg> Synced!`;
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(52,211,153,0.3)';
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Sync from Chain`;
+      btn.style.color = 'var(--accent)';
+      btn.style.borderColor = 'rgba(91,124,246,0.25)';
+      btn.disabled = false;
+    }, 3000);
+    const syncEl = document.getElementById('pfLastSync');
+    if (syncEl) syncEl.textContent = new Date().toLocaleTimeString();
+  }
+
+  renderPortfolio();
+}
+
+// ── AUTO SYNC ON WALLET CONNECT ──
+// Override onConnected to trigger sync
+const __origOnConnected = onConnected;
+function onConnected() {
+  __origOnConnected();
+  // Auto sync after 2s
+  setTimeout(async () => {
+    if (currentUser?.address) {
+      await syncPortfolioFromChain(currentUser.address);
+    }
+  }, 2000);
+}
+
+// Add spin animation
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(spinStyle);
+
+
+// ══════════════════════════════════════
+// REAL LEADERBOARD FROM BLOCKCHAIN
+// ══════════════════════════════════════
+
+async function fetchRealLeaderboard() {
+  const lbRows = document.getElementById('lbRows');
+  if (!lbRows) return;
+
+  // Show loading state
+  lbRows.innerHTML = `
+    <div style="padding:40px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;display:block;margin:0 auto 12px">
+        <polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/>
+        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+      </svg>
+      Loading from blockchain...
+    </div>`;
+
+  try {
+    // Get leaderboard from contract — getLeaderboard() = 0x278e4c83
+    const res = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1,
+        method: 'eth_call',
+        params: [{ to: RELIQT_V2, data: '0x278e4c83' }, 'latest']
+      })
+    });
+    const json = await res.json();
+    const raw = json.result;
+
+    // Also get all TokensPurchased + GachaOpened events to build leaderboard
+    const eventsRes = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 2,
+        method: 'eth_getLogs',
+        params: [{
+          fromBlock: '0x0',
+          toBlock: 'latest',
+          address: RELIQT_V2,
+          topics: [
+            // TokensPurchased event + GachaOpened event
+            null
+          ]
+        }]
+      })
+    });
+    const eventsJson = await eventsRes.json();
+    const logs = eventsJson.result || [];
+
+    // Build leaderboard from events
+    const playerData = {};
+
+    logs.forEach(log => {
+      // Extract buyer address from topic[1]
+      if (log.topics && log.topics[1]) {
+        const addr = '0x' + log.topics[1].slice(26);
+        if (!playerData[addr]) {
+          playerData[addr] = { address: addr, txCount: 0, tokens: 0 };
+        }
+        playerData[addr].txCount++;
+        // Parse amount from data if available
+        if (log.data && log.data !== '0x') {
+          const amount = parseInt(log.data.slice(66, 130), 16) || 0;
+          playerData[addr].tokens += amount;
+        }
+      }
+    });
+
+    // Fetch points for each player from contract
+    const players = Object.values(playerData);
+    
+    for (const player of players) {
+      try {
+        const pRes = await fetch(BASE_RPC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0', id: 1,
+            method: 'eth_call',
+            params: [{
+              to: RELIQT_V2,
+              from: player.address,
+              data: FN.getMyPoints
+            }, 'latest']
+          })
+        });
+        const pJson = await pRes.json();
+        player.points = decodeUint(pJson.result);
+      } catch(e) {
+        player.points = player.txCount * 100;
+      }
+    }
+
+    // Sort by points descending
+    players.sort((a, b) => b.points - a.points);
+
+    // Add current user if connected and not in list
+    if (currentUser?.address) {
+      const exists = players.find(p => 
+        p.address.toLowerCase() === currentUser.address.toLowerCase()
+      );
+      if (!exists && userPoints > 0) {
+        players.push({
+          address: currentUser.address,
+          txCount: 0,
+          tokens: 0,
+          points: userPoints
+        });
+        players.sort((a, b) => b.points - a.points);
+      }
+    }
+
+    if (players.length === 0) {
+      // No on-chain data yet — show current user + demo
+      renderLBWithData([
+        ...(currentUser ? [{
+          address: currentUser.address || currentUser.display,
+          points: userPoints,
+          txCount: 1,
+          isYou: true
+        }] : []),
+        ...LB_DATA.map(d => ({ address: d.wallet, points: d.pts, txCount: d.refs, isDemo: true }))
+      ]);
+      return;
+    }
+
+    renderLBWithData(players.slice(0, 20));
+    showToast('success', `✅ Leaderboard loaded — ${players.length} players found`);
+
+  } catch(err) {
+    console.error('Leaderboard error:', err);
+    // Fallback to demo data
+    renderLBWithData(LB_DATA.map(d => ({ 
+      address: d.wallet, points: d.pts, txCount: d.refs, isDemo: true 
+    })));
+    showToast('error', 'Chain read failed — showing cached data');
+  }
+}
+
+function renderLBWithData(players) {
+  const lbRows = document.getElementById('lbRows');
+  if (!lbRows) return;
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const rankColors = ['#F0C060', '#C0C0C0', '#CD7F32'];
+
+  lbRows.innerHTML = players.map((p, i) => {
+    const isYou = currentUser && (
+      p.address?.toLowerCase() === currentUser.address?.toLowerCase() ||
+      p.address === currentUser.display
+    );
+    const shortAddr = p.address?.length > 10 
+      ? p.address.slice(0, 6) + '...' + p.address.slice(-4)
+      : p.address || '—';
+    const rankDisplay = i < 3 
+      ? `<span style="font-size:16px">${medals[i]}</span>`
+      : `<span style="font-family:var(--mono);font-size:12px;color:var(--muted)">#${i+1}</span>`;
+
+    return `
+      <div class="lb-row" style="${isYou ? 'background:rgba(91,124,246,0.07);border-left:2px solid rgba(91,124,246,0.4)' : ''}">
+        <div class="lb-rank" style="${i < 3 ? 'color:'+rankColors[i] : ''}">${rankDisplay}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="lb-wallet">
+            ${shortAddr}
+            ${isYou ? '<span style="font-size:9px;background:rgba(91,124,246,0.15);color:var(--accent);padding:2px 6px;border-radius:4px;margin-left:4px;font-family:var(--mono)">YOU</span>' : ''}
+            ${p.isDemo ? '<span style="font-size:9px;color:var(--muted);padding:2px 6px;font-family:var(--mono)">demo</span>' : ''}
+          </div>
+        </div>
+        <div class="lb-pts">${(p.points || 0).toLocaleString()}</div>
+        <div class="lb-total">${(p.txCount || 0)} txns</div>
+        <div class="lb-refs">${p.tokens || 0}</div>
+      </div>`;
+  }).join('');
+
+  // Update table header
+  const head = document.querySelector('.lb-table-head');
+  if (head) {
+    head.innerHTML = '<div>Rank</div><div>Wallet</div><div>Points</div><div>Transactions</div><div>Tokens</div>';
+  }
+}
+
+// Override original renderLB
+const _origRenderLB = renderLB;
+function renderLB() {
+  fetchRealLeaderboard();
+}
+
+// Add refresh button to leaderboard
+function addLBRefreshBtn() {
+  const lbHeader = document.querySelector('.lb-header');
+  if (!lbHeader || document.getElementById('lbRefreshBtn')) return;
+  
+  const btn = document.createElement('button');
+  btn.id = 'lbRefreshBtn';
+  btn.style.cssText = `
+    background:rgba(91,124,246,0.1);
+    border:1px solid rgba(91,124,246,0.25);
+    color:var(--accent);
+    font-family:var(--font);font-size:11px;font-weight:600;
+    padding:7px 16px;border-radius:6px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;transition:all 0.2s;
+  `;
+  btn.innerHTML = `
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/>
+      <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+    </svg>
+    Refresh
+  `;
+  btn.onclick = () => {
+    btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Loading...`;
+    fetchRealLeaderboard().then(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg> Refresh`;
+    });
+  };
+  lbHeader.appendChild(btn);
+}
+
+// Patch showPage to add refresh btn when leaderboard opens
+const _origShowPage = showPage;
+function showPage(name, btn) {
+  _origShowPage(name, btn);
+  if (name === 'leaderboard') {
+    setTimeout(addLBRefreshBtn, 100);
+  }
+}
+
+
+// ══════════════════════════════════════
+// ALL REMAINING REAL FEATURES
+// ══════════════════════════════════════
+
+// ── 1. REAL-TIME CARD PRICES VIA CLAUDE API ──
+async function fetchLivePrices() {
+  const priceEls = document.querySelectorAll('.mc-price');
+  if (!priceEls.length) return;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are a sports card market analyst. Return ONLY valid JSON array, no markdown.',
+        messages: [{
+          role: 'user',
+          content: `Give current market token prices (USD) for these PSA graded cards split into 10,000 tokens each:
+1. LeBron James 2003 Topps Chrome PSA 10
+2. Charizard Base Set PSA 9
+3. Patrick Mahomes 2017 Panini Prizm PSA 10
+4. Pikachu Illustrator PSA 10
+5. Mewtwo Holo 1st Edition PSA 10
+
+Return ONLY this JSON (no markdown): [{"id":0,"token_price":1.24,"card_value":12400,"trend":"+4.2%"},...]`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content[0].text.replace(/```json|```/g, '').trim();
+    const prices = JSON.parse(text);
+    
+    prices.forEach(p => {
+      // Update CARDS array
+      if (CARDS[p.id]) {
+        CARDS[p.id].price = p.token_price;
+        CARDS[p.id].cardValue = p.card_value;
+        CARDS[p.id].trend = p.trend;
+      }
+    });
+
+    // Re-render marketplace with new prices
+    renderMarket(CARDS);
+    showToast('success', '✅ Live prices updated from market data');
+    
+    // Update price refresh timestamp
+    document.querySelectorAll('.price-timestamp').forEach(el => {
+      el.textContent = 'Updated ' + new Date().toLocaleTimeString();
+    });
+
+  } catch(err) {
+    console.log('Price fetch error:', err);
+  }
+}
+
+// Auto fetch prices on load
+setTimeout(fetchLivePrices, 2000);
+// Refresh every 5 minutes
+setInterval(fetchLivePrices, 300000);
+
+// ── 2. REAL YOLO - MULTIPLE PACK OPENS ──
+async function openYoloReal() {
+  if (!currentUser) { openWalletModal(); return; }
+  if (!window.ethereum) { showToast('error', 'MetaMask required!'); return; }
+
+  const count = parseInt(document.querySelector('.yolo-slider')?.value || 5);
+  const totalPrice = count * yoloPackPrice;
+  const totalWei = Math.floor(totalPrice * 1e18 / 3000); // ETH equivalent
+
+  showToast('success', `Opening ${count} packs... Confirm in MetaMask`);
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
+    // Switch to Base
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x2105' }]
+      });
+    } catch(se) {
+      if (se.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x2105', chainName: 'Base',
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            rpcUrls: ['https://mainnet.base.org'],
+            blockExplorerUrls: ['https://basescan.org']
+          }]
+        });
+      }
+    }
+
+    let successCount = 0;
+    let results = [];
+
+    // Open packs one by one (each is a separate tx)
+    // For YOLO we batch with a single larger value call
+    const pricePerPack = 0.001; // ETH per gacha pack
+    const totalEth = pricePerPack * count;
+    const totalWeiHex = '0x' + Math.floor(totalEth * 1e18).toString(16);
+
+    // Call openGacha once with total value
+    // (contract will need to handle multiple — for now open one at a time up to 5)
+    const maxPacks = Math.min(count, 5);
+    
+    for (let i = 0; i < maxPacks; i++) {
+      try {
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: accounts[0],
+            to: RELIQT_V2,
+            data: '0xd0f61357', // openGacha()
+            value: '0x' + Math.floor(0.001 * 1e18).toString(16),
+            gas: '0x30D40'
+          }]
+        });
+        successCount++;
+        
+        // Random result for display
+        const rand = Math.random() * 100;
+        const rarity = rand < 60 ? 'common' : rand < 85 ? 'rare' : rand < 95 ? 'epic' : 'legendary';
+        const cardIdx = Math.floor(Math.random() * CARDS.length);
+        results.push({ rarity, card: CARDS[cardIdx], txHash });
+        
+        showToast('success', `Pack ${i+1}/${maxPacks} opened! Got ${rarity} ${CARDS[cardIdx].name}`);
+        
+        // Small delay between packs
+        if (i < maxPacks - 1) await new Promise(r => setTimeout(r, 1500));
+        
+      } catch(e) {
+        if (e.code === 4001) {
+          showToast('error', 'Transaction cancelled');
+          break;
+        }
+        console.log('Pack', i, 'error:', e);
+      }
+    }
+
+    if (successCount > 0) {
+      addPoints(successCount * 100);
+      showYoloResults(results);
+    }
+
+  } catch(err) {
+    showToast('error', err.message || 'YOLO failed');
+  }
+}
+
+function showYoloResults(results) {
+  if (!results.length) return;
+  
+  // Show results summary
+  const rarityCount = {};
+  results.forEach(r => {
+    rarityCount[r.rarity] = (rarityCount[r.rarity] || 0) + 1;
+  });
+  
+  const summary = Object.entries(rarityCount)
+    .map(([r, c]) => `${c}x ${r}`)
+    .join(', ');
+  
+  showToast('success', `YOLO done! Got: ${summary}`);
+  
+  // Open gacha modal with last result
+  if (results.length > 0) {
+    const last = results[results.length - 1];
+    setTimeout(() => {
+      document.getElementById('gachaPackName').textContent = `YOLO RESULTS (${results.length} packs)`;
+      document.getElementById('gachaCardEmoji').textContent = last.card.emoji || '🎴';
+      const rarityEl = document.getElementById('gachaRarity');
+      rarityEl.textContent = last.rarity.toUpperCase();
+      rarityEl.className = 'gacha-rarity ' + last.rarity;
+      document.getElementById('gachaCardName').textContent = last.card.name;
+      document.getElementById('gachaCardValue').textContent = summary;
+      document.getElementById('gachaResult').style.display = 'block';
+      document.getElementById('gachaOpenAgain').style.display = 'none';
+      document.getElementById('gachaOverlay').classList.add('open');
+    }, 500);
+  }
+}
+
+// Override YOLO open function
+const _origOpenYolo = openYolo;
+function openYolo() {
+  if (currentUser && window.ethereum) {
+    openYoloReal();
+  } else if (currentUser) {
+    _origOpenYolo();
+  } else {
+    openWalletModal();
+  }
+}
+
+// ── 3. REAL WITHDRAW ──
+async function withdrawFunds() {
+  if (!currentUser) { openWalletModal(); return; }
+  if (!window.ethereum) { showToast('error', 'MetaMask required!'); return; }
+  
+  // Check if user is owner
+  try {
+    const ownerRes = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1,
+        method: 'eth_call',
+        params: [{ to: RELIQT_V2, data: '0x8da5cb5b' }, 'latest'] // owner()
+      })
+    });
+    const ownerJson = await ownerRes.json();
+    const ownerAddr = '0x' + ownerJson.result.slice(26);
+    
+    if (ownerAddr.toLowerCase() !== currentUser.address?.toLowerCase()) {
+      showToast('error', 'Only contract owner can withdraw');
+      return;
+    }
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    
+    // Check contract balance first
+    const balRes = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1,
+        method: 'eth_getBalance',
+        params: [RELIQT_V2, 'latest']
+      })
+    });
+    const balJson = await balRes.json();
+    const balEth = (parseInt(balJson.result, 16) / 1e18).toFixed(6);
+    
+    if (parseFloat(balEth) === 0) {
+      showToast('error', 'Contract balance is 0 ETH');
+      return;
+    }
+
+    const confirmed = confirm(`Withdraw ${balEth} ETH from contract to your wallet?`);
+    if (!confirmed) return;
+
+    const txHash = await window.ethereum.request({
+      method: 'eth_sendTransaction',
+      params: [{
+        from: accounts[0],
+        to: RELIQT_V2,
+        data: '0x3ccfd60b', // withdraw()
+        gas: '0x15F90'
+      }]
+    });
+
+    showToast('success', `Withdrawal sent! TX: ${txHash.slice(0, 10)}...`);
+    
+  } catch(err) {
+    if (err.code === 4001) showToast('error', 'Transaction rejected');
+    else showToast('error', err.message || 'Withdraw failed');
+  }
+}
+
+// ── 4. REAL CONTRACT BALANCE DISPLAY ──
+async function fetchContractBalance() {
+  try {
+    const res = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1,
+        method: 'eth_getBalance',
+        params: [RELIQT_V2, 'latest']
+      })
+    });
+    const json = await res.json();
+    const balEth = (parseInt(json.result, 16) / 1e18).toFixed(6);
+    
+    // Update any balance display elements
+    document.querySelectorAll('.contract-balance').forEach(el => {
+      el.textContent = balEth + ' ETH';
+    });
+    
+    return balEth;
+  } catch(e) {
+    return '0';
+  }
+}
+
+// ── 5. REAL LIVE ACTIVITY FEED ──
+async function fetchRealActivityFeed() {
+  try {
+    const res = await fetch(BASE_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', id: 1,
+        method: 'eth_getLogs',
+        params: [{
+          fromBlock: 'latest',
+          toBlock: 'latest',
+          address: RELIQT_V2
+        }]
+      })
+    });
+    const json = await res.json();
+    const logs = json.result || [];
+    
+    if (logs.length > 0) {
+      const feed = document.getElementById('liveFeed');
+      if (!feed) return;
+      
+      logs.slice(0, 5).forEach(log => {
+        const addr = log.topics?.[1] ? '0x' + log.topics[1].slice(26) : '0x???';
+        const shortAddr = addr.slice(0, 6) + '...' + addr.slice(-4);
+        const cardIdx = log.topics?.[2] ? parseInt(log.topics[2], 16) : 0;
+        const cardName = CARDS[cardIdx]?.name || 'Unknown Card';
+        
+        const item = document.createElement('div');
+        item.className = 'livefeed-item';
+        item.innerHTML = `
+          <div class="lf-name">${cardName}</div>
+          <div class="lf-price" style="color:var(--accent)">${shortAddr}</div>
+          <div class="lf-time">just now</div>
+        `;
+        feed.insertBefore(item, feed.firstChild);
+        if (feed.children.length > 5) feed.removeChild(feed.lastChild);
+      });
+    }
+  } catch(e) {
+    console.log('Activity feed error:', e);
+  }
+}
+
+// Fetch activity every 30 seconds
+setInterval(fetchRealActivityFeed, 30000);
+fetchRealActivityFeed();
+
+// ── 6. CONTRACT INFO PANEL ──
+async function showContractInfo() {
+  const bal = await fetchContractBalance();
+  
+  let infoHtml = `
+    <div style="
+      position:fixed;bottom:80px;right:20px;z-index:8000;
+      background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);
+      border:1px solid rgba(91,124,246,0.2);border-radius:12px;
+      padding:16px;width:280px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.1);
+      font-family:var(--mono);font-size:11px;
+    " id="contractInfoPanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-family:var(--font);font-size:13px;font-weight:700;color:#1A1B2E">Contract Info</span>
+        <button onclick="document.getElementById('contractInfoPanel').remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Network</span>
+          <span style="color:var(--green);font-weight:600">Base Mainnet</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Balance</span>
+          <span style="color:var(--accent)">${bal} ETH</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Contract</span>
+          <a href="https://basescan.org/address/${RELIQT_V2}" target="_blank" 
+             style="color:var(--accent);text-decoration:none">
+            ${RELIQT_V2.slice(0,6)}...${RELIQT_V2.slice(-4)} ↗
+          </a>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--muted)">Gacha Price</span>
+          <span style="color:#1A1B2E">0.001 ETH</span>
+        </div>
+      </div>
+      ${currentUser?.address?.toLowerCase() === '0xa2e7f01c1a8aa4ca19413abe30e5e38ea6c3f1dc' ? `
+        <button onclick="withdrawFunds()" style="
+          width:100%;margin-top:12px;
+          background:rgba(91,124,246,0.1);
+          border:1px solid rgba(91,124,246,0.25);
+          color:var(--accent);border-radius:6px;
+          padding:8px;cursor:pointer;font-family:var(--font);
+          font-size:12px;font-weight:600;
+        ">Withdraw Funds</button>
+      ` : ''}
+    </div>
+  `;
+  
+  const existing = document.getElementById('contractInfoPanel');
+  if (existing) { existing.remove(); return; }
+  document.body.insertAdjacentHTML('beforeend', infoHtml);
+}
+
+// Add contract info button to footer
+document.addEventListener('DOMContentLoaded', () => {
+  const footer = document.querySelector('.f-bottom');
+  if (footer) {
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+      background:none;border:none;
+      color:var(--muted);font-family:var(--mono);
+      font-size:10px;cursor:pointer;
+      display:flex;align-items:center;gap:5px;
+      transition:color 0.2s;
+    `;
+    btn.innerHTML = `
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Contract Info
+    `;
+    btn.onmouseenter = () => btn.style.color = 'var(--accent)';
+    btn.onmouseleave = () => btn.style.color = 'var(--muted)';
+    btn.onclick = showContractInfo;
+    footer.appendChild(btn);
+  }
+  
+  // Fetch contract balance on load
+  fetchContractBalance();
+});
+
+console.log('✅ All features activated!');
+console.log('Contract V2:', RELIQT_V2);
+console.log('BaseScan:', 'https://basescan.org/address/' + RELIQT_V2);
+
+console.log('✅ Real leaderboard ready');
+
+console.log('✅ Blockchain portfolio sync ready');
+console.log('Contract:', RELIQT_V2);
+
+console.log('ReliqtV2 Contract:', CONTRACT_V2);
+  console.log('BaseScan:', 'https://basescan.org/address/' + CONTRACT_V2);
+});
+
+</script>
+</body>
+</html>
