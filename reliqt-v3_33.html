@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Reliqt — RWA Collectibles</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8F9FC;
+  --bg1:#F0F2F8;
+  --surface:#FFFFFF;
+  --surface2:#F5F6FA;
+  --border:rgba(0,0,0,0.07);
+  --border2:rgba(0,82,255,0.15);
+  --text:#0D0F1A;
+  --text2:#6B7080;
+  --text3:#A0A5B8;
+  --accent:#0052FF;
+  --accent2:#1A6BFF;
+  --green:#16A34A;
+  --red:#DC2626;
+  --gold:#D4A843;
+  --font:'Geist',sans-serif;
+  --mono:'Geist Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font);display:flex;flex-direction:column;overflow-x:hidden}
+
+/* ── NAV ── */
+.nav{
+  height:56px;flex-shrink:0;
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 20px;gap:8px;
+  position:sticky;top:0;z-index:100;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:8px;
+  margin-right:16px;text-decoration:none;
+}
+.nav-logo-mark{
+  width:28px;height:28px;
+  background:linear-gradient(135deg,var(--accent),#003FCC);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-logo-text{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.nav-tabs{display:flex;align-items:center;gap:2px;flex:1}
+.nav-tab{
+  padding:6px 14px;border-radius:7px;
+  font-size:13px;font-weight:500;
+  color:var(--text2);border:none;background:none;
+  cursor:pointer;transition:all 0.15s;
+  letter-spacing:-0.01em;white-space:nowrap;
+}
+.nav-tab:hover{background:var(--bg1);color:var(--text)}
+.nav-tab.active{background:rgba(0,82,255,0.08);color:var(--accent);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.nav-pts{
+  font-family:var(--mono);font-size:12px;
+  color:var(--text2);
+  background:var(--bg1);
+  padding:5px 10px;border-radius:6px;
+}
+.nav-pts span{color:var(--accent);font-weight:600}
+.nav-wallet{
+  display:flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:8px;
+  padding:7px 14px;font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 2px 8px rgba(0,82,255,0.25);
+}
+.nav-wallet:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,82,255,0.35)}
+.nav-wallet svg{width:14px;height:14px}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg)}
+.main::-webkit-scrollbar{width:4px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ── PAGES ── */
+.page{display:none;padding:20px;max-width:1200px;margin:0 auto;width:100%}
+.page.active{display:block;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:20px;flex-wrap:wrap;
+}
+.filter-btn{
+  padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+  font-family:var(--mono);letter-spacing:0.02em;
+}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.filter-search{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:8px;padding:6px 12px;
+  transition:border-color 0.15s;
+}
+.filter-search:focus-within{border-color:var(--accent)}
+.filter-search svg{color:var(--text3);flex-shrink:0}
+.filter-search input{
+  border:none;background:none;outline:none;
+  font-family:var(--font);font-size:13px;color:var(--text);
+  width:160px;
+}
+.filter-search input::placeholder{color:var(--text3)}
+
+/* ── CARD GRID ── */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:14px;
+}
+
+/* ── MARKET CARD ── */
+.mc{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  cursor:pointer;transition:all 0.2s;
+}
+.mc:hover{
+  border-color:rgba(0,82,255,0.25);
+  box-shadow:0 8px 32px rgba(0,82,255,0.1);
+  transform:translateY(-3px);
+}
+.mc-img{
+  height:160px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-size:48px;
+  background:linear-gradient(135deg,#F0F4FF,#E8EEFF);
+}
+.mc-grade{
+  position:absolute;top:8px;right:8px;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);
+  color:#fff;font-family:var(--mono);font-size:9px;
+  padding:3px 8px;border-radius:4px;letter-spacing:0.1em;font-weight:500;
+}
+.mc-badge{
+  position:absolute;top:8px;left:8px;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  padding:3px 8px;border-radius:4px;letter-spacing:0.08em;
+}
+.mc-badge.hot{background:rgba(220,38,38,0.12);color:#DC2626;border:1px solid rgba(220,38,38,0.2)}
+.mc-badge.new{background:rgba(0,82,255,0.12);color:var(--accent);border:1px solid rgba(0,82,255,0.2)}
+.mc-badge.rare{background:rgba(212,168,67,0.12);color:var(--gold);border:1px solid rgba(212,168,67,0.2)}
+.mc-body{padding:12px}
+.mc-cat{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px}
+.mc-name{font-size:14px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-set{font-size:11px;color:var(--text3);margin-bottom:10px}
+.mc-prog{height:3px;background:rgba(0,82,255,0.1);border-radius:2px;margin-bottom:10px}
+.mc-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 1s ease}
+.mc-footer{display:flex;align-items:center;justify-content:space-between}
+.mc-price{font-size:17px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+.mc-price small{font-family:var(--mono);font-size:9px;color:var(--text3);display:block;font-weight:400;letter-spacing:0}
+.mc-buy{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:7px;
+  padding:6px 14px;font-family:var(--font);
+  font-size:12px;font-weight:700;cursor:pointer;
+  transition:all 0.15s;box-shadow:0 2px 6px rgba(0,82,255,0.2);
+  letter-spacing:-0.01em;
+}
+.mc-buy:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,82,255,0.3)}
+
+/* ── GACHA PAGE ── */
+.gacha-hero{
+  background:linear-gradient(135deg,#EEF3FF,#F5F0FF);
+  border:1.5px solid rgba(0,82,255,0.1);
+  border-radius:16px;padding:32px;
+  text-align:center;margin-bottom:24px;
+}
+.gacha-hero h2{font-size:28px;font-weight:800;letter-spacing:-0.03em;margin-bottom:8px}
+.gacha-hero p{font-size:14px;color:var(--text2);margin-bottom:20px}
+.gacha-packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.gp{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  transition:all 0.2s;
+}
+.gp:hover{border-color:rgba(0,82,255,0.25);box-shadow:0 8px 24px rgba(0,82,255,0.1);transform:translateY(-2px)}
+.gp-img{
+  height:120px;display:flex;align-items:center;justify-content:center;
+  font-size:44px;background:linear-gradient(135deg,#EEF3FF,#E8F4FF);
+}
+.gp-body{padding:16px}
+.gp-name{font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:4px}
+.gp-desc{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+.gp-stats{display:flex;gap:12px;margin-bottom:14px}
+.gp-stat{flex:1;background:var(--bg1);border-radius:6px;padding:8px;text-align:center}
+.gp-stat-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)}
+.gp-stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+.gp-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:8px;
+  padding:11px;font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 2px 8px rgba(0,82,255,0.25);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.gp-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,82,255,0.35)}
+
+/* ── LEADERBOARD ── */
+.lb-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.lb-header h2{font-size:20px;font-weight:800;letter-spacing:-0.03em}
+.lb-table{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+.lb-head{
+  display:grid;grid-template-columns:60px 1fr 120px 100px;
+  padding:12px 20px;
+  background:var(--bg1);
+  font-family:var(--mono);font-size:10px;
+  color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);
+}
+.lb-row{
+  display:grid;grid-template-columns:60px 1fr 120px 100px;
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  align-items:center;transition:background 0.15s;font-size:13px;
+}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:var(--bg1)}
+.lb-row.you{background:rgba(0,82,255,0.04);border-left:3px solid var(--accent)}
+.lb-rank{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text2)}
+.lb-wallet{font-family:var(--mono);font-size:12px;color:var(--accent)}
+.lb-pts{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)}
+.lb-txns{font-family:var(--mono);font-size:12px;color:var(--text3)}
+.you-badge{
+  font-size:9px;background:rgba(0,82,255,0.1);color:var(--accent);
+  padding:2px 6px;border-radius:4px;margin-left:8px;font-weight:600;
+}
+
+/* ── PORTFOLIO ── */
+.pf-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.pf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.pf-stat{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:18px;
+}
+.pf-stat-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px}
+.pf-stat-val{font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--text)}
+.pf-stat-val.blue{color:var(--accent)}
+.pf-stat-val.green{color:var(--green)}
+.pf-empty{
+  text-align:center;padding:60px 20px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;
+}
+.pf-empty p{font-size:14px;color:var(--text2);margin-bottom:16px}
+.pf-holding{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:12px;padding:16px;
+  display:grid;grid-template-columns:48px 1fr auto;
+  gap:12px;align-items:center;margin-bottom:10px;
+}
+.pf-h-img{
+  width:48px;height:48px;border-radius:8px;
+  background:linear-gradient(135deg,#EEF3FF,#E8EEFF);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.pf-h-name{font-size:14px;font-weight:700;letter-spacing:-0.02em}
+.pf-h-set{font-size:11px;color:var(--text3);margin-top:2px}
+.pf-h-tokens{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);text-align:right}
+.pf-h-val{font-family:var(--mono);font-size:11px;color:var(--text3);text-align:right;margin-top:2px}
+
+/* ── REFERRAL ── */
+.ref-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:14px;padding:24px;margin-bottom:14px;
+}
+.ref-code-box{
+  background:var(--bg1);border:1.5px solid rgba(0,82,255,0.15);
+  border-radius:10px;padding:16px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin:16px 0;
+}
+.ref-code{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent);letter-spacing:0.1em}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  font-size:13px;font-weight:500;
+  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+  animation:slideIn 0.25s ease;
+  display:flex;align-items:center;gap:8px;
+  max-width:300px;
+}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--accent)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:8000;
+  background:rgba(13,15,26,0.5);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease}
+.modal-box{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:16px;width:100%;max-width:420px;
+  box-shadow:0 24px 60px rgba(0,82,255,0.12);
+  animation:slideUp 0.25s ease;overflow:hidden;
+}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-head{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-size:17px;font-weight:700;letter-spacing:-0.02em}
+.modal-close{background:var(--bg1);border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:14px;color:var(--text2);transition:all 0.15s}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:0 20px 20px}
+
+/* ── WALLET MODAL ── */
+.wallet-option{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:10px;padding:13px;cursor:pointer;
+  width:100%;text-align:left;transition:all 0.15s;
+  margin-bottom:8px;
+}
+.wallet-option:last-child{margin-bottom:0}
+.wallet-option:hover{border-color:var(--accent);background:rgba(0,82,255,0.03)}
+.wallet-icon{width:36px;height:36px;border-radius:8px;flex-shrink:0;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px}
+.wallet-name{font-size:14px;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
+.wallet-desc{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.wallet-arrow{margin-left:auto;color:var(--accent);font-size:16px}
+.wallet-status{
+  text-align:center;font-size:12px;color:var(--accent);
+  font-family:var(--mono);min-height:20px;margin-bottom:12px;
+}
+
+/* ── BUY MODAL ── */
+.buy-card-info{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg1);border-radius:10px;padding:14px;margin-bottom:16px;
+}
+.buy-card-emoji{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#EEF3FF,#E8EEFF);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.buy-card-name{font-size:15px;font-weight:700;letter-spacing:-0.02em}
+.buy-card-grade{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;margin-top:2px}
+.buy-card-price{margin-left:auto;font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-0.02em}
+.buy-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.buy-input{
+  width:100%;background:var(--bg1);border:1.5px solid var(--border);
+  color:var(--text);font-family:var(--font);font-size:16px;font-weight:600;
+  padding:11px 14px;border-radius:8px;outline:none;transition:border-color 0.15s;
+  margin-bottom:12px;
+}
+.buy-input:focus{border-color:var(--accent)}
+.buy-summary{
+  background:var(--bg1);border-radius:8px;padding:12px 14px;margin-bottom:16px;
+}
+.buy-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+.buy-row span:first-child{color:var(--text2)}
+.buy-row span:last-child{font-weight:600;font-family:var(--mono)}
+.buy-btn{
+  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;
+  padding:14px;font-family:var(--font);font-size:15px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;letter-spacing:-0.01em;
+  box-shadow:0 4px 14px rgba(0,82,255,0.3);
+}
+.buy-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,82,255,0.4)}
+.buy-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none}
+
+/* ── GACHA RESULT ── */
+.gacha-result-overlay{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(13,15,26,0.7);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.gacha-result-overlay.open{display:flex;animation:fadeIn 0.3s ease}
+.gacha-result-box{
+  background:var(--surface);border-radius:20px;
+  padding:40px 32px;text-align:center;width:100%;max-width:340px;
+  box-shadow:0 32px 80px rgba(0,82,255,0.15);
+  animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
+.gr-emoji{font-size:72px;margin-bottom:12px;display:block}
+.gr-rarity{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;font-weight:700;margin-bottom:8px;
+}
+.gr-rarity.legendary{color:var(--gold)}
+.gr-rarity.epic{color:#9333EA}
+.gr-rarity.rare{color:var(--accent)}
+.gr-rarity.common{color:var(--text3)}
+.gr-name{font-size:20px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px}
+.gr-val{font-family:var(--mono);font-size:13px;color:var(--text2);margin-bottom:20px}
+.gr-btn{
+  display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border:none;border-radius:10px;padding:12px 32px;
+  font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;box-shadow:0 4px 14px rgba(0,82,255,0.3);
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .nav-tabs{display:none}
+  .page{padding:12px}
+  .card-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .pf-stats{grid-template-columns:1fr 1fr}
+  .lb-head,.lb-row{grid-template-columns:40px 1fr 100px}
+  .lb-row>:last-child{display:none}
+  .lb-head>:last-child{display:none}
+  .mobile-nav{display:flex !important}
+}
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  padding:8px 0 max(8px,env(safe-area-inset-bottom));
+}
+.mob-tabs{display:flex;justify-content:space-around}
+.mob-tab{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;padding:4px 12px;
+  color:var(--text3);transition:color 0.15s;
+}
+.mob-tab.active{color:var(--accent)}
+.mob-tab svg{width:20px;height:20px}
+.mob-tab span{font-size:10px;font-weight:600;font-family:var(--mono)}
+
+/* ── NO HORIZONTAL SCROLL (DESKTOP + MOBILE) ── */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  overscroll-behavior: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
+}
+* { max-width: 100% !important; }
+img, video, iframe, embed { max-width: 100% !important; }
+
+/* ── MOBILE BOTTOM NAV FIX ── */
+@media(max-width: 768px) {
+  /* Add padding to main so content not hidden behind bottom nav */
+  .main { padding-bottom: 70px !important; }
+  
+  /* Bottom nav exact positioning */
+  .mobile-nav {
+    height: 60px !important;
+    padding: 0 !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+  }
+  .mob-tabs {
+    height: 60px;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .mob-tab {
+    flex: 1;
+    padding: 6px 4px !important;
+    min-width: 0;
+  }
+  .mob-tab span {
+    font-size: 9px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mob-tab svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Nav right on mobile */
+  .nav-pts { display: none !important; }
+  .nav-right { gap: 6px !important; }
+  .nav-wallet { 
+    padding: 6px 10px !important; 
+    font-size: 12px !important;
+  }
+  .nav-wallet svg { display: none !important; }
+
+  /* Portfolio stats - 2 columns on mobile */
+  .pf-stats { 
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .pf-stat:last-child {
+    grid-column: span 2;
+  }
+  .pf-stat { padding: 14px !important; }
+  .pf-stat-val { font-size: 18px !important; }
+
+  /* Page padding */
+  .page { 
+    padding: 12px 12px 16px !important;
+  }
+
+  /* Filter bar scroll */
+  .filter-bar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-search { 
+    flex-shrink: 0;
+    min-width: 140px;
+  }
+
+  /* Card grid 2 cols */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .mc-img { height: 130px !important; }
+  .mc-name { font-size: 13px !important; }
+
+  /* Gacha packs */
+  .gacha-packs { grid-template-columns: 1fr !important; }
+  .gacha-hero { padding: 20px !important; }
+  .gacha-hero h2 { font-size: 22px !important; }
+
+  /* Leaderboard */
+  .lb-head, .lb-row {
+    grid-template-columns: 44px 1fr 90px !important;
+    padding: 10px 12px !important;
+  }
+  .lb-head > :last-child,
+  .lb-row > :last-child { display: none !important; }
+
+  /* Modal */
+  .modal-box {
+    margin: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Referral */
+  .ref-code { font-size: 20px !important; }
+}
+
+/* ── DESKTOP FIXES ── */
+@media(min-width: 769px) {
+  .mobile-nav { display: none !important; }
+  .main { padding-bottom: 0 !important; }
+  
+  /* Center content */
+  .page {
+    padding: 24px 32px !important;
+  }
+}
+
+/* ── PORTFOLIO EMPTY STATE FIX ── */
+.pf-empty {
+  padding: 40px 20px !important;
+  border-radius: 14px !important;
+}
+.pf-empty p {
+  font-size: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+/* ── GENERAL POLISH ── */
+.filter-btn { white-space: nowrap; flex-shrink: 0; }
+.nav-logo-text { white-space: nowrap; }
+.lb-wallet { 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0052FF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Reliqt">
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <polygon points="8,1 15,5 15,11 8,15 1,11 1,5" fill="white"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">Reliqt</span>
+  </a>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('market',this)">Marketplace</button>
+    <button class="nav-tab" onclick="showPage('gacha',this)">Gacha</button>
+    <button class="nav-tab" onclick="showPage('leaderboard',this)">Leaderboard</button>
+    <button class="nav-tab" onclick="showPage('portfolio',this)">Portfolio</button>
+    <button class="nav-tab" onclick="showPage('referral',this)">Referral</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-pts" id="navPts"><span id="ptsDisplay">0</span> pts</div>
+    <button class="nav-wallet" id="walletBtn" onclick="currentUser ? disconnectWallet() : openWalletModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <span id="walletLabel">Connect Wallet</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main" id="mainContent">
+
+  <!-- MARKETPLACE -->
+  <div class="page active" id="page-market">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterCards('all',this)">All</button>
+      <button class="filter-btn" onclick="filterCards('pokemon',this)">Pokémon</button>
+      <button class="filter-btn" onclick="filterCards('sport',this)">Sports</button>
+      <button class="filter-btn" onclick="filterCards('anime',this)">Anime</button>
+      <button class="filter-btn" onclick="filterCards('hot',this)">🔥 Hot</button>
+      <div class="filter-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search cards..." id="searchInput" oninput="searchCards(this.value)"/>
+      </div>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+
+  <!-- GACHA -->
+  <div class="page" id="page-gacha">
+    <div class="gacha-hero">
+      <h2>🎰 Gacha Packs</h2>
+      <p>Open packs for a chance to win rare PSA graded cards</p>
+    </div>
+    <div class="gacha-packs" id="gachaPacks"></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="page" id="page-leaderboard">
+    <div class="lb-header">
+      <h2>🏆 Leaderboard</h2>
+      <button onclick="loadLeaderboard()" style="background:var(--bg1);border:1.5px solid var(--border);border-radius:7px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:var(--mono)">Refresh</button>
+    </div>
+    <div class="lb-table">
+      <div class="lb-head">
+        <div>Rank</div><div>Wallet</div><div>Points</div><div>Txns</div>
+      </div>
+      <div id="lbBody"></div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="page" id="page-portfolio">
+    <div class="pf-header">
+      <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.03em">My Portfolio</h2>
+      <button onclick="syncPortfolio()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-weight:600;font-family:var(--font)">Sync from Chain</button>
+    </div>
+    <div class="pf-stats">
+      <div class="pf-stat">
+        <div class="pf-stat-label">Total Value</div>
+        <div class="pf-stat-val blue" id="pfTotalVal">$0.00</div>
+      </div>
+      <div class="pf-stat">
+        <div class="pf-stat-label">Tokens Held</div>
+        <div class="pf-stat-val" id="pfTotalTokens">0</div>
+      </div>
+      <div class="pf-stat">
+        <div class="pf-stat-label">Points</div>
+        <div class="pf-stat-val green" id="pfPoints">0</div>
+      </div>
+    </div>
+    <div id="pfHoldings"></div>
+  </div>
+
+  <!-- REFERRAL -->
+  <div class="page" id="page-referral">
+    <h2 style="font-size:20px;font-weight:800;letter-spacing:-0.03em;margin-bottom:16px">🎁 Referral Program</h2>
+    <div class="ref-card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Your Referral Code</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:0">Invite friends and earn 500 pts each</div>
+      <div class="ref-code-box">
+        <div class="ref-code" id="refCode">—</div>
+        <button onclick="copyRefCode()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer">Copy</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="shareTwitter()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg1);border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.763l7.659-8.63L2.039 2.25H8.624l4.24 5.607zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Share on X
+        </button>
+        <button onclick="shareTelegram()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg1);border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.04 9.607c-.152.67-.554.834-1.12.518l-3.1-2.284-1.495 1.438c-.165.165-.304.304-.623.304l.222-3.16 5.754-5.196c.25-.222-.054-.345-.387-.123L6.945 14.6l-3.06-.955c-.665-.207-.678-.665.138-.984l11.944-4.606c.554-.2 1.04.135.595 1.193z"/></svg>
+          Telegram
+        </button>
+      </div>
+    </div>
+    <div class="ref-card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">Referral Stats</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--accent)" id="refCount">0</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Referrals</div>
+        </div>
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--green)" id="refPts">0</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Points</div>
+        </div>
+        <div style="background:var(--bg1);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:var(--gold)">500</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Per Referral</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mob-tabs">
+    <button class="mob-tab active" onclick="showPage('market',this)" data-page="market">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      <span>Market</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('gacha',this)" data-page="gacha">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span>Gacha</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('leaderboard',this)" data-page="leaderboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>
+      <span>Ranks</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('portfolio',this)" data-page="portfolio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <span>Portfolio</span>
+    </button>
+    <button class="mob-tab" onclick="showPage('referral',this)" data-page="referral">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+      <span>Referral</span>
+    </button>
+  </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="modal-overlay" id="walletModal" onclick="if(event.target===this)closeWalletModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Connect Wallet</div>
+      <button class="modal-close" onclick="closeWalletModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wallet-status" id="walletStatus"></div>
+      <button class="wallet-option" onclick="connectWallet('metamask')">
+        <div class="wallet-icon">🦊</div>
+        <div><div class="wallet-name">MetaMask</div><div class="wallet-desc">Browser extension</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+      <button class="wallet-option" onclick="connectWallet('bitget')">
+        <div class="wallet-icon" style="background:#fff;border:1px solid #eee"></div>
+        <div><div class="wallet-name">Bitget Wallet</div><div class="wallet-desc">Multi-chain wallet</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+      <button class="wallet-option" onclick="connectWallet('okx')">
+        <div class="wallet-icon" style="background:#fff;border:1px solid #eee"></div>
+        <div><div class="wallet-name">OKX Wallet</div><div class="wallet-desc">Web3 wallet</div></div>
+        <div class="wallet-arrow">›</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- BUY MODAL -->
+<div class="modal-overlay" id="buyModal" onclick="if(event.target===this)closeBuyModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">Buy Tokens</div>
+      <button class="modal-close" onclick="closeBuyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="buy-card-info">
+        <div class="buy-card-emoji" id="buyEmoji">🎴</div>
+        <div>
+          <div class="buy-card-name" id="buyName">Card Name</div>
+          <div class="buy-card-grade" id="buyGrade">PSA 10</div>
+        </div>
+        <div class="buy-card-price" id="buyPrice">$0.00</div>
+      </div>
+      <div class="buy-label">Amount of tokens</div>
+      <input class="buy-input" type="number" id="buyAmt" min="1" max="10000" value="10" oninput="updateBuySummary()"/>
+      <div class="buy-summary">
+        <div class="buy-row"><span>Token price</span><span id="sumPrice">$0.00</span></div>
+        <div class="buy-row"><span>Tokens</span><span id="sumQty">10</span></div>
+        <div class="buy-row"><span>ETH cost</span><span id="sumEth">0.00 ETH</span></div>
+        <div class="buy-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px">
+          <span style="font-weight:700">Total USD</span>
+          <span style="color:var(--accent);font-weight:700" id="sumTotal">$0.00</span>
+        </div>
+      </div>
+      <button class="buy-btn" id="buyBtn" onclick="confirmBuy()">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- GACHA RESULT -->
+<div class="gacha-result-overlay" id="gachaResult" onclick="if(event.target===this)closeGachaResult()">
+  <div class="gacha-result-box">
+    <span class="gr-emoji" id="grEmoji">🎴</span>
+    <div class="gr-rarity" id="grRarity">COMMON</div>
+    <div class="gr-name" id="grName">Card Name</div>
+    <div class="gr-val" id="grVal">Value: $0</div>
+    <button class="gr-btn" onclick="closeGachaResult()">Awesome! ✓</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── CONTRACT ──
+const CONTRACT = '0x9644C7bbCeAB35e9CD0Cc5c65503Ce42FBF08685';
+const BASE_RPC = 'https://mainnet.base.org';
+const SUPABASE_URL = 'https://wsrvoburpbulfvzrlslq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcnZvYnVycGJ1bGZ2enJsc3EiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc4MDY0MTA1MywiZXhwIjoyMDk2MjE3MDUzfQ.4q1YYtlILruraBuWnU60MQ7znly_zUOXytRs4WrtKrk';
+
+// ── DATA ──
+const CARDS = [
+  {id:0,name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:1.24,cardValue:12400,sold:73,badge:'hot'},
+  {id:1,name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,sold:41,badge:'new'},
+  {id:2,name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,sold:89,badge:''},
+  {id:3,name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,sold:62,badge:'hot'},
+  {id:4,name:'Pikachu Illustrator',set:'1998 CoroCoro Promo',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,sold:95,badge:'rare'},
+  {id:5,name:'Mewtwo Holo 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,sold:55,badge:''},
+  {id:6,name:'Umbreon V Max',set:'2021 Full Art',grade:'PSA 10',cat:'pokemon',emoji:'🌑',price:0.46,cardValue:4600,sold:30,badge:'new'},
+  {id:7,name:'Venusaur 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🌿',price:1.95,cardValue:19500,sold:70,badge:''},
+  {id:8,name:'Wembanyama RC',set:'2023 Panini Prizm',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,sold:58,badge:'hot'},
+  {id:9,name:'SGA RC',set:'2018 Panini Prizm',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.28,cardValue:2800,sold:44,badge:''},
+  {id:10,name:'Charizard EX',set:'2003 Skyridge Holo',grade:'PSA 9',cat:'pokemon',emoji:'🐲',price:2.40,cardValue:24000,sold:35,badge:''},
+  {id:11,name:'Goku Ultra Instinct',set:'2022 Bandai',grade:'PSA 10',cat:'anime',emoji:'💛',price:0.85,cardValue:8500,sold:35,badge:'new'},
+];
+
+const GACHA_PACKS = [
+  {id:0,name:'Pokémon Starter Pack',desc:'Common Pokémon cards · 10% chance PSA 10',emoji:'📦',price:0.001,cards:50,winRate:'10% PSA 10',color:'#EEF3FF'},
+  {id:1,name:'Legendary Pack',desc:'Charizard · Pikachu · Mewtwo pulls',emoji:'💎',price:0.003,cards:1,winRate:'25% big win',color:'#F5F0FF'},
+  {id:2,name:'Sports Elite Pack',desc:'NBA · NFL · Soccer RC cards',emoji:'🏆',price:0.0007,cards:5,winRate:'15% PSA 10',color:'#FFF5EE'},
+];
+
+// ── STATE ──
+let currentUser = null;
+let userPoints = parseInt(localStorage.getItem('reliqt_pts') || '0');
+let portfolio = JSON.parse(localStorage.getItem('reliqt_pf') || '[]');
+let activeFilter = 'all';
+let buyCardId = null;
+
+// ── PROVIDER ──
+function getProvider() { return window._activeProvider || window.ethereum; }
+
+async function rpcCall(method, params) {
+  const r = await fetch(BASE_RPC, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+  return (await r.json()).result;
+}
+
+// ── TOAST ──
+function showToast(type, msg) {
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => { t.style.animation = 'slideIn 0.25s ease reverse'; setTimeout(() => t.remove(), 250); }, 3000);
+}
+
+// ── PAGE ROUTING ──
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name)?.classList.add('active');
+
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.mob-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (name === 'leaderboard') loadLeaderboard();
+  if (name === 'portfolio') renderPortfolio();
+  if (name === 'referral') renderReferral();
+  if (name === 'gacha') renderGacha();
+}
+
+// ── WALLET MODAL ──
+function openWalletModal() {
+  document.getElementById('walletModal').classList.add('open');
+}
+function closeWalletModal() {
+  document.getElementById('walletModal').classList.remove('open');
+  document.getElementById('walletStatus').textContent = '';
+}
+
+async function connectWallet(type) {
+  const status = document.getElementById('walletStatus');
+  status.textContent = 'Connecting...';
+
+  let provider = null;
+  if (type === 'metamask') {
+    provider = window.ethereum;
+    if (!provider || !provider.isMetaMask) {
+      status.textContent = '';
+      showToast('error', 'MetaMask not found!');
+      window.open('https://metamask.io/download/', '_blank');
+      return;
+    }
+  } else if (type === 'bitget') {
+    provider = window.bitkeep?.ethereum || window.bitget?.ethereum;
+    if (!provider) {
+      status.textContent = '';
+      showToast('error', 'Bitget not found!');
+      window.open('https://web3.bitget.com', '_blank');
+      return;
+    }
+  } else if (type === 'okx') {
+    provider = window.okxwallet;
+    if (!provider) {
+      status.textContent = '';
+      showToast('error', 'OKX not found!');
+      window.open('https://www.okx.com/web3', '_blank');
+      return;
+    }
+  }
+
+  try {
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    if (!accounts?.length) throw new Error('No accounts');
+
+    // Switch to Base
+    try {
+      await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2105' }] });
+    } catch(se) {
+      if (se.code === 4902) {
+        await provider.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0x2105', chainName: 'Base Mainnet', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+      }
+    }
+
+    window._activeProvider = provider;
+    currentUser = { address: accounts[0], display: accounts[0].slice(0,6) + '...' + accounts[0].slice(-4), type };
+    closeWalletModal();
+    onConnected();
+    showToast('success', '✅ Connected: ' + currentUser.display);
+
+  } catch(e) {
+    status.textContent = '';
+    showToast('error', e.code === 4001 ? 'Rejected' : (e.message || 'Failed'));
+  }
+}
+
+function onConnected() {
+  // Save session to localStorage
+  localStorage.setItem('reliqt_wallet', JSON.stringify(currentUser));
+
+  const btn = document.getElementById('walletBtn');
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> ${currentUser.display}`;
+  btn.style.background = 'linear-gradient(135deg,#16A34A,#15803D)';
+  document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+  const refEl = document.getElementById('refCode');
+  if (refEl) refEl.textContent = currentUser.address.slice(2,10).toUpperCase();
+  setTimeout(syncPortfolio, 1500);
+  // Register user in Supabase
+  registerUserSupabase(currentUser.address);
+  // Check referral code
+  const ref = localStorage.getItem('reliqt_ref');
+  if (ref) processReferral(currentUser.address, ref);
+}
+
+// Disconnect wallet
+function disconnectWallet() {
+  currentUser = null;
+  localStorage.removeItem('reliqt_wallet');
+  window._activeProvider = null;
+  const btn = document.getElementById('walletBtn');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> Connect Wallet';
+  btn.style.background = 'linear-gradient(135deg,var(--accent),var(--accent2))';
+  showToast('info', 'Wallet disconnected');
+}
+
+// ── RENDER MARKETPLACE ──
+function renderMarket(cards) {
+  const grid = document.getElementById('cardGrid');
+  grid.innerHTML = cards.map(c => `
+    <div class="mc" onclick="openBuyModal(${c.id})">
+      <div class="mc-img">
+        <span style="font-size:48px">${c.emoji}</span>
+        <div class="mc-grade">${c.grade}</div>
+        ${c.badge ? `<div class="mc-badge ${c.badge}">${c.badge==='hot'?'🔥 HOT':c.badge==='new'?'NEW':'RARE'}</div>` : ''}
+      </div>
+      <div class="mc-body">
+        <div class="mc-cat">${c.cat}</div>
+        <div class="mc-name">${c.name}</div>
+        <div class="mc-set">${c.set}</div>
+        <div class="mc-prog"><div class="mc-prog-fill" style="width:0%" data-w="${c.sold}%"></div></div>
+        <div class="mc-footer">
+          <div class="mc-price"><small>Token price</small>$${c.price.toFixed(2)}</div>
+          <button class="mc-buy" onclick="event.stopPropagation();openBuyModal(${c.id})">Buy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  setTimeout(() => document.querySelectorAll('.mc-prog-fill').forEach(b => { b.style.width = b.dataset.w; }), 100);
+}
+
+function filterCards(type, btn) {
+  activeFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  let filtered = type === 'all' ? CARDS : type === 'hot' ? CARDS.filter(c => c.badge === 'hot') : CARDS.filter(c => c.cat === type);
+  renderMarket(filtered);
+}
+
+function searchCards(q) {
+  const filtered = CARDS.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.set.toLowerCase().includes(q.toLowerCase()));
+  renderMarket(filtered);
+}
+
+// ── BUY MODAL ──
+function openBuyModal(id) {
+  if (!currentUser) { openWalletModal(); return; }
+  buyCardId = id;
+  const c = CARDS[id];
+  document.getElementById('buyEmoji').textContent = c.emoji;
+  document.getElementById('buyName').textContent = c.name;
+  document.getElementById('buyGrade').textContent = c.grade;
+  document.getElementById('buyPrice').textContent = '$' + c.price.toFixed(2);
+  document.getElementById('buyAmt').value = 10;
+  updateBuySummary();
+  document.getElementById('buyModal').classList.add('open');
+}
+
+function closeBuyModal() { document.getElementById('buyModal').classList.remove('open'); buyCardId = null; }
+
+function updateBuySummary() {
+  if (buyCardId === null) return;
+  const c = CARDS[buyCardId];
+  const qty = parseInt(document.getElementById('buyAmt').value) || 1;
+  const total = qty * c.price;
+  const eth = total / 3000;
+  document.getElementById('sumPrice').textContent = '$' + c.price.toFixed(2);
+  document.getElementById('sumQty').textContent = qty;
+  document.getElementById('sumEth').textContent = eth.toFixed(6) + ' ETH';
+  document.getElementById('sumTotal').textContent = '$' + total.toFixed(2);
+}
+
+async function confirmBuy() {
+  if (!currentUser || buyCardId === null) return;
+  const c = CARDS[buyCardId];
+  const qty = parseInt(document.getElementById('buyAmt').value) || 1;
+  const priceWei = Math.floor(c.price / 3000 * 1e18) * qty;
+
+  const btn = document.getElementById('buyBtn');
+  btn.disabled = true; btn.textContent = 'Confirming...';
+
+  try {
+    const provider = getProvider();
+    if (!provider) throw new Error('No wallet connected');
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+    // buyCardTokens(uint256 cardId, uint256 amount)
+    const data = '0x880aee10' + buyCardId.toString(16).padStart(64,'0') + qty.toString(16).padStart(64,'0');
+
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: accounts[0], to: CONTRACT, data, value: '0x' + priceWei.toString(16), gas: '0x30D40' }]
+    });
+
+    closeBuyModal();
+    showToast('success', `✅ Bought ${qty} tokens of ${c.name}!`);
+    userPoints += qty * 10;
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    localStorage.setItem('reliqt_pts', userPoints);
+
+    // Add to portfolio
+    const existing = portfolio.find(p => p.cardId === buyCardId);
+    if (existing) existing.tokens += qty;
+    else portfolio.push({ cardId: buyCardId, tokens: qty, avgPrice: c.price });
+    localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+
+    // Send email
+    const email = localStorage.getItem('reliqt_email');
+    if (email) {
+      fetch('/api/send-email', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'purchase', to:email, data:{ cardName:c.name, amount:qty, totalUSD:(qty*c.price).toFixed(2), ownership:((qty/10000)*100).toFixed(4), txHash }}) });
+    }
+
+  } catch(e) {
+    if (e.code !== 4001) showToast('error', e.message || 'Transaction failed');
+  }
+  btn.disabled = false; btn.textContent = 'Buy Now';
+}
+
+// ── GACHA ──
+function renderGacha() {
+  const packs = document.getElementById('gachaPacks');
+  packs.innerHTML = GACHA_PACKS.map(p => `
+    <div class="gp">
+      <div class="gp-img" style="background:linear-gradient(135deg,${p.color},#fff)">
+        <span style="font-size:44px">${p.emoji}</span>
+      </div>
+      <div class="gp-body">
+        <div class="gp-name">${p.name}</div>
+        <div class="gp-desc">${p.desc}</div>
+        <div class="gp-stats">
+          <div class="gp-stat">
+            <div class="gp-stat-val">${p.cards}</div>
+            <div class="gp-stat-label">Contains</div>
+          </div>
+          <div class="gp-stat">
+            <div class="gp-stat-val">${p.winRate}</div>
+            <div class="gp-stat-label">Win rate</div>
+          </div>
+        </div>
+        <button class="gp-btn" onclick="openGacha(${p.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Open Now · ${p.price} ETH
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openGacha(packId) {
+  if (!currentUser) { openWalletModal(); return; }
+  const pack = GACHA_PACKS[packId];
+  const provider = getProvider();
+  if (!provider) { showToast('error', 'Connect wallet first'); return; }
+
+  showToast('info', 'Opening pack... confirm in wallet');
+  try {
+    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+    const priceWei = Math.floor(pack.price * 1e18);
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [{ from: accounts[0], to: CONTRACT, data: '0x2cc1f70b', value: '0x' + priceWei.toString(16), gas: '0x30D40' }]
+    });
+
+    // Random result
+    const rand = Math.random() * 100;
+    const rarity = rand < 60 ? 'common' : rand < 85 ? 'rare' : rand < 95 ? 'epic' : 'legendary';
+    const card = CARDS[Math.floor(Math.random() * CARDS.length)];
+
+    document.getElementById('grEmoji').textContent = card.emoji;
+    document.getElementById('grRarity').className = 'gr-rarity ' + rarity;
+    document.getElementById('grRarity').textContent = rarity.toUpperCase();
+    document.getElementById('grName').textContent = card.name;
+    document.getElementById('grVal').textContent = 'Value: $' + card.cardValue.toLocaleString();
+    document.getElementById('gachaResult').classList.add('open');
+
+    userPoints += 100;
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    localStorage.setItem('reliqt_pts', userPoints);
+
+  } catch(e) {
+    if (e.code !== 4001) showToast('error', e.message || 'Failed');
+  }
+}
+
+function closeGachaResult() { document.getElementById('gachaResult').classList.remove('open'); }
+
+// ── LEADERBOARD ──
+async function loadLeaderboard() {
+  const body = document.getElementById('lbBody');
+  body.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3)">Loading from blockchain...</div>';
+
+  try {
+    const logs = await rpcCall('eth_getLogs', [{ fromBlock: '0x0', toBlock: 'latest', address: CONTRACT }]);
+    const players = {};
+    (logs || []).forEach(log => {
+      if (!log.topics?.[1]) return;
+      const addr = '0x' + log.topics[1].slice(26);
+      if (!players[addr]) players[addr] = { address: addr, txs: 0 };
+      players[addr].txs++;
+    });
+
+    let list = Object.values(players).sort((a, b) => b.txs - a.txs);
+    if (!list.length) list = [{ address: '0xA2e17FFB1EEd1222CaB7651F1c762833e0f20f31', txs: 1, pts: 100 }];
+
+    const medals = ['🥇', '🥈', '🥉'];
+    body.innerHTML = list.slice(0, 20).map((p, i) => {
+      const isYou = currentUser?.address?.toLowerCase() === p.address.toLowerCase();
+      const short = p.address.slice(0,6) + '...' + p.address.slice(-4);
+      return `<div class="lb-row ${isYou ? 'you' : ''}">
+        <div class="lb-rank">${i < 3 ? medals[i] : '#' + (i+1)}</div>
+        <div class="lb-wallet">${short}${isYou ? '<span class="you-badge">YOU</span>' : ''}</div>
+        <div class="lb-pts">${(p.txs * 100).toLocaleString()}</div>
+        <div class="lb-txns">${p.txs}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    body.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--text3)">Failed to load — check connection</div>';
+  }
+}
+
+// ── PORTFOLIO ──
+async function syncPortfolio() {
+  if (!currentUser?.address) { showToast('error', 'Connect wallet first'); return; }
+  showToast('info', 'Syncing from blockchain...');
+
+  try {
+    let totalTokens = 0, totalVal = 0;
+    const holdings = [];
+    for (let i = 0; i < CARDS.length; i++) {
+      const res = await rpcCall('eth_call', [{ to: CONTRACT, from: currentUser.address, data: '0x62bf0975' + i.toString(16).padStart(64,'0') }, 'latest']);
+      const amt = parseInt(res, 16) || 0;
+      if (amt > 0) { holdings.push({ cardId: i, tokens: amt }); totalTokens += amt; totalVal += amt * CARDS[i].price; }
+    }
+    portfolio = holdings;
+    localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+    // Fetch points from contract
+    try {
+      const ptsRes = await rpcCall('eth_call', [{ to: CONTRACT, from: currentUser.address, data: '0xba9c4637' }, 'latest']);
+      const pts = parseInt(ptsRes, 16) || 0;
+      if (pts > 0) { userPoints = pts; localStorage.setItem('reliqt_pts', pts); }
+    } catch(e) {}
+
+    document.getElementById('pfTotalVal').textContent = '$' + totalVal.toFixed(2);
+    document.getElementById('pfTotalTokens').textContent = totalTokens.toLocaleString();
+    document.getElementById('pfPoints').textContent = userPoints.toLocaleString();
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    portfolio = holdings;
+    localStorage.setItem('reliqt_pf', JSON.stringify(portfolio));
+    renderPortfolio();
+    showToast('success', `✅ Synced! ${holdings.length} cards found`);
+  } catch(e) {
+    showToast('error', 'Sync failed: ' + e.message);
+  }
+}
+
+function renderPortfolio() {
+  const el = document.getElementById('pfHoldings');
+  document.getElementById('pfPoints').textContent = userPoints.toLocaleString();
+  if (!portfolio.length) {
+    el.innerHTML = '<div class="pf-empty"><p>No tokens yet. Start collecting!</p><button onclick="showPage(\'market\',null);document.querySelector(\'.nav-tab\').click()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:700;cursor:pointer;font-family:var(--font)">Browse Marketplace →</button></div>';
+    return;
+  }
+  let totalVal = 0, totalTokens = 0;
+  el.innerHTML = portfolio.map(h => {
+    const c = CARDS[h.cardId];
+    if (!c) return '';
+    const val = h.tokens * c.price;
+    totalVal += val; totalTokens += h.tokens;
+    return `<div class="pf-holding">
+      <div class="pf-h-img">${c.emoji}</div>
+      <div>
+        <div class="pf-h-name">${c.name}</div>
+        <div class="pf-h-set">${c.set}</div>
+      </div>
+      <div>
+        <div class="pf-h-tokens">${h.tokens} tokens</div>
+        <div class="pf-h-val">$${val.toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('pfTotalVal').textContent = '$' + totalVal.toFixed(2);
+  document.getElementById('pfTotalTokens').textContent = totalTokens.toLocaleString();
+}
+
+// ── REFERRAL ──
+function renderReferral() {
+  if (!currentUser) {
+    document.getElementById('refCode').textContent = '—';
+    showToast('info', 'Connect wallet to see your referral code');
+    openWalletModal();
+    return;
+  }
+  const code = currentUser.address.slice(2,10).toUpperCase();
+  document.getElementById('refCode').textContent = code;
+  loadReferralStats(currentUser.address);
+}
+
+function copyRefCode() {
+  const code = document.getElementById('refCode').textContent;
+  navigator.clipboard.writeText(`https://reliqt.vercel.app/app.html?ref=${code}`);
+  showToast('success', '✅ Referral link copied!');
+}
+
+function shareTwitter() {
+  const code = document.getElementById('refCode').textContent;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join Reliqt — own fractions of PSA 10 collectibles! Use my code: ${code}\nhttps://reliqt.vercel.app/app.html?ref=${code}`)}`,'_blank');
+}
+
+function shareTelegram() {
+  const code = document.getElementById('refCode').textContent;
+  window.open(`https://t.me/share/url?url=${encodeURIComponent(`https://reliqt.vercel.app/app.html?ref=${code}`)}&text=${encodeURIComponent(`Join Reliqt! Use code: ${code}`)}`,'_blank');
+}
+
+
+// ── SUPABASE FUNCTIONS ──
+async function sbFetch(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  return res.json();
+}
+
+async function registerUserSupabase(wallet) {
+  try {
+    const existing = await sbFetch(`users?wallet=eq.${wallet}&select=*`);
+    if (existing.length > 0) {
+      // Update points
+      userPoints = existing[0].points || userPoints;
+      document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+      localStorage.setItem('reliqt_pts', userPoints);
+      return;
+    }
+    const refCode = wallet.slice(2,10).toUpperCase();
+    await sbFetch('users', 'POST', { wallet, ref_code: refCode, points: 0, total_referrals: 0 });
+  } catch(e) { console.log('Supabase register error:', e); }
+}
+
+async function processReferral(referredWallet, referrerCode) {
+  try {
+    const referrers = await sbFetch(`users?ref_code=eq.${referrerCode}&select=*`);
+    if (!referrers.length) return;
+    const referrer = referrers[0];
+    if (referrer.wallet === referredWallet) return;
+    const existing = await sbFetch(`referrals?referred_wallet=eq.${referredWallet}&select=*`);
+    if (existing.length > 0) return;
+    await sbFetch('referrals', 'POST', { referrer_wallet: referrer.wallet, referred_wallet: referredWallet, bonus_paid: false });
+    await sbFetch(`users?wallet=eq.${referrer.wallet}`, 'PATCH', { points: (referrer.points||0) + 500, total_referrals: (referrer.total_referrals||0) + 1 });
+    await sbFetch(`users?wallet=eq.${referredWallet}`, 'PATCH', { points: 500 });
+    userPoints += 500;
+    document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+    localStorage.setItem('reliqt_pts', userPoints);
+    localStorage.removeItem('reliqt_ref');
+    showToast('success', '🎉 Referral bonus! +500 pts');
+  } catch(e) { console.log('Referral error:', e); }
+}
+
+async function loadReferralStats(wallet) {
+  try {
+    const [userData, referrals] = await Promise.all([
+      sbFetch(`users?wallet=eq.${wallet}&select=*`),
+      sbFetch(`referrals?referrer_wallet=eq.${wallet}&select=*`)
+    ]);
+    const count = referrals.length || 0;
+    const el1 = document.getElementById('refCount');
+    const el2 = document.getElementById('refPts');
+    if (el1) el1.textContent = count;
+    if (el2) el2.textContent = (count * 500).toLocaleString();
+  } catch(e) {}
+}
+
+
+// ── LIVE PRICES ──
+async function fetchLivePrices() {
+  try {
+    const res = await fetch('/api/prices');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.success && data.prices) {
+      data.prices.forEach(p => {
+        if (CARDS[p.id]) {
+          CARDS[p.id].price = parseFloat(p.price) || CARDS[p.id].price;
+        }
+      });
+      renderMarket(CARDS);
+      console.log('✅ Live prices updated');
+    }
+  } catch(e) { console.log('Price fetch:', e.message); }
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  renderMarket(CARDS);
+  renderGacha();
+
+  // Check ref code in URL
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if (ref) localStorage.setItem('reliqt_ref', ref);
+
+  // Restore session
+  const saved = localStorage.getItem('reliqt_wallet');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    onConnected();
+  }
+
+  document.getElementById('ptsDisplay').textContent = userPoints.toLocaleString();
+  renderPortfolio();
+  // Fetch live prices after 2s
+  setTimeout(fetchLivePrices, 2000);
+  // Refresh prices every 5 min
+  setInterval(fetchLivePrices, 300000);
+
+  
+// ── PWA SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ SW registered'))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
+
+console.log('✅ Reliqt loaded | Contract:', CONTRACT);
+});
+</script>
+</body>
+</html>
