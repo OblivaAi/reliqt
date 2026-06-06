@@ -1,0 +1,25 @@
+{
+  "rewrites": [
+    { "source": "/marketplace", "destination": "/app.html" },
+    { "source": "/marketplace/", "destination": "/app.html" },
+    { "source": "/docs", "destination": "/docs.html" },
+    { "source": "/docs/", "destination": "/docs.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/about/", "destination": "/about.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/terms/", "destination": "/terms.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/privacy/", "destination": "/privacy.html" },
+    { "source": "/risk", "destination": "/risk.html" },
+    { "source": "/risk/", "destination": "/risk.html" }
+  ],
+  "redirects": [
+    { "source": "/app", "permanent": true, "destination": "/marketplace" },
+    { "source": "/app.html", "permanent": true, "destination": "/marketplace" },
+    { "source": "/docs.html", "permanent": true, "destination": "/docs" },
+    { "source": "/about.html", "permanent": true, "destination": "/about" },
+    { "source": "/terms.html", "permanent": true, "destination": "/terms" },
+    { "source": "/privacy.html", "permanent": true, "destination": "/privacy" },
+    { "source": "/risk.html", "permanent": true, "destination": "/risk" }
+  ]
+}
