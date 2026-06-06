@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Reliqt Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff;
+  --bg2: #f8f9fb;
+  --bg3: #f1f3f7;
+  --sidebar-bg: #f5f6f8;
+  --border: #e5e8ef;
+  --border2: #d0d5e0;
+  --accent: #0052FF;
+  --accent-hover: #0041cc;
+  --accent-light: #eff3ff;
+  --accent-light2: #dce6ff;
+  --text: #0a0d14;
+  --text2: #4a5568;
+  --text3: #8a96aa;
+  --text4: #b0b8c8;
+  --mono: 'Geist Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --sidebar: 256px;
+  --topbar: 56px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  max-width: 100vw;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-sq {
+  width: 30px; height: 30px;
+  background: var(--accent); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+}
+.logo-text { font-weight: 600; font-size: 15px; color: var(--text); }
+.logo-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+.nav-section { padding: 16px 8px 4px; }
+.nav-section-title {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3); padding: 0 8px; margin-bottom: 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 6px;
+  color: var(--text2); font-size: 13px; font-weight: 400;
+  cursor: pointer; transition: all 0.12s;
+  text-decoration: none; margin-bottom: 1px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+.sidebar-footer {
+  margin-top: auto; padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--text4);
+}
+
+/* ─── MAIN ─── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  height: var(--topbar);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); }
+.breadcrumb span { color: var(--text); font-weight: 500; }
+.bc-sep { color: var(--border2); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-link { font-size: 12px; color: var(--text2); text-decoration: none; font-weight: 500; transition: color 0.12s; }
+.topbar-link:hover { color: var(--accent); }
+.launch-btn {
+  background: var(--accent); color: #fff;
+  padding: 7px 16px; font-size: 12px;
+  font-family: var(--sans); font-weight: 600;
+  border: none; cursor: pointer; border-radius: 8px;
+  text-decoration: none; transition: background 0.12s;
+}
+.launch-btn:hover { background: var(--accent-hover); }
+
+/* ─── PAGE CONTAINER ─── */
+.page-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.page-container::-webkit-scrollbar { width: 4px; }
+.page-container::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ─── PAGE ─── */
+.page {
+  display: none;
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 52px 48px 80px;
+  animation: fadeIn 0.18s ease;
+}
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── TYPOGRAPHY ─── */
+.section-eyebrow {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+h1 {
+  font-size: 34px; font-weight: 700; line-height: 1.15;
+  color: var(--text); margin-bottom: 14px; letter-spacing: -0.02em;
+}
+h1 em { color: var(--accent); font-style: normal; }
+h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.01em; }
+h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-top: 28px; }
+p { color: var(--text2); margin-bottom: 14px; font-size: 14px; line-height: 1.75; }
+.lead {
+  font-size: 15px; color: var(--text2); line-height: 1.8;
+  margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--border);
+}
+
+/* ─── COMPONENTS ─── */
+.callout {
+  background: var(--accent-light); border: 1px solid var(--accent-light2);
+  border-left: 3px solid var(--accent);
+  padding: 14px 18px; border-radius: 0 8px 8px 0;
+  margin: 18px 0; font-size: 13px; color: var(--text2); line-height: 1.7;
+}
+.callout.green { background: #f0fdf4; border-color: #bbf7d0; border-left-color: #22c55e; }
+.callout.yellow { background: #fffbeb; border-color: #fde68a; border-left-color: #f59e0b; }
+.callout strong { color: var(--text); }
+
+.code-block {
+  background: #0f1117; border: 1px solid #1e2535; border-radius: 12px;
+  margin: 16px 0; overflow: hidden;
+  font-size: 12.5px; font-family: var(--mono); line-height: 1.85; color: #e2e8f0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.code-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: #161b27; border-bottom: 1px solid #1e2535;
+}
+.code-dots { display: flex; gap: 6px; align-items: center; }
+.code-dot { width: 12px; height: 12px; border-radius: 50%; }
+.code-dot.red    { background: #ff5f57; }
+.code-dot.yellow { background: #ffbd2e; }
+.code-dot.green  { background: #28c840; }
+.code-filename { font-size: 11px; color: #4a5a78; font-family: var(--mono); letter-spacing: 0.04em; }
+.code-lang { font-size: 10px; color: #2a3a58; font-family: var(--mono); letter-spacing: 0.12em; text-transform: uppercase; }
+.code-body { padding: 20px 24px; overflow-x: auto; }
+.code-block .comment { color: #4a5568; font-style: italic; }
+.code-block .key { color: #93c5fd; }
+.code-block .val { color: #34d399; }
+.code-block .fn { color: #f472b6; }
+
+code {
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 12px; color: var(--accent); font-family: var(--mono);
+}
+
+table {
+  width: 100%; border-collapse: collapse; margin: 18px 0;
+  font-size: 13px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+th {
+  text-align: left; padding: 10px 16px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text3); background: var(--bg2); border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  color: var(--text2); vertical-align: top;
+}
+td:first-child { color: var(--text); font-weight: 500; font-family: var(--mono); font-size: 12px; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg2); }
+
+.steps { margin: 24px 0; display: flex; flex-direction: column; }
+.step { display: flex; gap: 18px; padding-bottom: 24px; position: relative; }
+.step:last-child { padding-bottom: 0; }
+.step-num {
+  width: 28px; height: 28px; background: var(--accent); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+  position: relative; z-index: 1;
+}
+.step-line {
+  position: absolute; left: 13px; top: 28px; bottom: 0;
+  width: 1px; background: var(--border);
+}
+.step:last-child .step-line { display: none; }
+.step-body { padding-top: 4px; }
+.step-title { font-weight: 600; color: var(--text); margin-bottom: 5px; font-size: 14px; }
+.step-desc { color: var(--text2); font-size: 13.5px; line-height: 1.75; }
+
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+.info-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 18px 20px; border-radius: 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.info-card:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.info-card-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.info-card-val { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.info-card-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+
+.tag {
+  display: inline-flex; align-items: center;
+  background: var(--accent-light); border: 1px solid var(--accent-light2);
+  color: var(--accent); font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 20px; letter-spacing: 0.06em; margin-bottom: 14px;
+}
+.tag.green { background: #f0fdf4; border-color: #bbf7d0; color: #16a34a; }
+.tag.orange { background: #fffbeb; border-color: #fde68a; color: #d97706; }
+
+.badge-live {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  color: #16a34a; font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px; letter-spacing: 0.04em;
+}
+.badge-live::before { content: ''; width: 5px; height: 5px; background: #22c55e; border-radius: 50%; }
+
+.faq-item {
+  border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 8px; overflow: hidden; transition: box-shadow 0.15s;
+}
+.faq-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.faq-q {
+  padding: 14px 18px; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13.5px; font-weight: 500; color: var(--text);
+  background: var(--bg2); user-select: none; transition: background 0.12s;
+}
+.faq-q:hover { background: var(--bg3); }
+.faq-q::after { content: '+'; font-size: 20px; color: var(--text3); transition: transform 0.2s; line-height: 1; }
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a {
+  display: none; padding: 14px 18px;
+  font-size: 13.5px; color: var(--text2); line-height: 1.8;
+  border-top: 1px solid var(--border); background: #fff;
+}
+.faq-item.open .faq-a { display: block; }
+
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.pill {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); font-size: 12px; padding: 5px 12px;
+  border-radius: 20px; font-weight: 500;
+}
+
+/* ─── MOBILE ─── */
+.hamburger {
+  display: none;
+  background: none; border: none; cursor: pointer;
+  padding: 4px; flex-direction: column; gap: 5px;
+}
+.hamburger span {
+  display: block; width: 20px; height: 2px;
+  background: var(--text2); border-radius: 2px;
+  transition: all 0.2s;
+}
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 40;
+}
+.overlay.visible { display: block; }
+
+.code-body { overflow-x: auto; max-width: 100%; }
+.code-body::-webkit-scrollbar { height: 3px; }
+.code-body::-webkit-scrollbar-thumb { background: #2a3550; border-radius: 2px; }
+
+@media (max-width: 768px) {
+  :root { --sidebar: 240px; }
+
+  body { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+
+  .hamburger { display: flex; }
+
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0; bottom: 0;
+    z-index: 50;
+    transition: left 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+  }
+  .sidebar.open { left: 0; }
+
+  .main { width: 100%; }
+
+  .topbar { padding: 0 16px; }
+
+  .content {
+    padding: 28px 20px 80px;
+    max-width: 100%;
+  }
+
+  h1 { font-size: 26px; }
+  h2 { font-size: 18px; }
+
+  .card-grid { grid-template-columns: 1fr; }
+
+  .page-container { overflow-x: hidden; }
+
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .code-block { border-radius: 10px; }
+  .code-filename { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="data:image/jpeg;base64,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" style="width:32px;height:32px;object-fit:contain;border-radius:6px;flex-shrink:0;" alt="Reliqt Logo"/>
+    <div>
+      <div class="logo-text">Reliqt</div>
+      <div class="logo-sub">Documentation v1.0</div>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Overview</div>
+    <button class="nav-item active" onclick="navigate('intro', this)">Introduction</button>
+    <button class="nav-item" onclick="navigate('how-it-works', this)">How It Works</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Token</div>
+    <button class="nav-item" onclick="navigate('reliqt-token', this)">$RELIQT Token</button>
+    <button class="nav-item" onclick="navigate('uniswap-pools', this)">Uniswap V4 Pools</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Platform</div>
+    <button class="nav-item" onclick="navigate('trading-pairs', this)">Trading & Pairs</button>
+    <button class="nav-item" onclick="navigate('gacha', this)">Gacha System</button>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Technical</div>
+    <button class="nav-item" onclick="navigate('smart-contract', this)">Smart Contract</button>
+    <button class="nav-item" onclick="navigate('faq', this)">FAQ</button>
+  </div>
+
+  <div class="sidebar-footer">Built on Base · reliqt.app</div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="breadcrumb">
+      Docs <span class="bc-sep">/</span> <span id="breadcrumb-title">Introduction</span>
+    </div>
+    <div class="topbar-right">
+      <a href="https://reliqt.app" class="topbar-link">reliqt.app ↗</a>
+      <a href="#" class="launch-btn">Launch App</a>
+    </div>
+  </div>
+
+  <div class="page-container">
+
+    <!-- INTRO -->
+    <div class="page active" id="page-intro">
+      <div class="section-eyebrow">Getting Started</div>
+      <h1>Welcome to <em>Reliqt</em></h1>
+      <p class="lead">Reliqt is a Real World Asset (RWA) collectibles platform built on Base. We tokenize PSA-graded physical trading cards into onchain tokens — each card gets its own ERC-20 token, its own liquidity pool on Uniswap V4, and a native trading pair with <code>$RELIQT</code>.</p>
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="info-card-label">Network</div>
+          <div class="info-card-val">Base</div>
+          <div class="info-card-desc">Mainnet. Fast, cheap, permanent.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Cards Tokenized</div>
+          <div class="info-card-val">12</div>
+          <div class="info-card-desc">PSA 10 graded, physically vaulted.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Liquidity Protocol</div>
+          <div class="info-card-val">Uniswap V4</div>
+          <div class="info-card-desc">One pool per card, all paired with $RELIQT.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Vault Status</div>
+          <div class="info-card-val">100% Insured</div>
+          <div class="info-card-desc">All physical cards fully insured.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="page" id="page-how-it-works">
+      <div class="section-eyebrow">Overview</div>
+      <h2>How It Works</h2>
+      <p>Reliqt bridges the physical collectibles market with DeFi. Here's the complete lifecycle of a card on the platform:</p>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Physical Card Acquisition</div>
+          <div class="step-desc">We source PSA 10-graded trading cards — the highest possible grade — from verified sellers. Only Gem Mint certified cards enter the Reliqt ecosystem, spanning Sports, Pokémon, and Anime categories.</div></div>
+        </div>
+        <div class="step"><div class="step-num">2</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Vault & Insurance</div>
+          <div class="step-desc">Every physical card is placed in a secure, fully-insured vault. The vault ensures the underlying asset is safe, protected, and independently verified at all times.</div></div>
+        </div>
+        <div class="step"><div class="step-num">3</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Tokenization on Base</div>
+          <div class="step-desc">Each card is tokenized into a unique ERC-20 token deployed on Base. A LeBron James PSA 10 becomes <code>rLEBRON</code>. The token supply is fixed and represents fractional ownership of the physical card.</div></div>
+        </div>
+        <div class="step"><div class="step-num">4</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Liquidity Pool on Uniswap V4</div>
+          <div class="step-desc">A dedicated liquidity pool is created on Uniswap V4 for each card token, paired with <code>$RELIQT</code>. This enables permissionless, real-time price discovery and trading for every card.</div></div>
+        </div>
+        <div class="step"><div class="step-num">5</div>
+          <div class="step-body"><div class="step-title">Trade, Hold, or Provide Liquidity</div>
+          <div class="step-desc">Users can buy or sell card tokens using $RELIQT via the Reliqt Trade interface or directly on Uniswap V4. All activity is onchain, transparent, and non-custodial.</div></div>
+        </div>
+      </div>
+      <div class="callout green"><strong>Non-custodial.</strong> Reliqt never holds your tokens. Once you buy a card token, it lives in your own wallet — not on a platform database.</div>
+    </div>
+
+    <!-- $RELIQT TOKEN -->
+    <div class="page" id="page-reliqt-token">
+      <div class="section-eyebrow">Token</div>
+      <h2>$RELIQT Token</h2>
+      <div class="tag">NATIVE CURRENCY</div>
+      <p>$RELIQT is the native currency of the entire Reliqt ecosystem. It is the base pair for every card token on the platform — replacing USDC or ETH as the unit of exchange.</p>
+      <h3>Role in the Ecosystem</h3>
+      <table>
+        <tr><th>Use Case</th><th>Description</th></tr>
+        <tr><td>Buy Card Tokens</td><td>All card purchases on the marketplace use $RELIQT as payment</td></tr>
+        <tr><td>Gacha System</td><td>Every gacha spin costs $RELIQT. Rewards settled onchain.</td></tr>
+        <tr><td>Trading Pairs</td><td>All Uniswap V4 pools paired with $RELIQT (e.g. rLEBRON / $RELIQT)</td></tr>
+        <tr><td>Liquidity Provision</td><td>LPs provide $RELIQT alongside card tokens to earn trading fees</td></tr>
+      </table>
+      <h3>Token Details</h3>
+      <div class="code-block"><div class="code-block-header">
+  <div class="code-dots">
+    <div class="code-dot red"></div>
+    <div class="code-dot yellow"></div>
+    <div class="code-dot green"></div>
+  </div>
+  <div class="code-filename">reliqt-contract.sol</div>
+  <div class="code-lang">SOLIDITY</div>
+</div>
+<div class="code-body">
+<span class="comment">// $RELIQT Token Info</span>
+<span class="key">Name</span>:      <span class="val">Reliqt</span>
+<span class="key">Symbol</span>:    <span class="val">$RELIQT</span>
+<span class="key">Network</span>:   <span class="val">Base Mainnet</span>
+<span class="key">Standard</span>:  <span class="val">ERC-20</span>
+<span class="key">Infra</span>:     <span class="val">Launched via Bankr Bot</span>
+<span class="key">Base pair</span>: <span class="val">WETH / $RELIQT (Uniswap V4)</span>
+      </div></div>
+      <div class="callout yellow"><strong>Note:</strong> $RELIQT is launched and managed via <strong>Bankr Bot</strong> infrastructure on Base. Trading fees are automatically distributed back to the ecosystem.</div>
+    </div>
+
+    <!-- UNISWAP V4 -->
+    <div class="page" id="page-uniswap-pools">
+      <div class="section-eyebrow">DeFi Layer</div>
+      <h2>Uniswap V4 Pools</h2>
+      <div class="tag">DEFI LAYER</div>
+      <p>Every card tokenized on Reliqt has its own dedicated liquidity pool on Uniswap V4, deployed on Base. All pools use $RELIQT as the base pair.</p>
+      <h3>Pool Structure</h3>
+      <div class="code-block"><div class="code-block-header">
+  <div class="code-dots">
+    <div class="code-dot red"></div>
+    <div class="code-dot yellow"></div>
+    <div class="code-dot green"></div>
+  </div>
+  <div class="code-filename">pools.ts</div>
+  <div class="code-lang">TYPESCRIPT</div>
+</div>
+<div class="code-body">
+<span class="comment">// Each card gets its own pool</span>
+<span class="fn">Pool</span>(<span class="val">rLEBRON</span>    / <span class="val">$RELIQT</span>, fee: <span class="val">1%</span>)
+<span class="fn">Pool</span>(<span class="val">rMAHOMES</span>   / <span class="val">$RELIQT</span>, fee: <span class="val">1%</span>)
+<span class="fn">Pool</span>(<span class="val">rCHARIZARD</span> / <span class="val">$RELIQT</span>, fee: <span class="val">1%</span>)
+<span class="fn">Pool</span>(<span class="val">rPIKACHU</span>   / <span class="val">$RELIQT</span>, fee: <span class="val">1%</span>)
+<span class="comment">// ... one pool per card, all on Base</span>
+      </div></div>
+      <h3>Active Pools</h3>
+      <table>
+        <tr><th>Token</th><th>Category</th><th>Pair</th><th>Status</th></tr>
+        <tr><td>rLEBRON</td><td>Sports</td><td>rLEBRON / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rMAHOMES</td><td>Sports</td><td>rMAHOMES / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rHAALAND</td><td>Sports</td><td>rHAALAND / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rCHARIZARD</td><td>Pokémon</td><td>rCHARIZARD / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rPIKACHU</td><td>Pokémon</td><td>rPIKACHU / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rMEWTWO</td><td>Pokémon</td><td>rMEWTWO / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+        <tr><td>rWEMBY</td><td>Sports</td><td>rWEMBY / $RELIQT</td><td><span class="badge-live">LIVE</span></td></tr>
+      </table>
+      <div class="callout"><strong>Tip:</strong> Providing liquidity to early-stage card pools carries impermanent loss risk. Consider pool depth and trading volume before committing.</div>
+    </div>
+
+    <!-- TRADING -->
+    <div class="page" id="page-trading-pairs">
+      <div class="section-eyebrow">Platform</div>
+      <h2>Trading & Pairs</h2>
+      <div class="tag">MARKETPLACE</div>
+      <p>The Reliqt Trade interface provides a full candlestick chart and order interface for every card token. All trading happens onchain via Uniswap V4 — no order books, no centralized matching.</p>
+      <h3>How to Trade</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Connect Wallet</div>
+          <div class="step-desc">Connect your Base-compatible wallet (Coinbase Wallet, MetaMask, or any Privy-supported wallet) at reliqt.app.</div></div>
+        </div>
+        <div class="step"><div class="step-num">2</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Get $RELIQT</div>
+          <div class="step-desc">Acquire $RELIQT on Uniswap V4 (Base). $RELIQT is required to buy any card token on the platform.</div></div>
+        </div>
+        <div class="step"><div class="step-num">3</div><div class="step-line"></div>
+          <div class="step-body"><div class="step-title">Select a Card</div>
+          <div class="step-desc">Go to the Trade page, select a card token (e.g. rLEBRON), and review the live chart, market cap, supply, and last value.</div></div>
+        </div>
+        <div class="step"><div class="step-num">4</div>
+          <div class="step-body"><div class="step-title">Buy or Sell</div>
+          <div class="step-desc">Enter the amount of $RELIQT to spend (Buy) or card tokens to sell. Approve the transaction in your wallet. Tokens land in your wallet instantly.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GACHA -->
+    <div class="page" id="page-gacha">
+      <div class="section-eyebrow">Platform</div>
+      <h2>Gacha System</h2>
+      <div class="tag orange">FEATURE</div>
+      <p>The Reliqt Gacha system lets users spin to win random card tokens using $RELIQT. Every pull is executed onchain — provably fair, transparent, and recorded permanently on Base.</p>
+      <h3>Parameters</h3>
+      <table>
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Cost per spin</td><td>Paid in $RELIQT</td></tr>
+        <tr><td>Randomness</td><td>Onchain (Base)</td></tr>
+        <tr><td>Reward</td><td>Card tokens from active pool</td></tr>
+        <tr><td>Rarity tiers</td><td>Common · Rare · Legendary</td></tr>
+        <tr><td>Settlement</td><td>Instant — tokens sent to your wallet</td></tr>
+      </table>
+      <h3>Rarity Tiers</h3>
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="info-card-label">Common</div>
+          <div class="info-card-val" style="font-size:16px;">Standard Cards</div>
+          <div class="info-card-desc">Sports & Pokémon base set tokens. Most frequent drop rate.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Rare</div>
+          <div class="info-card-val" style="font-size:16px;color:#0052FF;">Holo & 1st Ed.</div>
+          <div class="info-card-desc">1st Edition and special print cards. Lower drop rate.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Legendary</div>
+          <div class="info-card-val" style="font-size:16px;color:#d97706;">Icons Only</div>
+          <div class="info-card-desc">rLEBRON, rCHARIZARD, rPIKACHU Illustrator. Rarest tier.</div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-label">Settlement</div>
+          <div class="info-card-val" style="font-size:16px;color:#16a34a;">Instant</div>
+          <div class="info-card-desc">All winnings sent directly to your wallet onchain.</div>
+        </div>
+      </div>
+      <div class="callout green"><strong>Provably Fair.</strong> All gacha outcomes are determined by onchain randomness on Base. Results cannot be manipulated by Reliqt or any third party.</div>
+    </div>
+
+    <!-- SMART CONTRACT -->
+    <div class="page" id="page-smart-contract">
+      <div class="section-eyebrow">Technical</div>
+      <h2>Smart Contract</h2>
+      <div class="tag">TECHNICAL</div>
+      <p>Reliqt is deployed on Base Mainnet. All card tokens are standard ERC-20 contracts. The platform interacts with Uniswap V4 pools directly for all trading and liquidity operations.</p>
+      <h3>Contract Architecture</h3>
+      <div class="code-block"><div class="code-block-header">
+  <div class="code-dots">
+    <div class="code-dot red"></div>
+    <div class="code-dot yellow"></div>
+    <div class="code-dot green"></div>
+  </div>
+  <div class="code-filename">reliqt-contract.sol</div>
+  <div class="code-lang">SOLIDITY</div>
+</div>
+<div class="code-body">
+<span class="comment">// Card Token (deployed per card)</span>
+<span class="key">contract</span> <span class="fn">ReliqtCard</span> <span class="key">is</span> ERC20 {
+  <span class="key">string</span>  <span class="val">cardName</span>;    <span class="comment">// "LeBron James PSA 10"</span>
+  <span class="key">string</span>  <span class="val">symbol</span>;      <span class="comment">// "rLEBRON"</span>
+  <span class="key">uint256</span> <span class="val">totalSupply</span>; <span class="comment">// fixed, immutable</span>
+}
+
+<span class="comment">// Uniswap V4 Pool (per card)</span>
+<span class="key">pair</span>:    <span class="val">rCARD</span> / <span class="val">$RELIQT</span>
+<span class="key">network</span>: <span class="val">Base Mainnet</span>
+<span class="key">fee</span>:     <span class="val">1%</span>
+      </div></div>
+      <h3>Tech Stack</h3>
+      <div class="pill-row">
+        <div class="pill">Base Mainnet</div>
+        <div class="pill">Uniswap V4</div>
+        <div class="pill">Bankr Bot</div>
+        <div class="pill">ERC-20</div>
+        <div class="pill">Privy Wallets</div>
+        <div class="pill">Supabase</div>
+        <div class="pill">PSA Grading</div>
+      </div>
+      <h3>Security</h3>
+      <table>
+        <tr><th>Component</th><th>Status</th></tr>
+        <tr><td>Card token contracts</td><td>Standard ERC-20, immutable supply</td></tr>
+        <tr><td>Liquidity pools</td><td>Uniswap V4 — battle-tested protocol</td></tr>
+        <tr><td>Physical vault</td><td>100% insured</td></tr>
+        <tr><td>Wallet custody</td><td>Non-custodial via Privy</td></tr>
+        <tr><td>Price feeds</td><td>No admin control — pure AMM</td></tr>
+      </table>
+      <div class="callout"><strong>Contract addresses</strong> will be published once all pools migrate to $RELIQT. Follow <a href="#" style="color:var(--accent);">@reliqt_app</a> on X for updates.</div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="page" id="page-faq">
+      <div class="section-eyebrow">Help</div>
+      <h2>FAQ</h2>
+      <p style="margin-bottom:20px;">Common questions about Reliqt, $RELIQT, and the platform.</p>
+
+      <div class="faq-item open">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What is Reliqt?</div>
+        <div class="faq-a">Reliqt is a Real World Asset (RWA) collectibles platform on Base. We tokenize PSA 10-graded trading cards into ERC-20 tokens, each with its own liquidity pool on Uniswap V4 paired with $RELIQT.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What is $RELIQT?</div>
+        <div class="faq-a">$RELIQT is the native token of the Reliqt ecosystem. It is the base currency for all card purchases, gacha spins, and liquidity pairs. Launched via Bankr Bot on Base Mainnet.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Are the cards real?</div>
+        <div class="faq-a">Yes. Every card on Reliqt is a physical PSA 10 (Gem Mint) graded collectible stored in a fully insured vault. When you buy a card token, you hold fractional ownership of that real physical card.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How do I get $RELIQT?</div>
+        <div class="faq-a">$RELIQT is available on Uniswap V4 on Base Mainnet. Swap ETH or any Base token for $RELIQT. Once you have it, you can buy card tokens, spin the gacha, or provide liquidity.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Why $RELIQT instead of USDC?</div>
+        <div class="faq-a">Using $RELIQT as the base pair means every activity on Reliqt directly contributes to the $RELIQT economy — creating a closed-loop ecosystem where platform growth and token value are aligned.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Is Reliqt non-custodial?</div>
+        <div class="faq-a">Yes. Reliqt never holds your tokens. Once you purchase a card token, it transfers directly to your wallet. You maintain full ownership and control at all times.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">What networks does Reliqt support?</div>
+        <div class="faq-a">Reliqt is deployed exclusively on Base Mainnet — a Layer 2 built on Ethereum offering fast, low-fee transactions ideal for frequent card trading and gacha interactions.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">How is gacha fairness guaranteed?</div>
+        <div class="faq-a">All gacha outcomes are determined by onchain randomness on Base. Results are transparent, verifiable, and cannot be manipulated by Reliqt or any party.</div>
+      </div>
+    </div>
+
+  </div><!-- /page-container -->
+</main>
+
+<script>
+const titles = {
+  'intro': 'Introduction',
+  'how-it-works': 'How It Works',
+  'reliqt-token': '$RELIQT Token',
+  'uniswap-pools': 'Uniswap V4 Pools',
+  'trading-pairs': 'Trading & Pairs',
+  'gacha': 'Gacha System',
+  'smart-contract': 'Smart Contract',
+  'faq': 'FAQ'
+};
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('visible');
+}
+
+function navigate(id, btn) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Deactivate nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // Show target
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Update breadcrumb
+  document.getElementById('breadcrumb-title').textContent = titles[id] || id;
+  // Scroll page container to top
+  document.querySelector('.page-container').scrollTop = 0;
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('visible');
+  }
+}
+</script>
+</body>
+</html>
