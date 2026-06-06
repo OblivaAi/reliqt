@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/app", "destination": "/app.html" },
+    { "source": "/Marketplace", "destination": "/app.html" },
     { "source": "/trade", "destination": "/trade.html" },
     { "source": "/admin", "destination": "/admin.html" }
   ]
