@@ -538,10 +538,10 @@ body > *:not(.bg-fx){position:relative;z-index:1}
       <div class="ca-label">
         <span class="ca-ticker">$RELIQT</span>
         <span class="ca-badge-white">Base</span>
-        <span class="ca-soon-white" id="caSoon2">Coming Soon</span>
+        <a href="https://dexscreener.com/base/0x46d382f62b10b7ace7d44155f58dddd192dab938c20de067cfe59e1028f2c566" target="_blank" style="text-decoration:none"><span class="ca-soon-white" id="caSoon2">Coming Soon</span></a>
       </div>
       <div class="ca-row">
-        <span class="ca-addr-white" id="caAddr2">Contract address available after launch</span>
+        <span class="ca-addr-white" id="caAddr2">0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3</span>
         <button class="ca-copy-white" id="caCopy2" onclick="copyCA2()" disabled>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         </button>
@@ -708,7 +708,7 @@ document.querySelectorAll('.feat-card,.how-step').forEach(el=>{
 
 <script>
 // CA Token — update this after launch
-const RELIQT_CA = ''; // paste CA here after Bankr launch
+const RELIQT_CA = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3';
 
 window.onload = function() {
   if (RELIQT_CA) {
@@ -732,7 +732,15 @@ function copyCA() {
 </script>
 
 <script>
-const RELIQT_CA2 = '';
+const RELIQT_CA2 = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3';
+window.addEventListener('load',function(){
+  if(RELIQT_CA2){
+    const el2=document.getElementById('caSoon2');
+    const btn2=document.getElementById('caCopy2');
+    if(el2){el2.textContent=RELIQT_CA2.slice(0,6)+'...'+RELIQT_CA2.slice(-4);el2.style.background='rgba(22,163,74,0.2)';el2.style.borderColor='rgba(22,163,74,0.4)';el2.style.color='#86efac';}
+    if(btn2)btn2.disabled=false;
+  }
+});
 function copyCA2() {
   if (!RELIQT_CA2) return;
   navigator.clipboard.writeText(RELIQT_CA2).then(() => {
