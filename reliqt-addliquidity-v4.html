@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reliqt — Add Liquidity V3</title>
+<title>Reliqt — Initialize & Add Liquidity V3</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
   :root {
@@ -18,84 +18,56 @@
   .logo{display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:1rem;}
   .diamonds{display:flex;gap:3px;}
   .diamond{width:10px;height:10px;background:var(--blue);transform:rotate(45deg);}
-  .diamond:nth-child(2){background:#60a5fa;}
-  .diamond:nth-child(3){background:#93c5fd;}
+  .diamond:nth-child(2){background:#60a5fa;}.diamond:nth-child(3){background:#93c5fd;}
   .logo-text{font-size:1.4rem;font-weight:700;letter-spacing:0.1em;color:var(--white);}
   h1{font-size:1.6rem;font-weight:700;color:var(--white);margin-bottom:0.4rem;}
   .subtitle{color:var(--muted);font-size:0.9rem;}
-  .badge{display:inline-block;background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.75rem;font-weight:600;margin-top:0.5rem;}
-
+  .badge{display:inline-block;background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.3);border-radius:20px;padding:0.2rem 0.75rem;font-size:0.75rem;font-weight:600;margin-top:0.5rem;}
   .wallet-bar{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;}
   .wallet-info{display:flex;flex-direction:column;gap:0.2rem;}
   .wallet-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
-  .wallet-addr{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text);}
-
+  .wallet-addr{font-family:'JetBrains Mono',monospace;font-size:0.85rem;}
   .btn{padding:0.55rem 1.25rem;border-radius:8px;border:none;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.15s;}
-  .btn-blue{background:var(--blue);color:white;}
-  .btn-blue:hover{background:var(--blue2);}
-  .btn-blue:disabled{opacity:0.4;cursor:not-allowed;}
-  .btn-green{background:var(--green);color:white;}
-  .btn-green:hover{background:#16a34a;}
-  .btn-green:disabled{opacity:0.4;cursor:not-allowed;}
-  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
-  .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
-
+  .btn-blue{background:var(--blue);color:white;}.btn-blue:hover{background:var(--blue2);}.btn-blue:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-green{background:var(--green);color:white;}.btn-green:hover{background:#16a34a;}.btn-green:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
   .config-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;}
   .config-title{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;}
   .config-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
   .config-item label{display:block;font-size:0.75rem;color:var(--muted);margin-bottom:0.35rem;}
   .config-item input,.config-item select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.75rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.85rem;outline:none;}
   .config-item input:focus,.config-item select:focus{border-color:var(--blue);}
-
-  .info-box{background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.5rem;font-size:0.8rem;color:#93c5fd;line-height:1.6;}
-  .info-box strong{color:var(--blue);}
-
+  .info-box{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:0.85rem 1rem;margin-bottom:1.5rem;font-size:0.8rem;color:#86efac;line-height:1.8;}
+  .info-box strong{color:var(--green);}
+  .step-badge{display:inline-block;background:rgba(59,130,246,0.2);color:var(--blue);border-radius:4px;padding:0.1rem 0.4rem;font-size:0.7rem;font-weight:700;margin-right:0.3rem;}
   .tokens-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
   .tokens-title{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);}
-
   .token-row{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1.1rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:1rem;transition:border-color 0.2s;}
-  .token-row.processing{border-color:var(--yellow);}
-  .token-row.success{border-color:var(--green);}
-  .token-row.failed{border-color:var(--red);}
-
+  .token-row.processing{border-color:var(--yellow);}.token-row.success{border-color:var(--green);}.token-row.failed{border-color:var(--red);}
   .token-check{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .token-check.checked{background:var(--blue);border-color:var(--blue);}
-  .token-check.checked::after{content:'✓';color:white;font-size:11px;font-weight:700;}
-
+  .token-check.checked{background:var(--blue);border-color:var(--blue);}.token-check.checked::after{content:'✓';color:white;font-size:11px;font-weight:700;}
   .token-info{flex:1;}
   .token-name{font-weight:700;font-size:0.95rem;color:var(--white);margin-bottom:0.2rem;}
   .token-ca{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);}
-
   .token-status{font-size:0.78rem;font-weight:600;padding:0.25rem 0.6rem;border-radius:20px;white-space:nowrap;}
   .status-idle{background:var(--bg3);color:var(--muted);}
-  .status-pending{background:rgba(245,158,11,0.15);color:var(--yellow);}
+  .status-init{background:rgba(245,158,11,0.15);color:var(--yellow);}
   .status-approving{background:rgba(59,130,246,0.15);color:var(--blue);}
-  .status-adding{background:rgba(59,130,246,0.15);color:var(--blue);}
+  .status-minting{background:rgba(59,130,246,0.15);color:var(--blue);}
   .status-done{background:rgba(34,197,94,0.15);color:var(--green);}
   .status-failed{background:rgba(239,68,68,0.15);color:var(--red);}
-
   .action-bar{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;}
-
   .log-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-top:1.5rem;overflow:hidden;}
   .log-header{padding:0.75rem 1.1rem;border-bottom:1px solid var(--border);font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
-  .log-body{padding:0.75rem 1rem;max-height:280px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.7;}
-  .log-line{margin-bottom:0.1rem;}
-  .log-line.info{color:var(--text);}
-  .log-line.success{color:var(--green);}
-  .log-line.error{color:var(--red);}
-  .log-line.warn{color:var(--yellow);}
-  .log-line.muted{color:var(--muted);}
-
+  .log-body{padding:0.75rem 1rem;max-height:300px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:0.78rem;line-height:1.7;}
+  .log-line.info{color:var(--text);}.log-line.success{color:var(--green);}.log-line.error{color:var(--red);}.log-line.warn{color:var(--yellow);}.log-line.muted{color:var(--muted);}
   .progress-bar-wrap{background:var(--bg3);border-radius:4px;height:4px;margin-top:1.2rem;overflow:hidden;}
-  .progress-bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width 0.4s ease;width:0%;}
-
+  .progress-bar-fill{height:100%;background:var(--green);border-radius:4px;transition:width 0.4s ease;width:0%;}
   .summary{display:none;background:var(--bg2);border:1px solid var(--green);border-radius:12px;padding:1.25rem;margin-top:1.5rem;}
   .summary.show{display:block;}
   .summary-title{color:var(--green);font-weight:700;font-size:1rem;margin-bottom:0.75rem;}
   .summary-item{font-size:0.82rem;color:var(--text);margin-bottom:0.3rem;}
   .summary-item a{color:var(--blue);text-decoration:none;}
-  .summary-item a:hover{text-decoration:underline;}
-
   @media(max-width:520px){.config-grid{grid-template-columns:1fr;}.wallet-bar{flex-direction:column;align-items:flex-start;}}
 </style>
 </head>
@@ -110,9 +82,9 @@
       </div>
       <span class="logo-text">RELIQT</span>
     </div>
-    <h1>Add Liquidity — Uniswap V3</h1>
-    <p class="subtitle">rTOKEN / $RELIQT pairs on Base Mainnet</p>
-    <span class="badge">Uniswap V3 · Base Mainnet · Chain ID 8453</span>
+    <h1>Initialize & Add Liquidity</h1>
+    <p class="subtitle">rTOKEN / $RELIQT — Uniswap V3 on Base Mainnet</p>
+    <span class="badge">✓ Auto-initialize pools before adding liquidity</span>
   </div>
 
   <div class="wallet-bar">
@@ -127,11 +99,11 @@
   </div>
 
   <div class="info-box">
-    <strong>How it works:</strong> For each token, the script will:<br>
-    1. Approve $RELIQT to Uniswap V3 Position Manager<br>
-    2. Approve rTOKEN to Uniswap V3 Position Manager<br>
-    3. Call <code>mint()</code> to create the liquidity position<br>
-    Pair: <strong>rTOKEN / $RELIQT</strong> · Fee: 1% (best for new token pairs)
+    <strong>4-step process per token:</strong><br>
+    <span class="step-badge">1</span> Approve $RELIQT to Position Manager<br>
+    <span class="step-badge">2</span> Approve rTOKEN to Position Manager<br>
+    <span class="step-badge">3</span> <strong>Initialize pool</strong> via <code>createAndInitializePoolIfNecessary()</code><br>
+    <span class="step-badge">4</span> Mint liquidity position via <code>mint()</code>
   </div>
 
   <div class="config-card">
@@ -139,23 +111,23 @@
     <div class="config-grid">
       <div class="config-item">
         <label>$RELIQT Amount per Pair</label>
-        <input type="number" id="reliqtAmount" value="10" min="1" step="1" />
+        <input type="number" id="reliqtAmount" value="10" min="1" />
       </div>
       <div class="config-item">
         <label>Fee Tier</label>
         <select id="feeTier">
-          <option value="10000" selected>1% (New Pairs)</option>
+          <option value="10000" selected>1% (Recommended for new pairs)</option>
           <option value="3000">0.3% (Standard)</option>
           <option value="500">0.05% (Stable)</option>
         </select>
       </div>
       <div class="config-item">
-        <label>Tick Lower (full range)</label>
-        <input type="number" id="tickLower" value="-887200" />
+        <label>Initial Price (rTOKEN per $RELIQT)</label>
+        <input type="number" id="initPrice" value="1" min="0.000001" step="0.1" />
       </div>
       <div class="config-item">
-        <label>Tick Upper (full range)</label>
-        <input type="number" id="tickUpper" value="887200" />
+        <label>rTOKEN Amount per Pair</label>
+        <input type="number" id="cardAmount" value="10" min="1" />
       </div>
     </div>
   </div>
@@ -175,7 +147,7 @@
   </div>
 
   <div class="action-bar">
-    <button class="btn btn-green" id="runBtn" onclick="runAll()" disabled>▶ Add Liquidity to All Selected</button>
+    <button class="btn btn-green" id="runBtn" onclick="runAll()" disabled>▶ Initialize & Add Liquidity</button>
     <button class="btn btn-outline" onclick="resetAll()">Reset</button>
   </div>
 
@@ -190,7 +162,7 @@
   </div>
 
   <div class="summary" id="summary">
-    <div class="summary-title">✓ Liquidity Added Successfully</div>
+    <div class="summary-title">✓ All Pools Initialized & Liquidity Added</div>
     <div id="summaryContent"></div>
   </div>
 
@@ -201,296 +173,324 @@
 // CONSTANTS
 // ============================================================
 const RELIQT_TOKEN = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3';
-const BASE_CHAIN_ID = '0x2105'; // 8453
+const BASE_CHAIN_ID = '0x2105';
 
-// Uniswap V3 NonfungiblePositionManager on Base
+// Uniswap V3 NonfungiblePositionManager on Base (handles init + mint)
 const POSITION_MANAGER = '0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f3';
 
-// Uniswap V3 Factory on Base
-const FACTORY = '0x33128a8fC17869897dcE68Ed026d694621f6FDfD';
-
 const TOKENS = [
-  { symbol: 'rLEBRON',    name: 'LeBron James RC',    ca: '0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5' },
-  { symbol: 'rCHARIZARD', name: 'Charizard Base Set', ca: '0x22Ac18Fd398e3040FE61854229ff1e4265F57902' },
-  { symbol: 'rPIKACHU',   name: 'Pikachu CD Promo',   ca: '0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63' },
-  { symbol: 'rMAHOMES',   name: 'Patrick Mahomes RC',  ca: '0x9e89159aB6763baed111980A809D53663D2c35b4' },
-  { symbol: 'rHAALAND',   name: 'Erling Haaland RC',  ca: '0xaE67C945523F03BE4bd1fC32888161447a75ef13' },
-  { symbol: 'rMEWTWO',    name: 'Mewtwo Holo 1st Ed', ca: '0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B' },
-  { symbol: 'rWEMBY',     name: 'Wembanyama RC',      ca: '0xBd057659a966BC7acfE26798FcB320595C553754' },
+  { symbol:'rLEBRON',    name:'LeBron James RC',    ca:'0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5' },
+  { symbol:'rCHARIZARD', name:'Charizard Base Set', ca:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902' },
+  { symbol:'rPIKACHU',   name:'Pikachu CD Promo',   ca:'0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63' },
+  { symbol:'rMAHOMES',   name:'Patrick Mahomes RC', ca:'0x9e89159aB6763baed111980A809D53663D2c35b4' },
+  { symbol:'rHAALAND',   name:'Erling Haaland RC',  ca:'0xaE67C945523F03BE4bd1fC32888161447a75ef13' },
+  { symbol:'rMEWTWO',    name:'Mewtwo Holo 1st Ed', ca:'0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B' },
+  { symbol:'rWEMBY',     name:'Wembanyama RC',      ca:'0xBd057659a966BC7acfE26798FcB320595C553754' },
 ];
-
-const DECIMALS_18 = BigInt('1000000000000000000');
 
 // ============================================================
 let account = null;
-let selected = new Set(TOKENS.map((_, i) => i));
-let statuses = TOKENS.map(() => 'idle');
-let txHashes = TOKENS.map(() => ({ approve1: null, approve2: null, mint: null }));
+let selected = new Set(TOKENS.map((_,i)=>i));
+let statuses = TOKENS.map(()=>'idle');
+let mintTxs = TOKENS.map(()=>null);
 let logLines = [];
 let running = false;
 
 // ============================================================
-// HELPERS
+// MATH HELPERS
 // ============================================================
-function toHex(n, pad = 64) {
-  let v = BigInt(n);
-  if (v < 0n) v = (1n << 256n) + v;
-  return v.toString(16).padStart(pad, '0');
-}
-function addrPad(a) { return a.replace('0x','').padStart(64,'0'); }
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-async function waitForTx(hash, timeout = 180000) {
+function addrPad(a){ return a.replace('0x','').toLowerCase().padStart(64,'0'); }
+
+function toHex256(n){
+  let v = BigInt(n);
+  if(v < 0n) v = (1n << 256n) + v;
+  return v.toString(16).padStart(64,'0');
+}
+
+// Convert price to sqrtPriceX96
+// sqrtPriceX96 = sqrt(price) * 2^96
+// price = amount of token1 per token0
+function priceToSqrtX96(price) {
+  // Use JS float math, good enough for initialization
+  const sqrt = Math.sqrt(price);
+  const Q96 = 2n ** 96n;
+  // Multiply sqrt by 2^96 using BigInt
+  const sqrtBig = BigInt(Math.floor(sqrt * 2**48)) * (2n ** 48n);
+  return sqrtBig;
+}
+
+async function waitForTx(hash, timeout=180000){
   const start = Date.now();
-  while (Date.now() - start < timeout) {
-    const r = await window.ethereum.request({ method: 'eth_getTransactionReceipt', params: [hash] });
-    if (r) return r;
+  while(Date.now()-start < timeout){
+    const r = await window.ethereum.request({method:'eth_getTransactionReceipt',params:[hash]});
+    if(r) return r;
     await sleep(3000);
   }
-  throw new Error('Tx timeout');
+  throw new Error('Tx timeout after 3 min');
 }
 
 // ============================================================
-// ERC20 APPROVE
+// ERC20
 // ============================================================
-async function approveToken(tokenAddr, spender, amount) {
-  // approve(address,uint256)
-  const data = '0x095ea7b3' + addrPad(spender) + toHex(amount);
-  const hash = await window.ethereum.request({
-    method: 'eth_sendTransaction',
-    params: [{ from: account, to: tokenAddr, data, gas: '0x186A0' }]
+async function approveToken(tokenAddr, spender, amount){
+  const data = '0x095ea7b3' + addrPad(spender) + toHex256(amount);
+  return await window.ethereum.request({
+    method:'eth_sendTransaction',
+    params:[{from:account, to:tokenAddr, data, gas:'0x186A0'}]
   });
-  return hash;
 }
 
-// ============================================================
-// GET BALANCE
-// ============================================================
-async function getBalance(tokenAddr, userAddr) {
-  // balanceOf(address)
-  const data = '0x70a08231' + addrPad(userAddr);
-  const res = await window.ethereum.request({ method: 'eth_call', params: [{ to: tokenAddr, data }, 'latest'] });
+async function getBalance(tokenAddr){
+  const data = '0x70a08231' + addrPad(account);
+  const res = await window.ethereum.request({method:'eth_call',params:[{to:tokenAddr,data},'latest']});
   return BigInt(res);
 }
 
 // ============================================================
-// MINT POSITION (V3)
+// INITIALIZE POOL + MINT
+// Uses NonfungiblePositionManager.createAndInitializePoolIfNecessary
+// then mint()
 // ============================================================
-async function mintV3Position(token0, token1, fee, tickLower, tickUpper, amount0, amount1) {
-  // Sort tokens
-  const [tok0, tok1, amt0, amt1] = token0.toLowerCase() < token1.toLowerCase()
-    ? [token0, token1, amount0, amount1]
-    : [token1, token0, amount1, amount0];
-
-  const deadline = Math.floor(Date.now() / 1000) + 1800; // 30 min
-
-  // mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))
-  const selector = '0x88316456';
-
-  const encoded = selector
-    + addrPad(tok0)
-    + addrPad(tok1)
-    + toHex(fee)
-    + toHex(tickLower)
-    + toHex(tickUpper)
-    + toHex(amt0)                    // amount0Desired
-    + toHex(amt1)                    // amount1Desired
-    + toHex(0)                       // amount0Min
-    + toHex(0)                       // amount1Min
-    + addrPad(account)               // recipient
-    + toHex(deadline);               // deadline
+async function initializePool(token0, token1, fee, sqrtPriceX96){
+  // createAndInitializePoolIfNecessary(address,address,uint24,uint160)
+  // selector: 0x13ead562
+  const selector = '0x13ead562';
+  const data = selector
+    + addrPad(token0)
+    + addrPad(token1)
+    + toHex256(fee)
+    + toHex256(sqrtPriceX96);
 
   const hash = await window.ethereum.request({
-    method: 'eth_sendTransaction',
-    params: [{ from: account, to: POSITION_MANAGER, data: encoded, gas: '0x7A120' }] // 500000 gas
+    method:'eth_sendTransaction',
+    params:[{from:account, to:POSITION_MANAGER, data, gas:'0x493E0'}]
+  });
+  return hash;
+}
+
+async function mintPosition(token0, token1, fee, tickLower, tickUpper, amount0, amount1){
+  const deadline = Math.floor(Date.now()/1000) + 1800;
+  // mint((address token0, address token1, uint24 fee, int24 tickLower, int24 tickUpper,
+  //        uint256 amount0Desired, uint256 amount1Desired, uint256 amount0Min, uint256 amount1Min,
+  //        address recipient, uint256 deadline))
+  const selector = '0x88316456';
+  const data = selector
+    + addrPad(token0)
+    + addrPad(token1)
+    + toHex256(fee)
+    + toHex256(tickLower)
+    + toHex256(tickUpper)
+    + toHex256(amount0)
+    + toHex256(amount1)
+    + toHex256(0)
+    + toHex256(0)
+    + addrPad(account)
+    + toHex256(deadline);
+
+  const hash = await window.ethereum.request({
+    method:'eth_sendTransaction',
+    params:[{from:account, to:POSITION_MANAGER, data, gas:'0x7A120'}]
   });
   return hash;
 }
 
 // ============================================================
-// WALLET CONNECT
+// CONNECT WALLET
 // ============================================================
-async function connectWallet() {
-  if (!window.ethereum) { alert('MetaMask not found!'); return; }
+async function connectWallet(){
+  if(!window.ethereum){ alert('Install MetaMask first!'); return; }
   try {
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    account = accounts[0];
-
+    const accs = await window.ethereum.request({method:'eth_requestAccounts'});
+    account = accs[0];
     try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
-    } catch (e) {
-      if (e.code === 4902) {
-        await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: BASE_CHAIN_ID, chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: ['https://mainnet.base.org'], blockExplorerUrls: ['https://basescan.org'] }] });
+      await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BASE_CHAIN_ID}]});
+    } catch(e){
+      if(e.code===4902){
+        await window.ethereum.request({method:'wallet_addEthereumChain',params:[{
+          chainId:BASE_CHAIN_ID,chainName:'Base',
+          nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},
+          rpcUrls:['https://mainnet.base.org'],
+          blockExplorerUrls:['https://basescan.org']
+        }]});
       }
     }
-
-    document.getElementById('walletAddr').textContent = account.slice(0,6) + '...' + account.slice(-4);
+    document.getElementById('walletAddr').textContent = account.slice(0,6)+'...'+account.slice(-4);
     document.getElementById('connectBtn').textContent = 'Connected ✓';
     document.getElementById('connectBtn').disabled = true;
     document.getElementById('runBtn').disabled = false;
-
-    const bal = await getBalance(RELIQT_TOKEN, account);
-    const balNum = Number(bal) / 1e18;
-    document.getElementById('reliqtBalance').textContent = balNum.toFixed(2) + ' $RELIQT';
-    log(`Wallet: ${account}`, 'success');
-    log(`$RELIQT balance: ${balNum.toFixed(4)}`, 'info');
-  } catch (e) {
-    log('Connect failed: ' + e.message, 'error');
+    const bal = await getBalance(RELIQT_TOKEN);
+    const balNum = Number(bal)/1e18;
+    document.getElementById('reliqtBalance').textContent = balNum.toFixed(2)+' $RELIQT';
+    log(`Connected: ${account}`,'success');
+    log(`$RELIQT balance: ${balNum.toFixed(4)}`,'info');
+  } catch(e){
+    log('Connect failed: '+e.message,'error');
   }
 }
 
 // ============================================================
-// RUN ALL
+// MAIN LOOP
 // ============================================================
-async function runAll() {
-  if (!account) { alert('Connect wallet first!'); return; }
-  if (running) return;
+async function runAll(){
+  if(!account){ alert('Connect wallet first!'); return; }
+  if(running) return;
 
-  const toProcess = [...selected].filter(i => statuses[i] !== 'done');
-  if (!toProcess.length) { log('All done already.', 'warn'); return; }
+  const toProcess = [...selected].filter(i=>statuses[i]!=='done');
+  if(!toProcess.length){ log('Nothing to process.','warn'); return; }
 
   running = true;
   document.getElementById('runBtn').disabled = true;
   document.getElementById('progressWrap').style.display = 'block';
 
-  const reliqtAmt = parseFloat(document.getElementById('reliqtAmount').value) || 10;
-  const fee = parseInt(document.getElementById('feeTier').value);
-  const tickLower = parseInt(document.getElementById('tickLower').value);
-  const tickUpper = parseInt(document.getElementById('tickUpper').value);
+  const reliqtAmt = parseFloat(document.getElementById('reliqtAmount').value)||10;
+  const cardAmt   = parseFloat(document.getElementById('cardAmount').value)||10;
+  const fee       = parseInt(document.getElementById('feeTier').value);
+  const initPrice = parseFloat(document.getElementById('initPrice').value)||1;
 
-  // Snap ticks to fee spacing
-  const spacing = fee === 500 ? 10 : fee === 3000 ? 60 : 200;
-  const snappedLower = Math.ceil(tickLower / spacing) * spacing;
-  const snappedUpper = Math.floor(tickUpper / spacing) * spacing;
+  // Tick spacing per fee
+  const spacing = fee===500?10:fee===3000?60:200;
+  const tickLower = Math.ceil(-887272/spacing)*spacing;
+  const tickUpper = Math.floor(887272/spacing)*spacing;
 
-  const reliqtAmtWei = BigInt(Math.floor(reliqtAmt * 1e18));
-  const cardAmtWei = BigInt(Math.floor(reliqtAmt * 1e18)); // equal amounts
+  const reliqtWei = BigInt(Math.floor(reliqtAmt*1e18));
+  const cardWei   = BigInt(Math.floor(cardAmt*1e18));
 
-  log(`Starting: ${toProcess.length} tokens @ ${reliqtAmt} $RELIQT each`, 'info');
-  log(`Fee: ${fee/10000}% | Ticks: [${snappedLower}, ${snappedUpper}]`, 'muted');
+  log(`Starting ${toProcess.length} tokens @ ${reliqtAmt} $RELIQT + ${cardAmt} rTOKEN each`,'info');
+  log(`Fee: ${fee/10000}% | Init price: 1 rTOKEN = ${initPrice} $RELIQT`,'muted');
 
   let done = 0;
-  for (const i of toProcess) {
+  for(const i of toProcess){
     const t = TOKENS[i];
-    log(`────────────────────────────`, 'muted');
-    log(`[${t.symbol}] Starting...`, 'info');
+    log(`────────────────────────────`,'muted');
+    log(`[${t.symbol}] Processing...`,'info');
 
     try {
-      // Step 1: Approve $RELIQT
-      statuses[i] = 'approving';
-      renderTokens();
-      log(`[${t.symbol}] Approving $RELIQT...`, 'info');
-      const appReliqt = await approveToken(RELIQT_TOKEN, POSITION_MANAGER, reliqtAmtWei * 2n);
-      log(`[${t.symbol}] $RELIQT approve tx sent`, 'success');
-      const r1 = await waitForTx(appReliqt);
-      if (r1.status !== '0x1') throw new Error('$RELIQT approval failed');
-      log(`[${t.symbol}] $RELIQT approved ✓`, 'success');
+      // Sort tokens (V3 requires token0 < token1)
+      const isToken0 = t.ca.toLowerCase() < RELIQT_TOKEN.toLowerCase();
+      const [tok0, tok1] = isToken0 ? [t.ca, RELIQT_TOKEN] : [RELIQT_TOKEN, t.ca];
+      const [amt0, amt1] = isToken0 ? [cardWei, reliqtWei] : [reliqtWei, cardWei];
 
-      // Step 2: Approve rTOKEN
-      log(`[${t.symbol}] Approving ${t.symbol}...`, 'info');
-      const appCard = await approveToken(t.ca, POSITION_MANAGER, cardAmtWei * 2n);
-      log(`[${t.symbol}] ${t.symbol} approve tx sent`, 'success');
-      const r2 = await waitForTx(appCard);
-      if (r2.status !== '0x1') throw new Error(`${t.symbol} approval failed`);
-      log(`[${t.symbol}] ${t.symbol} approved ✓`, 'success');
+      // sqrtPriceX96: price = tok1/tok0
+      // if tok0 = rTOKEN, price = RELIQT per rTOKEN = initPrice
+      // if tok0 = RELIQT, price = rTOKEN per RELIQT = 1/initPrice
+      const rawPrice = isToken0 ? initPrice : (1/initPrice);
+      const sqrtPriceX96 = priceToSqrtX96(rawPrice);
 
-      // Step 3: Mint position
-      statuses[i] = 'adding';
-      renderTokens();
-      log(`[${t.symbol}] Minting V3 position...`, 'info');
-      const mintTx = await mintV3Position(
-        t.ca, RELIQT_TOKEN,
-        fee, snappedLower, snappedUpper,
-        cardAmtWei, reliqtAmtWei
-      );
-      txHashes[i] = { mint: mintTx };
-      log(`[${t.symbol}] Mint tx: ${mintTx.slice(0,20)}...`, 'success');
-      const r3 = await waitForTx(mintTx);
-      if (r3.status !== '0x1') throw new Error('Mint reverted — pool may need initialization first');
+      // STEP 1: Approve $RELIQT
+      statuses[i]='approving'; renderTokens();
+      log(`[${t.symbol}] Approving $RELIQT...`,'info');
+      const h1 = await approveToken(RELIQT_TOKEN, POSITION_MANAGER, reliqtWei*2n);
+      const r1 = await waitForTx(h1);
+      if(r1.status!=='0x1') throw new Error('$RELIQT approval failed');
+      log(`[${t.symbol}] $RELIQT approved ✓`,'success');
 
-      statuses[i] = 'done';
-      log(`[${t.symbol}] ✓ Liquidity added! Pool live.`, 'success');
+      // STEP 2: Approve rTOKEN
+      log(`[${t.symbol}] Approving ${t.symbol}...`,'info');
+      const h2 = await approveToken(t.ca, POSITION_MANAGER, cardWei*2n);
+      const r2 = await waitForTx(h2);
+      if(r2.status!=='0x1') throw new Error(`${t.symbol} approval failed`);
+      log(`[${t.symbol}] ${t.symbol} approved ✓`,'success');
 
-    } catch (e) {
-      statuses[i] = 'failed';
-      log(`[${t.symbol}] FAILED: ${e.message}`, 'error');
+      // STEP 3: Initialize pool
+      statuses[i]='init'; renderTokens();
+      log(`[${t.symbol}] Initializing pool (sqrtPriceX96: ${sqrtPriceX96.toString().slice(0,12)}...)...`,'info');
+      const h3 = await initializePool(tok0, tok1, fee, sqrtPriceX96);
+      const r3 = await waitForTx(h3);
+      if(r3.status!=='0x1') throw new Error('Pool initialization failed');
+      log(`[${t.symbol}] Pool initialized ✓`,'success');
+      await sleep(2000); // wait for pool to be ready
+
+      // STEP 4: Mint position
+      statuses[i]='minting'; renderTokens();
+      log(`[${t.symbol}] Minting liquidity position...`,'info');
+      const h4 = await mintPosition(tok0, tok1, fee, tickLower, tickUpper, amt0, amt1);
+      mintTxs[i] = h4;
+      const r4 = await waitForTx(h4);
+      if(r4.status!=='0x1') throw new Error('Mint failed');
+
+      statuses[i]='done';
+      log(`[${t.symbol}] ✓ Pool live! Liquidity added.`,'success');
+
+    } catch(e){
+      statuses[i]='failed';
+      log(`[${t.symbol}] FAILED: ${e.message}`,'error');
     }
 
     done++;
-    document.getElementById('progressFill').style.width = `${(done / toProcess.length) * 100}%`;
+    document.getElementById('progressFill').style.width=`${(done/toProcess.length)*100}%`;
     renderTokens();
     await sleep(2000);
   }
 
   running = false;
   document.getElementById('runBtn').disabled = false;
-
-  const ok = toProcess.filter(i => statuses[i] === 'done').length;
-  log(`────────────────────────────`, 'muted');
-  log(`Complete! ${ok}/${toProcess.length} pools created.`, ok === toProcess.length ? 'success' : 'warn');
-  if (ok > 0) showSummary(toProcess.filter(i => statuses[i] === 'done'), reliqtAmt);
+  const ok = toProcess.filter(i=>statuses[i]==='done').length;
+  log(`────────────────────────────`,'muted');
+  log(`Done! ${ok}/${toProcess.length} pools created successfully.`, ok===toProcess.length?'success':'warn');
+  if(ok>0) showSummary(toProcess.filter(i=>statuses[i]==='done'), reliqtAmt);
 }
 
 // ============================================================
-// UI HELPERS
+// UI
 // ============================================================
-function renderTokens() {
-  document.getElementById('tokenList').innerHTML = TOKENS.map((t, i) => `
-    <div class="token-row ${statuses[i]==='done'?'success':statuses[i]==='failed'?'failed':['adding','approving'].includes(statuses[i])?'processing':''}" id="row-${i}">
+const STATUS_CLASS = {idle:'status-idle',approving:'status-approving',init:'status-init',minting:'status-minting',done:'status-done',failed:'status-failed'};
+const STATUS_LABEL = {idle:'Ready',approving:'Approving...',init:'Initializing...',minting:'Minting...',done:'✓ Done',failed:'✗ Failed'};
+
+function renderTokens(){
+  document.getElementById('tokenList').innerHTML = TOKENS.map((t,i)=>`
+    <div class="token-row ${statuses[i]==='done'?'success':statuses[i]==='failed'?'failed':['approving','init','minting'].includes(statuses[i])?'processing':''}">
       <div class="token-check ${selected.has(i)?'checked':''}" onclick="toggleSelect(${i})"></div>
       <div class="token-info">
         <div class="token-name">${t.symbol} <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">— ${t.name}</span></div>
         <div class="token-ca">${t.ca}</div>
-        ${txHashes[i]?.mint ? `<div style="margin-top:0.3rem"><a href="https://basescan.org/tx/${txHashes[i].mint}" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--blue)">View on BaseScan ↗</a></div>` : ''}
+        ${mintTxs[i]?`<div style="margin-top:0.3rem"><a href="https://basescan.org/tx/${mintTxs[i]}" target="_blank" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--blue)">View mint tx ↗</a></div>`:''}
       </div>
-      <span class="token-status ${{idle:'status-idle',pending:'status-pending',approving:'status-approving',adding:'status-adding',done:'status-done',failed:'status-failed'}[statuses[i]]||'status-idle'}">${{idle:'Ready',pending:'Pending',approving:'Approving...',adding:'Minting...',done:'✓ Done',failed:'✗ Failed'}[statuses[i]]||statuses[i]}</span>
+      <span class="token-status ${STATUS_CLASS[statuses[i]]||'status-idle'}">${STATUS_LABEL[statuses[i]]||statuses[i]}</span>
     </div>
   `).join('');
 }
 
-function toggleSelect(i) { if (running) return; selected.has(i) ? selected.delete(i) : selected.add(i); renderTokens(); }
-function selectAll(v) { if (running) return; selected = v ? new Set(TOKENS.map((_,i)=>i)) : new Set(); renderTokens(); }
+function toggleSelect(i){ if(running)return; selected.has(i)?selected.delete(i):selected.add(i); renderTokens(); }
+function selectAll(v){ if(running)return; selected=v?new Set(TOKENS.map((_,i)=>i)):new Set(); renderTokens(); }
 
-function log(msg, type='info') {
-  const t = new Date().toLocaleTimeString('en-US',{hour12:false});
+function log(msg,type='info'){
+  const t=new Date().toLocaleTimeString('en-US',{hour12:false});
   logLines.push({msg:`[${t}] ${msg}`,type});
-  const b = document.getElementById('logBody');
-  b.innerHTML = logLines.map(l=>`<div class="log-line ${l.type}">${l.msg}</div>`).join('');
-  b.scrollTop = b.scrollHeight;
-  document.getElementById('logCount').textContent = `${logLines.length} events`;
+  const b=document.getElementById('logBody');
+  b.innerHTML=logLines.map(l=>`<div class="log-line ${l.type}">${l.msg}</div>`).join('');
+  b.scrollTop=b.scrollHeight;
+  document.getElementById('logCount').textContent=`${logLines.length} events`;
 }
 
-function showSummary(idxs, amt) {
-  const s = document.getElementById('summary');
-  document.getElementById('summaryContent').innerHTML = idxs.map(i => `
-    <div class="summary-item">✓ ${TOKENS[i].symbol} / $RELIQT — ${amt} $RELIQT liquidity added
-      ${txHashes[i]?.mint ? `<a href="https://basescan.org/tx/${txHashes[i].mint}" target="_blank"> [BaseScan ↗]</a>` : ''}
+function showSummary(idxs, amt){
+  document.getElementById('summaryContent').innerHTML = idxs.map(i=>`
+    <div class="summary-item">✓ ${TOKENS[i].symbol} / $RELIQT pool live
+      ${mintTxs[i]?`<a href="https://basescan.org/tx/${mintTxs[i]}" target="_blank"> [BaseScan ↗]</a>`:''}
     </div>
   `).join('') + `<div class="summary-item" style="margin-top:0.75rem;color:var(--muted)">
-    Check on <a href="https://app.uniswap.org/pool" target="_blank">Uniswap ↗</a> or <a href="https://dexscreener.com/base" target="_blank">DexScreener ↗</a>
+    Check: <a href="https://app.uniswap.org/pool" target="_blank">Uniswap Pool ↗</a> · <a href="https://dexscreener.com/base" target="_blank">DexScreener ↗</a>
   </div>`;
-  s.classList.add('show');
+  document.getElementById('summary').classList.add('show');
 }
 
-function resetAll() {
-  if (running) return;
-  statuses = TOKENS.map(()=>'idle');
-  txHashes = TOKENS.map(()=>({approve1:null,approve2:null,mint:null}));
-  logLines = [];
-  document.getElementById('logBody').innerHTML = '<div class="log-line muted">— Reset. Ready.</div>';
-  document.getElementById('logCount').textContent = '0 events';
-  document.getElementById('progressFill').style.width = '0%';
-  document.getElementById('progressWrap').style.display = 'none';
+function resetAll(){
+  if(running)return;
+  statuses=TOKENS.map(()=>'idle'); mintTxs=TOKENS.map(()=>null); logLines=[];
+  document.getElementById('logBody').innerHTML='<div class="log-line muted">— Reset. Ready.</div>';
+  document.getElementById('logCount').textContent='0 events';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('progressWrap').style.display='none';
   document.getElementById('summary').classList.remove('show');
-  selected = new Set(TOKENS.map((_,i)=>i));
+  selected=new Set(TOKENS.map((_,i)=>i));
   renderTokens();
 }
 
-// Init
 renderTokens();
-log('Uniswap V3 script loaded. Connect wallet to begin.', 'muted');
-log('Network: Base Mainnet | DEX: Uniswap V3', 'muted');
-log('Pair: rTOKEN / $RELIQT (0xB95f...9ba3)', 'muted');
+log('Script ready. Connect wallet to begin.','muted');
+log('Mode: Initialize pool → Add liquidity (4 steps per token)','muted');
+log('Pair: rTOKEN / $RELIQT · Base Mainnet','muted');
 </script>
 </body>
 </html>
