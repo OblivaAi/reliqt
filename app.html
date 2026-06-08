@@ -2317,7 +2317,7 @@ if ('serviceWorker' in navigator) {
 // TRADE PAGE
 // ══════════════════════════════════════
 const TRADE_TOKENS = [
-  {id:0,symbol:'rLEBRON',name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.001,cardValue:12400,supply:10000,change:0,volume:0,pop:12,address:'0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5',pool:'0xa568a959Aa287F9004DBe9C5402b581083A0dc6f',live:true},
+  {id:0,symbol:'rLEBRON',name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.001,cardValue:12400,supply:10000,change:0,volume:0,pop:12,address:'0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5',pool:'0x3c4e3bed3e0c3354e8496c33f0df4d0e360feab58c04d6a4d3e6746e5cadc301',live:true},
   {id:1,symbol:'rMAHOMES',name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,supply:10000,change:1.8,volume:312000,pop:8,address:'0x9e89159aB6763baed111980A809D53663D2c35b4',live:true,pool:'0x9e89159aB6763baed111980A809D53663D2c35b4'},
   {id:2,symbol:'rHAALAND',name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,supply:10000,change:1.3,volume:540000,pop:6,address:'0xaE67C945523F03BE4bd1fC32888161447a75ef13',live:true,pool:'0xaE67C945523F03BE4bd1fC32888161447a75ef13'},
   {id:3,symbol:'rCHARIZARD',name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,supply:10000,change:2.1,volume:1200000,pop:3,address:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902',live:true,pool:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902'},
@@ -2457,10 +2457,11 @@ function trSetTab(tab) {
   if (currentUser) btn.textContent = (tab === 'buy' ? 'Buy ' : 'Sell ') + trCurrentToken.symbol;
 }
 
-// ── UNISWAP SWAP ROUTER (Base Mainnet) ──
-const SWAP_ROUTER     = '0x2626664c2603336E57B271c5C0b26F421741e481'; // SwapRouter02 Base
+// ── UNISWAP V4 UNIVERSAL ROUTER (Base Mainnet) ──
+const SWAP_ROUTER     = '0x6ff5693b99212da76ad316178a184ab56d299b43'; // Universal Router V4 Base
 const USDC_BASE       = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3'; // $RELIQT token (pair)
 const FEE_TIER        = 10000; // 1%
+const PERMIT2         = '0x000000000022D473030F116dDEE9F6B43aC78BA3'; // Permit2
 
 function hexPad(val, bytes=32) {
   return val.toString(16).replace('0x','').padStart(bytes*2,'0');
@@ -2519,35 +2520,90 @@ async function trExecute() {
 
     // 1. Check & approve
     btn.textContent = 'Checking approval...';
-    const allowance = await checkAllowance(tokenIn, currentUser.address, SWAP_ROUTER);
-    if (allowance < amountIn) {
-      showToast('info', `Approving ${isBuy ? 'USDC' : t.symbol}... confirm in MetaMask`);
+    // V4 needs approval to Permit2, then Permit2 to Universal Router
+    const allowancePermit2 = await checkAllowance(tokenIn, currentUser.address, PERMIT2);
+    if (allowancePermit2 < amountIn) {
+      showToast('info', `Approving ${isBuy ? '$RELIQT' : t.symbol} to Permit2... confirm in MetaMask`);
       btn.textContent = 'Approving...';
-      await approveToken(tokenIn, SWAP_ROUTER);
+      await approveToken(tokenIn, PERMIT2);
     }
 
-    // 2. exactInputSingle via SwapRouter02
-    // function exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))
-    // selector: 0x414bf389
+    // 2. Swap via Uniswap V4 Universal Router
+    // V4 uses PoolKey + Universal Router execute()
+    // Commands: 0x10 = V4_SWAP
     btn.textContent = 'Confirm in MetaMask...';
     showToast('info', 'Confirm swap in MetaMask...');
 
     const p = hexPad;
-    const calldata = '0x414bf389'
-      + p(tokenIn.replace('0x',''))
-      + p(tokenOut.replace('0x',''))
-      + p(FEE_TIER)
-      + p(currentUser.address.replace('0x',''))
-      + p(deadline)
-      + p(amountIn.toString(16))
-      + p(0)  // amountOutMinimum = 0 (no slippage protection for simplicity)
-      + p(0); // sqrtPriceLimitX96 = 0
+
+    // Sort tokens for PoolKey (token0 < token1)
+    const isToken0 = tokenIn.toLowerCase() < tokenOut.toLowerCase();
+    const [tok0, tok1] = isToken0 ? [tokenIn, tokenOut] : [tokenOut, tokenIn];
+    const zeroForOne = isToken0; // buying tokenOut means selling tokenIn
+
+    // Encode V4 swap via Universal Router
+    // execute(bytes commands, bytes[] inputs, uint256 deadline)
+    // Command 0x10 = V4_SWAP
+    const commands = '0x10';
+
+    // V4_SWAP action: SWAP_EXACT_IN_SINGLE
+    // Actions library: 0x06 = SWAP_EXACT_IN_SINGLE, 0x0c = SETTLE_ALL, 0x11 = TAKE_ALL
+    const ACTION_SWAP = '0x06';
+    const ACTION_SETTLE = '0x0c';
+    const ACTION_TAKE = '0x11';
+
+    // Encode actions + params for V4 swap
+    // PoolKey: (currency0, currency1, fee, tickSpacing, hooks)
+    const tickSpacing = 200; // for 1% fee tier
+
+    // ABI encode the V4 swap input
+    // We use a simplified approach: encode as packed bytes
+    function enc(v, bytes=32){ return BigInt(v).toString(16).padStart(bytes*2,'0'); }
+    function encAddr(a){ return a.replace('0x','').toLowerCase().padStart(64,'0'); }
+
+    // PoolKey struct encoding
+    const poolKeyEncoded = encAddr(tok0) + encAddr(tok1) + enc(FEE_TIER) + enc(tickSpacing) + encAddr('0x0000000000000000000000000000000000000000');
+
+    // ExactInputSingleParams: (PoolKey poolKey, bool zeroForOne, uint128 amountIn, uint128 amountOutMinimum, bytes hookData)
+    const swapParams = poolKeyEncoded
+      + enc(zeroForOne ? 1 : 0)
+      + enc(amountIn)
+      + enc(0) // amountOutMinimum
+      + enc(0xe0, 1) + enc(0); // hookData offset + length (empty)
+
+    // actions = [SWAP_EXACT_IN_SINGLE, SETTLE_ALL, TAKE_ALL]
+    // For simplicity encode as: 0x06 0x0c 0x11
+    const actionsHex = '0x060c11';
+
+    // Encode full execute calldata
+    // execute(bytes commands, bytes[] inputs, uint256 deadline)
+    // selector: 0x3593564c
+    const selector = '0x3593564c';
+    const deadlineHex = enc(deadline);
+
+    // commands offset (0x60), inputs offset (0x80), deadline
+    // commands = 0x10 (1 byte)
+    // inputs = array of 1 element
+    const cmdBytes = '01' + '10' + '0'.repeat(62); // length=1, value=0x10, padded
+    const inputsData = swapParams;
+
+    // Full calldata using simplified encoding
+    const calldata = selector
+      + enc(0x60)  // commands offset
+      + enc(0xa0)  // inputs offset  
+      + deadlineHex
+      + enc(1)     // commands length
+      + '10' + '0'.repeat(62) // commands data (0x10 padded)
+      + enc(1)     // inputs array length
+      + enc(0x20)  // offset to first input
+      + enc(swapParams.length / 2) // input bytes length
+      + swapParams.padEnd(Math.ceil(swapParams.length/64)*64, '0'); // input data
 
     const txHash = await provider.request({ method:'eth_sendTransaction', params:[{
       from: currentUser.address,
       to: SWAP_ROUTER,
       data: calldata,
-      gas: '0x' + (350000).toString(16)
+      gas: '0x' + (500000).toString(16)
     }]});
 
     btn.textContent = 'Waiting on-chain...';
