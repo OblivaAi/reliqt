@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    { "source": "/marketplace", "destination": "/app.html" },
+    { "source": "/docs", "destination": "/docs.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/risk", "destination": "/risk.html" },
+    { "source": "/addliquidity", "destination": "/reliqt-addliquidity-v4.html" }
+  ],
+  "redirects": [
+    { "source": "/app.html", "destination": "/marketplace", "permanent": true },
+    { "source": "/about.html", "destination": "/about", "permanent": true },
+    { "source": "/terms.html", "destination": "/terms", "permanent": true },
+    { "source": "/privacy.html", "destination": "/privacy", "permanent": true },
+    { "source": "/risk.html", "destination": "/risk", "permanent": true }
+  ]
+}
