@@ -1177,9 +1177,9 @@ img, video, iframe, embed { max-width: 100% !important; }
 
         <div class="tr-tp-label">Amount</div>
         <div class="tr-input-box">
-          <div class="tr-input-sublabel">You Pay (USDC)</div>
+          <div class="tr-input-sublabel">You Pay ($RELIQT)</div>
           <input class="tr-input" type="number" id="trAmtIn" placeholder="0.00" oninput="trCalc()" min="0" step="0.01"/>
-          <div class="tr-input-hint">Balance: <span id="trBalIn">0.00 USDC</span></div>
+          <div class="tr-input-hint">Balance: <span id="trBalIn">0.00 $RELIQT</span></div>
         </div>
 
         <input type="range" class="tr-slider" id="trSlider" min="0" max="100" value="0" oninput="trSlide(this.value)"/>
@@ -1783,7 +1783,7 @@ async function confirmBuy() {
     const bal = BigInt(balHex || '0x0');
     const gasEst = BigInt(200000) * BigInt(2000000000); // 200k gas * 2 gwei
     if (bal < priceWei + gasEst) {
-      showToast('error', `Not enough ETH. Need ~${(Number(priceWei)/1e18).toFixed(6)} ETH`);
+      showToast('error', `Not enough $RELIQT. Need ~${(Number(priceWei)/1e18).toFixed(4)} $RELIQT`);
       btn.disabled = false; btn.textContent = 'Buy Now';
       return;
     }
@@ -1968,10 +1968,15 @@ async function openGacha(packId) {
     const accounts = await provider.request({ method: 'eth_requestAccounts' });
     const priceWei = Math.floor(pack.price * 1e18);
 
-    // Send ETH to treasury wallet
+    // Send $RELIQT to treasury wallet
+    const RELIQT_ADDR = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3';
+    const TREASURY = '0xA2e17FFB1EEd1222CaB7651F1c762833e0f20f31';
+    const transferData = '0xa9059cbb'
+      + TREASURY.replace('0x','').padStart(64,'0')
+      + Math.floor(priceWei).toString(16).padStart(64,'0');
     const txHash = await provider.request({
       method: 'eth_sendTransaction',
-      params: [{ from: accounts[0], to: CONTRACT, value: '0x' + priceWei.toString(16), gas: '0x5208' }]
+      params: [{ from: accounts[0], to: RELIQT_ADDR, data: transferData, gas: '0xC350' }]
     });
 
     showToast('info', 'Transaction sent! Revealing...');
@@ -2313,12 +2318,12 @@ if ('serviceWorker' in navigator) {
 // ══════════════════════════════════════
 const TRADE_TOKENS = [
   {id:0,symbol:'rLEBRON',name:'LeBron James',set:'2003 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.001,cardValue:12400,supply:10000,change:0,volume:0,pop:12,address:'0x2e3b2b122bae8B2cb325C2cb2C414854927f44a5',pool:'0xa568a959Aa287F9004DBe9C5402b581083A0dc6f',live:true},
-  {id:1,symbol:'rMAHOMES',name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,supply:10000,change:1.8,volume:312000,pop:8,address:'0x9e89159aB6763baed111980A809D53663D2c35b4'},
-  {id:2,symbol:'rHAALAND',name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,supply:10000,change:1.3,volume:540000,pop:6,address:'0xaE67C945523F03BE4bd1fC32888161447a75ef13'},
-  {id:3,symbol:'rCHARIZARD',name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,supply:10000,change:2.1,volume:1200000,pop:3,address:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902'},
-  {id:4,symbol:'rPIKACHU',name:'Pikachu Illustrator',set:'1998 CoroCoro Promo',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,supply:10000,change:0.5,volume:280000,pop:1,address:'0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63'},
-  {id:5,symbol:'rMEWTWO',name:'Mewtwo Holo 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,supply:10000,change:3.7,volume:680000,pop:5,address:'0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B'},
-  {id:6,symbol:'rWEMBY',name:'Victor Wembanyama',set:'2023 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,supply:10000,change:6.1,volume:920000,pop:15,address:'0xBd057659a966BC7acfE26798FcB320595C553754'},
+  {id:1,symbol:'rMAHOMES',name:'Patrick Mahomes',set:'2017 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏈',price:0.82,cardValue:8200,supply:10000,change:1.8,volume:312000,pop:8,address:'0x9e89159aB6763baed111980A809D53663D2c35b4',live:true,pool:'0x9e89159aB6763baed111980A809D53663D2c35b4'},
+  {id:2,symbol:'rHAALAND',name:'Erling Haaland',set:'2019 Topps Chrome RC',grade:'PSA 10',cat:'sport',emoji:'⚽',price:2.10,cardValue:21000,supply:10000,change:1.3,volume:540000,pop:6,address:'0xaE67C945523F03BE4bd1fC32888161447a75ef13',live:true,pool:'0xaE67C945523F03BE4bd1fC32888161447a75ef13'},
+  {id:3,symbol:'rCHARIZARD',name:'Charizard Base Set',set:'1999 Shadowless 1st Ed',grade:'PSA 9',cat:'pokemon',emoji:'🔥',price:4.75,cardValue:47500,supply:10000,change:2.1,volume:1200000,pop:3,address:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902',live:true,pool:'0x22Ac18Fd398e3040FE61854229ff1e4265F57902'},
+  {id:4,symbol:'rPIKACHU',name:'Pikachu Illustrator',set:'1998 CoroCoro Promo',grade:'PSA 10',cat:'pokemon',emoji:'⚡',price:12.00,cardValue:120000,supply:10000,change:0.5,volume:280000,pop:1,address:'0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63',live:true,pool:'0x6b97a7dCDE79d5Fa80FfC9774925A09c2Af2dd63'},
+  {id:5,symbol:'rMEWTWO',name:'Mewtwo Holo 1st Ed',set:'1999 Base Set',grade:'PSA 10',cat:'pokemon',emoji:'🟣',price:3.20,cardValue:32000,supply:10000,change:3.7,volume:680000,pop:5,address:'0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B',live:true,pool:'0xc2cfC8889Bf71b068AE51E4dC33ecA9f2B57479B'},
+  {id:6,symbol:'rWEMBY',name:'Victor Wembanyama',set:'2023 Panini Prizm RC',grade:'PSA 10',cat:'sport',emoji:'🏀',price:0.36,cardValue:3600,supply:10000,change:6.1,volume:920000,pop:15,address:'0xBd057659a966BC7acfE26798FcB320595C553754',live:true,pool:'0xBd057659a966BC7acfE26798FcB320595C553754'},
 ];
 
 const RELIQT_FACTORY = '0x48DC7247e6F7578c48090504c241635fd0299d80';
@@ -2428,7 +2433,7 @@ function trCalc() {
   const usdc = parseFloat(document.getElementById('trAmtIn').value) || 0;
   const tokens = usdc / trCurrentToken.price;
   document.getElementById('trAmtOut').value = tokens > 0 ? tokens.toFixed(4) : '';
-  document.getElementById('trSumTotal').textContent = '$' + usdc.toFixed(2);
+  document.getElementById('trSumTotal').textContent = usdc.toFixed(4) + ' $RELIQT';
   const slider = document.getElementById('trSlider');
   const pct = Math.min((usdc / 1000) * 100, 100);
   slider.value = pct;
@@ -2454,7 +2459,7 @@ function trSetTab(tab) {
 
 // ── UNISWAP SWAP ROUTER (Base Mainnet) ──
 const SWAP_ROUTER     = '0x2626664c2603336E57B271c5C0b26F421741e481'; // SwapRouter02 Base
-const USDC_BASE       = '0x833589fCd6eDb6E08f4c7C32D4f71b54bdA02913';
+const USDC_BASE       = '0xB95fBdDa7787DB5835A63E72e42ee19a0a419ba3'; // $RELIQT token (pair)
 const FEE_TIER        = 10000; // 1%
 
 function hexPad(val, bytes=32) {
@@ -2508,7 +2513,7 @@ async function trExecute() {
     const provider = getProvider();
     const tokenIn  = isBuy ? USDC_BASE : t.address;
     const tokenOut = isBuy ? t.address : USDC_BASE;
-    const decimalsIn = isBuy ? 6 : 18;
+    const decimalsIn = 18; // both $RELIQT and rTOKEN are 18 decimals
     const amountIn = BigInt(Math.floor(amt * 10**decimalsIn));
     const deadline = Math.floor(Date.now()/1000) + 1200; // 20 min
 
@@ -2556,7 +2561,7 @@ async function trExecute() {
       // Refresh USDC balance
       const bal = await getERC20Balance(USDC_BASE, currentUser.address);
       const el = document.getElementById('trBalIn');
-      if (el) el.textContent = (Number(bal)/1e6).toFixed(2) + ' USDC';
+      if (el) el.textContent = (Number(bal)/1e18).toFixed(4) + ' $RELIQT';
       // Link to BaseScan
       setTimeout(() => {
         if (confirm('View on BaseScan?')) window.open('https://basescan.org/tx/' + txHash, '_blank');
@@ -2578,7 +2583,7 @@ async function loadTradeBalance() {
   try {
     const bal = await getERC20Balance(USDC_BASE, currentUser.address);
     const el = document.getElementById('trBalIn');
-    if (el) el.textContent = (Number(bal)/1e6).toFixed(2) + ' USDC';
+    if (el) el.textContent = (Number(bal)/1e18).toFixed(4) + ' $RELIQT';
   } catch(e) {}
 }
 
